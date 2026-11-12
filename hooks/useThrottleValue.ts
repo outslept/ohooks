@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   type ThrottledFunction,
-  type UseThrottleOptions,
+  type ThrottleOptions,
   useThrottleCallback,
 } from './useThrottleCallback';
 import { useUpdateEffect } from './useUpdateEffect';
@@ -9,7 +9,7 @@ import { useUpdateEffect } from './useUpdateEffect';
 export function useThrottleValue<T>(
   value: T,
   wait: number,
-  options?: UseThrottleOptions,
+  options?: ThrottleOptions,
 ): [T, ThrottledFunction<(value: T) => void>] {
   const [throttledValue, setThrottledValue] = useState<T>(value);
 

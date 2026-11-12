@@ -79,7 +79,7 @@ export function useEventListener<
 >(
   eventName: K,
   handler: (event: E) => void,
-  element: EventListenerTarget<
+  element?: EventListenerTarget<
     T extends HTMLElement | SVGElement | Window | Document | MediaQueryList
       ? never
       : T

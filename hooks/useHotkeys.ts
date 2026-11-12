@@ -138,11 +138,12 @@ function isEditableElement(target: EventTarget | null): boolean {
   );
 }
 
-function matchesHotkey(
+export function matchesHotkey(
+  hotkey: string | ParsedHotkey,
   event: KeyboardEvent,
-  parsed: ParsedHotkey,
-  isMac: boolean
+  isMac: boolean = isMacPlatform()
 ): boolean {
+  const parsed = typeof hotkey === 'string' ? parseHotkey(hotkey) : hotkey;
   const expectCtrl = parsed.ctrl || (parsed.mod && !isMac);
   const expectMeta = parsed.meta || (parsed.mod && isMac);
 
@@ -221,7 +222,7 @@ export function useHotkeys(
       }
 
       for (const parsed of combos) {
-        if (matchesHotkey(keyboardEvent, parsed, isMac)) {
+        if (matchesHotkey(parsed, keyboardEvent, isMac)) {
           if (preventDefault) {
             keyboardEvent.preventDefault();
           }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   type DebouncedFunction,
-  type UseDebounceOptions,
+  type DebounceOptions,
   useDebounceCallback,
 } from './useDebounceCallback';
 import { useUpdateEffect } from './useUpdateEffect';
@@ -9,7 +9,7 @@ import { useUpdateEffect } from './useUpdateEffect';
 export function useDebounceValue<T>(
   value: T,
   delay: number,
-  options?: UseDebounceOptions,
+  options?: DebounceOptions,
 ): [T, DebouncedFunction<(value: T) => void>] {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 

@@ -79,3 +79,5 @@ export function useKeyPress(
 
   return isPressed;
 }
+
+export default useKeyPress;
