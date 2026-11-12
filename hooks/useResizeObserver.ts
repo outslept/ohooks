@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { type EventListenerTarget } from './useEventListener';
 import { useLatest } from './useLatest';
 
-export interface UseResizeObserverOptions {
-  box?: ResizeObserverBoxOptions;
+export interface UseResizeObserverOptions extends ResizeObserverOptions {
   enabled?: boolean;
-  onResize?: (entry: ResizeObserverEntry) => void;
 }
 
 function resolveElement<T extends Element>(
@@ -22,12 +20,11 @@ function resolveElement<T extends Element>(
 
 export function useResizeObserver<T extends Element = HTMLElement>(
   target: EventListenerTarget<T>,
+  callback: ResizeObserverCallback,
   options: UseResizeObserverOptions = {},
-): ResizeObserverEntry | null {
-  const { box = 'content-box', enabled = true, onResize } = options;
-
-  const [entry, setEntry] = useState<ResizeObserverEntry | null>(null);
-  const onResizeRef = useLatest(onResize);
+): void {
+  const { box = 'content-box', enabled = true } = options;
+  const callbackRef = useLatest(callback);
 
   useEffect(() => {
     const element = resolveElement(target);
@@ -41,14 +38,8 @@ export function useResizeObserver<T extends Element = HTMLElement>(
       return;
     }
 
-    const observer = new ResizeObserver((entries) => {
-      const latestEntry = entries[0];
-      if (!latestEntry) {
-        return;
-      }
-
-      setEntry(latestEntry);
-      onResizeRef.current?.(latestEntry);
+    const observer = new ResizeObserver((entries, obs) => {
+      callbackRef.current(entries, obs);
     });
 
     observer.observe(element, { box });
@@ -56,7 +47,5 @@ export function useResizeObserver<T extends Element = HTMLElement>(
     return () => {
       observer.disconnect();
     };
-  }, [target, box, enabled, onResizeRef]);
-
-  return entry;
+  }, [target, box, enabled, callbackRef]);
 }
