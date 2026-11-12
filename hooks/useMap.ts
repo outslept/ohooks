@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useEventCallback } from './useEventCallback';
 
 export interface UseMapActions<K, V> {
@@ -55,13 +55,19 @@ export function useMap<K, V>(
     setMap(() => new Map(initialValue));
   });
 
-  const get = useEventCallback((key: K): V | undefined => {
-    return map.get(key);
-  });
+  const get = useCallback(
+    (key: K): V | undefined => {
+      return map.get(key);
+    },
+    [map],
+  );
 
-  const has = useEventCallback((key: K): boolean => {
-    return map.has(key);
-  });
+  const has = useCallback(
+    (key: K): boolean => {
+      return map.has(key);
+    },
+    [map],
+  );
 
   return [
     map,
