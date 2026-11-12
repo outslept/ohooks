@@ -15,7 +15,10 @@
     "test:chromium": "vitest run --project=chromium",
     "test:firefox": "vitest run --project=firefox",
     "test:webkit": "vitest run --project=webkit",
-    "test:silent": "vitest run --silent --reporter=dot"
+    "test:silent": "vitest run --silent --reporter=dot",
+    "registry:generate": "node scripts/generate-registry.ts",
+    "registry:validate": "npx shadcn@latest registry validate .",
+    "registry:build": "npm run registry:generate && npx shadcn@latest build"
   },
   "dependencies": {
     "cn": "^0.5.2",
