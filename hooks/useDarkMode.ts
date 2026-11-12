@@ -1,75 +1,88 @@
-import { useEventCallback } from './useEventCallback';
-import { type EventListenerTarget } from './useEventListener';
+import { useCallback } from 'react';
+import {
+  EventListenerTarget,
+  resolveTargetElement,
+} from './useEventListener';
+import { useHydrated } from './useHydrated';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useLocalStorage } from './useLocalStorage';
 import { useMediaQuery } from './useMediaQuery';
 
+export type ColorSchemePreference = 'light' | 'dark' | 'system';
+
 export interface UseDarkModeOptions {
   defaultValue?: boolean;
-  localStorageKey?: string;
-  initializeWithValue?: boolean;
-  applyDarkClass?: boolean;
+  storageKey?: string;
   darkClassName?: string;
+  applyDarkClass?: boolean;
   target?: EventListenerTarget<HTMLElement>;
+  initializeWithValue?: boolean;
 }
 
 export interface UseDarkModeReturn {
   isDarkMode: boolean;
+  preference: ColorSchemePreference;
+  toggle: () => void;
   enable: () => void;
   disable: () => void;
-  toggle: () => void;
-  set: (value: boolean) => void;
-  reset: () => void;
+  setPreference: (preference: ColorSchemePreference) => void;
+  resetToSystem: () => void;
 }
 
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 
-function resolveElement(
-  target?: EventListenerTarget<HTMLElement>,
-): HTMLElement | null {
-  if (typeof document === 'undefined') {
-    return null;
-  }
-  if (target === undefined) {
-    return document.documentElement;
-  }
-  if (target === null) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
-}
-
 export function useDarkMode(
-  options: UseDarkModeOptions = {},
+  options: UseDarkModeOptions = {}
 ): UseDarkModeReturn {
   const {
     defaultValue = false,
-    localStorageKey = 'use-dark-mode',
-    initializeWithValue = true,
-    applyDarkClass = true,
+    storageKey = 'color-scheme-preference',
     darkClassName = 'dark',
+    applyDarkClass = true,
     target,
+    initializeWithValue = false,
   } = options;
 
-  const isDarkOS = useMediaQuery(COLOR_SCHEME_QUERY, {
+  const isHydrated = useHydrated();
+  const isSystemDark = useMediaQuery(COLOR_SCHEME_QUERY, {
     defaultValue,
+    initializeWithValue,
   });
 
-  const [storedValue, setStoredValue, removeStoredValue] = useLocalStorage<
-    boolean | null
-  >(localStorageKey, null, { initializeWithValue });
+  const [preference, setPreference] = useLocalStorage<ColorSchemePreference>(
+    storageKey,
+    'system',
+    { initializeWithValue }
+  );
 
-  const isDarkMode = storedValue ?? isDarkOS;
+  const resolvedDarkMode =
+    preference === 'system' ? isSystemDark : preference === 'dark';
+
+  const isDarkMode =
+    initializeWithValue || isHydrated ? resolvedDarkMode : defaultValue;
+
+  const enable = useCallback(() => {
+    setPreference('dark');
+  }, [setPreference]);
+
+  const disable = useCallback(() => {
+    setPreference('light');
+  }, [setPreference]);
+
+  const toggle = useCallback(() => {
+    setPreference(resolvedDarkMode ? 'light' : 'dark');
+  }, [resolvedDarkMode, setPreference]);
+
+  const resetToSystem = useCallback(() => {
+    setPreference('system');
+  }, [setPreference]);
 
   useIsomorphicLayoutEffect(() => {
-    if (!applyDarkClass) {
+    if (!applyDarkClass || !darkClassName || typeof document === 'undefined') {
       return;
     }
 
-    const element = resolveElement(target);
+    const element = resolveTargetElement(target, document.documentElement);
     if (!element) {
       return;
     }
@@ -79,34 +92,21 @@ export function useDarkMode(
     } else {
       element.classList.remove(darkClassName);
     }
-  }, [applyDarkClass, darkClassName, isDarkMode, target]);
 
-  const enable = useEventCallback(() => {
-    setStoredValue(true);
-  });
-
-  const disable = useEventCallback(() => {
-    setStoredValue(false);
-  });
-
-  const toggle = useEventCallback(() => {
-    setStoredValue((prev) => !(prev ?? isDarkOS));
-  });
-
-  const set = useEventCallback((value: boolean) => {
-    setStoredValue(value);
-  });
-
-  const reset = useEventCallback(() => {
-    removeStoredValue();
-  });
+    return () => {
+      element.classList.remove(darkClassName);
+    };
+  }, [isDarkMode, applyDarkClass, darkClassName, target]);
 
   return {
     isDarkMode,
+    preference,
+    toggle,
     enable,
     disable,
-    toggle,
-    set,
-    reset,
+    setPreference,
+    resetToSystem,
   };
 }
+
+export default useDarkMode;
