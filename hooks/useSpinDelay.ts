@@ -1,80 +1,90 @@
 import { useEffect, useRef, useState } from 'react';
+import { useHydrated } from './useHydrated';
 
-export interface UseSpinDelayOptions {
+export interface SpinDelayOptions {
   delay?: number;
   minDuration?: number;
   ssr?: boolean;
 }
 
+type SpinState = 'IDLE' | 'DELAY' | 'DISPLAY' | 'EXPIRE';
+
 export function useSpinDelay(
-  isLoading: boolean,
-  options: UseSpinDelayOptions = {},
+  loading: boolean,
+  options: SpinDelayOptions = {}
 ): boolean {
-  const { delay = 150, minDuration = 300, ssr = false } = options;
+  const { delay = 500, minDuration = 200, ssr = true } = options;
+  const isHydrated = useHydrated();
 
-  const initiallyVisible =
-    isLoading && (delay <= 0 || (ssr && typeof window === 'undefined'));
+  const [state, setState] = useState<SpinState>(() => {
+    if (ssr && loading) {
+      return 'DISPLAY';
+    }
+    return loading ? 'DELAY' : 'IDLE';
+  });
 
-  const [isSpinning, setIsSpinning] = useState<boolean>(initiallyVisible);
-  const isSpinningRef = useRef<boolean>(initiallyVisible);
-  const shownAtRef = useRef<number | null>(
-    initiallyVisible ? Date.now() : null,
-  );
+  const timeoutRef: { current: ReturnType<typeof setTimeout> | null } =
+    useRef(null);
+
+  const clearTimer = () => {
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
 
   useEffect(() => {
-    const safeDelay = Math.max(0, delay);
-    const safeMinDuration = Math.max(0, minDuration);
-
-    if (isLoading) {
-      if (isSpinningRef.current) {
-        return;
-      }
-
+    if (loading && state === 'IDLE') {
+      clearTimer();
+      const safeDelay = Math.max(0, delay);
       if (safeDelay === 0) {
-        shownAtRef.current = Date.now();
-        isSpinningRef.current = true;
-        setIsSpinning(true);
-        return;
+        setState('DISPLAY');
+      } else {
+        setState('DELAY');
+        timeoutRef.current = setTimeout(() => {
+          setState('DISPLAY');
+        }, safeDelay);
       }
-
-      const timerId = setTimeout(() => {
-        shownAtRef.current = Date.now();
-        isSpinningRef.current = true;
-        setIsSpinning(true);
-      }, safeDelay);
-
-      return () => {
-        clearTimeout(timerId);
-      };
+    } else if (loading && state === 'DELAY' && timeoutRef.current === null) {
+      const safeDelay = Math.max(0, delay);
+      if (safeDelay === 0) {
+        setState('DISPLAY');
+      } else {
+        timeoutRef.current = setTimeout(() => {
+          setState('DISPLAY');
+        }, safeDelay);
+      }
+    } else if (!loading && state === 'DELAY') {
+      clearTimer();
+      setState('IDLE');
+    } else if (!loading && state === 'DISPLAY') {
+      clearTimer();
+      const safeMinDuration = Math.max(0, minDuration);
+      if (safeMinDuration === 0) {
+        setState('IDLE');
+      } else {
+        setState('EXPIRE');
+        timeoutRef.current = setTimeout(() => {
+          setState('IDLE');
+        }, safeMinDuration);
+      }
+    } else if (loading && state === 'EXPIRE') {
+      clearTimer();
+      setState('DISPLAY');
     }
+  }, [loading, state, delay, minDuration]);
 
-    if (!isSpinningRef.current) {
-      return;
-    }
-
-    const elapsed =
-      shownAtRef.current !== null
-        ? Date.now() - shownAtRef.current
-        : safeMinDuration;
-    const remaining = Math.max(0, safeMinDuration - elapsed);
-
-    if (remaining === 0) {
-      shownAtRef.current = null;
-      isSpinningRef.current = false;
-      setIsSpinning(false);
-      return;
-    }
-
-    const timerId = setTimeout(() => {
-      shownAtRef.current = null;
-      isSpinningRef.current = false;
-      setIsSpinning(false);
-    }, remaining);
-
+  useEffect(() => {
     return () => {
-      clearTimeout(timerId);
+      clearTimer();
     };
-  }, [isLoading, delay, minDuration]);
+  }, []);
 
-  return isSpinning;
+  if (!isHydrated && ssr) {
+    return loading;
+  }
+
+  return state === 'DISPLAY' || state === 'EXPIRE';
 }
+
+export default useSpinDelay;
