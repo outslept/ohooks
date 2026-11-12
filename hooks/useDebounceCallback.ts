@@ -1,8 +1,7 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useLatest } from './useLatest';
-import { useUnmount } from './useUnmount';
 
-export interface UseDebounceOptions {
+export interface DebounceOptions {
   leading?: boolean;
   trailing?: boolean;
   maxWait?: number;
@@ -18,21 +17,24 @@ export interface DebouncedFunction<T extends (...args: never[]) => unknown> {
 export function useDebounceCallback<T extends (...args: never[]) => unknown>(
   fn: T,
   delay: number,
-  options: UseDebounceOptions = {},
+  options: DebounceOptions = {}
 ): DebouncedFunction<T> {
   const { leading = false, trailing = true, maxWait } = options;
 
   const fnRef = useLatest(fn);
-  const timerIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastCallTimeRef = useRef<number | null>(null);
-  const lastInvokeTimeRef = useRef<number>(0);
-  const lastArgsRef = useRef<Parameters<T> | null>(null);
-  const resultRef = useRef<ReturnType<T> | undefined>(undefined);
+  const timerIdRef: { current: ReturnType<typeof setTimeout> | null } =
+    useRef(null);
+  const lastArgsRef: { current: Parameters<T> | null } = useRef(null);
+  const lastCallTimeRef: { current: number | null } = useRef(null);
+  const lastInvokeTimeRef: { current: number } = useRef(0);
+  const resultRef: { current: ReturnType<T> | undefined } = useRef(undefined);
 
-  const debounced = useMemo(() => {
-    const wait = Math.max(0, delay);
-    const maxing = maxWait !== undefined;
-    const maxWaitTime = maxing ? Math.max(maxWait, wait) : 0;
+  const debounced = useMemo<DebouncedFunction<T>>(() => {
+    const safeDelay = Math.max(0, delay);
+    const hasMaxWait = maxWait !== undefined;
+    const safeMaxWait = hasMaxWait
+      ? Math.max(safeDelay, maxWait)
+      : undefined;
 
     const invokeFunc = (time: number): ReturnType<T> | undefined => {
       const args = lastArgsRef.current;
@@ -44,6 +46,24 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
       return resultRef.current;
     };
 
+    const startTimer = (
+      pendingFunc: () => void,
+      wait: number
+    ): ReturnType<typeof setTimeout> => {
+      return setTimeout(pendingFunc, wait);
+    };
+
+    const remainingWait = (time: number): number => {
+      const timeSinceLastCall =
+        time - (lastCallTimeRef.current ?? time);
+      const timeSinceLastInvoke = time - lastInvokeTimeRef.current;
+      const timeWaiting = safeDelay - timeSinceLastCall;
+
+      return safeMaxWait !== undefined
+        ? Math.min(timeWaiting, safeMaxWait - timeSinceLastInvoke)
+        : timeWaiting;
+    };
+
     const shouldInvoke = (time: number): boolean => {
       if (lastCallTimeRef.current === null) {
         return true;
@@ -52,21 +72,10 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
       const timeSinceLastInvoke = time - lastInvokeTimeRef.current;
 
       return (
-        timeSinceLastCall >= wait ||
+        timeSinceLastCall >= safeDelay ||
         timeSinceLastCall < 0 ||
-        (maxing && timeSinceLastInvoke >= maxWaitTime)
+        (safeMaxWait !== undefined && timeSinceLastInvoke >= safeMaxWait)
       );
-    };
-
-    const remainingWait = (time: number): number => {
-      const timeSinceLastCall =
-        lastCallTimeRef.current === null ? 0 : time - lastCallTimeRef.current;
-      const timeSinceLastInvoke = time - lastInvokeTimeRef.current;
-      const timeWaiting = wait - timeSinceLastCall;
-
-      return maxing
-        ? Math.min(timeWaiting, maxWaitTime - timeSinceLastInvoke)
-        : timeWaiting;
     };
 
     const trailingEdge = (time: number): ReturnType<T> | undefined => {
@@ -75,7 +84,6 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
       if (trailing && lastArgsRef.current !== null) {
         return invokeFunc(time);
       }
-
       lastArgsRef.current = null;
       return resultRef.current;
     };
@@ -86,12 +94,12 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
         trailingEdge(time);
         return;
       }
-      timerIdRef.current = setTimeout(timerExpired, remainingWait(time));
+      timerIdRef.current = startTimer(timerExpired, remainingWait(time));
     };
 
     const leadingEdge = (time: number): ReturnType<T> | undefined => {
       lastInvokeTimeRef.current = time;
-      timerIdRef.current = setTimeout(timerExpired, wait);
+      timerIdRef.current = startTimer(timerExpired, safeDelay);
       return leading ? invokeFunc(time) : resultRef.current;
     };
 
@@ -109,6 +117,8 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
       if (timerIdRef.current === null) {
         return resultRef.current;
       }
+      clearTimeout(timerIdRef.current);
+      timerIdRef.current = null;
       return trailingEdge(Date.now());
     };
 
@@ -116,9 +126,7 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
       return timerIdRef.current !== null;
     };
 
-    const debouncedFn = (
-      ...args: Parameters<T>
-    ): ReturnType<T> | undefined => {
+    const debouncedFn = (...args: Parameters<T>): ReturnType<T> | undefined => {
       const time = Date.now();
       const isInvoking = shouldInvoke(time);
 
@@ -127,17 +135,17 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
 
       if (isInvoking) {
         if (timerIdRef.current === null) {
-          return leadingEdge(time);
+          return leadingEdge(lastCallTimeRef.current);
         }
-        if (maxing) {
+        if (safeMaxWait !== undefined) {
           clearTimeout(timerIdRef.current);
-          timerIdRef.current = setTimeout(timerExpired, wait);
-          return invokeFunc(time);
+          timerIdRef.current = startTimer(timerExpired, safeDelay);
+          return invokeFunc(lastCallTimeRef.current);
         }
       }
 
       if (timerIdRef.current === null) {
-        timerIdRef.current = setTimeout(timerExpired, wait);
+        timerIdRef.current = startTimer(timerExpired, safeDelay);
       }
 
       return resultRef.current;
@@ -150,9 +158,13 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
     return debouncedFn;
   }, [delay, leading, trailing, maxWait, fnRef]);
 
-  useUnmount(() => {
-    debounced.cancel();
-  });
+  useEffect(() => {
+    return () => {
+      debounced.cancel();
+    };
+  }, [debounced]);
 
   return debounced;
 }
+
+export default useDebounceCallback;
