@@ -1,8 +1,7 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useLatest } from './useLatest';
-import { useUnmount } from './useUnmount';
 
-export interface UseThrottleOptions {
+export interface ThrottleOptions {
   leading?: boolean;
   trailing?: boolean;
 }
@@ -17,33 +16,34 @@ export interface ThrottledFunction<T extends (...args: never[]) => unknown> {
 export function useThrottleCallback<T extends (...args: never[]) => unknown>(
   fn: T,
   wait: number,
-  options: UseThrottleOptions = {},
+  options: ThrottleOptions = {}
 ): ThrottledFunction<T> {
   const { leading = true, trailing = true } = options;
 
   const fnRef = useLatest(fn);
-  const timerIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastInvokeTimeRef = useRef<number>(0);
-  const lastArgsRef = useRef<Parameters<T> | null>(null);
-  const resultRef = useRef<ReturnType<T> | undefined>(undefined);
+  const timerIdRef: { current: ReturnType<typeof setTimeout> | null } =
+    useRef(null);
+  const lastArgsRef: { current: Parameters<T> | null } = useRef(null);
+  const lastInvokeTimeRef: { current: number } = useRef(0);
+  const resultRef: { current: ReturnType<T> | undefined } = useRef(undefined);
 
-  const throttled = useMemo(() => {
-    const interval = Math.max(0, wait);
+  const throttled = useMemo<ThrottledFunction<T>>(() => {
+    const safeWait = Math.max(0, wait);
 
-    const invokeFunc = (
-      time: number,
-      args: Parameters<T>,
-    ): ReturnType<T> | undefined => {
-      lastInvokeTimeRef.current = time;
+    const invokeFunc = (time: number): ReturnType<T> | undefined => {
+      const args = lastArgsRef.current;
       lastArgsRef.current = null;
-      resultRef.current = fnRef.current(...args) as ReturnType<T>;
+      lastInvokeTimeRef.current = time;
+      if (args !== null) {
+        resultRef.current = fnRef.current(...args) as ReturnType<T>;
+      }
       return resultRef.current;
     };
 
-    const trailingEdge = (): ReturnType<T> | undefined => {
+    const trailingEdge = (time: number): ReturnType<T> | undefined => {
       timerIdRef.current = null;
       if (trailing && lastArgsRef.current !== null) {
-        return invokeFunc(leading ? Date.now() : 0, lastArgsRef.current);
+        return invokeFunc(time);
       }
       lastArgsRef.current = null;
       return resultRef.current;
@@ -63,46 +63,36 @@ export function useThrottleCallback<T extends (...args: never[]) => unknown>(
         return resultRef.current;
       }
       clearTimeout(timerIdRef.current);
-      return trailingEdge();
+      timerIdRef.current = null;
+      return trailingEdge(Date.now());
     };
 
     const isPending = (): boolean => {
       return timerIdRef.current !== null;
     };
 
-    const throttledFn = (
-      ...args: Parameters<T>
-    ): ReturnType<T> | undefined => {
-      if (!leading && !trailing) {
-        return resultRef.current;
-      }
-
+    const throttledFn = (...args: Parameters<T>): ReturnType<T> | undefined => {
       const now = Date.now();
-      const isFirstCall = lastInvokeTimeRef.current === 0;
 
-      if (isFirstCall && !leading) {
+      if (lastInvokeTimeRef.current === 0 && !leading) {
         lastInvokeTimeRef.current = now;
       }
 
-      const remaining = interval - (now - lastInvokeTimeRef.current);
+      const remaining = safeWait - (now - lastInvokeTimeRef.current);
       lastArgsRef.current = args;
 
-      if (
-        (!isFirstCall || leading) &&
-        (remaining <= 0 || remaining > interval)
-      ) {
+      if (remaining <= 0 || remaining > safeWait) {
         if (timerIdRef.current !== null) {
           clearTimeout(timerIdRef.current);
           timerIdRef.current = null;
         }
-        return invokeFunc(now, args);
+        return invokeFunc(now);
       }
 
       if (timerIdRef.current === null && trailing) {
-        timerIdRef.current = setTimeout(
-          trailingEdge,
-          Math.max(0, remaining),
-        );
+        timerIdRef.current = setTimeout(() => {
+          trailingEdge(Date.now());
+        }, remaining);
       }
 
       return resultRef.current;
@@ -115,9 +105,13 @@ export function useThrottleCallback<T extends (...args: never[]) => unknown>(
     return throttledFn;
   }, [wait, leading, trailing, fnRef]);
 
-  useUnmount(() => {
-    throttled.cancel();
-  });
+  useEffect(() => {
+    return () => {
+      throttled.cancel();
+    };
+  }, [throttled]);
 
   return throttled;
 }
+
+export default useThrottleCallback;
