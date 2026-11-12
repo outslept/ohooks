@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLatest } from './useLatest';
 
 export interface AnimationFrameInfo {
@@ -8,59 +8,130 @@ export interface AnimationFrameInfo {
 }
 
 export interface UseAnimationFrameOptions {
-  enabled?: boolean;
+  immediate?: boolean;
   fpsLimit?: number;
+}
+
+export interface UseAnimationFrameControls {
+  start: () => void;
+  stop: () => void;
+  toggle: () => void;
+  isActive: boolean;
 }
 
 export function useAnimationFrame(
   callback: (info: AnimationFrameInfo) => void,
-  options: boolean | UseAnimationFrameOptions = true,
-): void {
-  const normalizedOptions: UseAnimationFrameOptions =
-    typeof options === 'boolean' ? { enabled: options } : options;
+  options: UseAnimationFrameOptions = {}
+): UseAnimationFrameControls {
+  const { immediate = true, fpsLimit } = options;
 
-  const { enabled = true, fpsLimit } = normalizedOptions;
   const callbackRef = useLatest(callback);
+  const fpsLimitRef = useLatest(fpsLimit);
 
-  useEffect(() => {
-    if (
-      !enabled ||
-      typeof window === 'undefined' ||
-      typeof window.requestAnimationFrame !== 'function'
-    ) {
-      return;
+  const [isActive, setIsActive] = useState<boolean>(immediate);
+  const isActiveRef: { current: boolean } = useRef(immediate);
+  const rafIdRef: { current: number | null } = useRef(null);
+  const startTimeRef: { current: number | null } = useRef(null);
+  const previousTimeRef: { current: number | null } = useRef(null);
+
+  const cancelFrame = useCallback(() => {
+    if (rafIdRef.current !== null && typeof window !== 'undefined') {
+      window.cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
     }
+  }, []);
 
-    let frameId = 0;
-    let startTime: DOMHighResTimeStamp | null = null;
-    let prevTime: DOMHighResTimeStamp | null = null;
+  const step = useCallback(
+    (timestamp: DOMHighResTimeStamp) => {
+      if (!isActiveRef.current) return;
 
-    const minFrameInterval =
-      fpsLimit !== undefined && fpsLimit > 0 ? 1000 / fpsLimit : 0;
-
-    const loop = (timestamp: DOMHighResTimeStamp): void => {
-      if (startTime === null) {
-        startTime = timestamp;
+      if (startTimeRef.current === null) {
+        startTimeRef.current = timestamp;
       }
 
-      const deltaTime = prevTime === null ? 0 : timestamp - prevTime;
+      if (previousTimeRef.current === null) {
+        previousTimeRef.current = timestamp;
+        callbackRef.current({
+          timestamp,
+          deltaTime: 0,
+          elapsedTime: 0,
+        });
+      } else {
+        const deltaTime = timestamp - previousTimeRef.current;
+        const currentFpsLimit = fpsLimitRef.current;
 
-      if (prevTime === null || deltaTime >= minFrameInterval) {
-        prevTime = timestamp;
+        if (currentFpsLimit !== undefined && currentFpsLimit > 0) {
+          const minFrameInterval = 1000 / currentFpsLimit;
+          if (deltaTime < minFrameInterval) {
+            rafIdRef.current = window.requestAnimationFrame(step);
+            return;
+          }
+          previousTimeRef.current =
+            timestamp - (deltaTime % minFrameInterval);
+        } else {
+          previousTimeRef.current = timestamp;
+        }
+
+        const elapsedTime = timestamp - startTimeRef.current;
         callbackRef.current({
           timestamp,
           deltaTime,
-          elapsedTime: timestamp - startTime,
+          elapsedTime,
         });
       }
 
-      frameId = window.requestAnimationFrame(loop);
-    };
+      if (isActiveRef.current && typeof window !== 'undefined') {
+        rafIdRef.current = window.requestAnimationFrame(step);
+      }
+    },
+    [callbackRef, fpsLimitRef]
+  );
 
-    frameId = window.requestAnimationFrame(loop);
+  const start = useCallback(() => {
+    if (isActiveRef.current) return;
+    isActiveRef.current = true;
+    setIsActive(true);
+  }, []);
+
+  const stop = useCallback(() => {
+    if (!isActiveRef.current) return;
+    isActiveRef.current = false;
+    cancelFrame();
+    startTimeRef.current = null;
+    previousTimeRef.current = null;
+    setIsActive(false);
+  }, [cancelFrame]);
+
+  const toggle = useCallback(() => {
+    if (isActiveRef.current) {
+      stop();
+    } else {
+      start();
+    }
+  }, [start, stop]);
+
+  useEffect(() => {
+    if (!isActive || typeof window === 'undefined') {
+      cancelFrame();
+      return;
+    }
+
+    isActiveRef.current = true;
+    startTimeRef.current = null;
+    previousTimeRef.current = null;
+    rafIdRef.current = window.requestAnimationFrame(step);
 
     return () => {
-      window.cancelAnimationFrame(frameId);
+      cancelFrame();
     };
-  }, [enabled, fpsLimit, callbackRef]);
+  }, [isActive, step, cancelFrame]);
+
+  return {
+    start,
+    stop,
+    toggle,
+    isActive,
+  };
 }
+
+export default useAnimationFrame;
