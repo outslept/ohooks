@@ -1,0 +1,58 @@
+import { type SetStateAction, useState } from 'react';
+import { useEventCallback } from './useEventCallback';
+
+export interface UseCounterOptions {
+  min?: number;
+  max?: number;
+}
+
+export interface UseCounterReturn {
+  count: number;
+  inc: (delta?: number) => void;
+  dec: (delta?: number) => void;
+  set: (value: SetStateAction<number>) => void;
+  reset: () => void;
+}
+
+function clamp(value: number, min?: number, max?: number): number {
+  let result = value;
+  if (min !== undefined && result < min) {
+    result = min;
+  }
+  if (max !== undefined && result > max) {
+    result = max;
+  }
+  return result;
+}
+
+export function useCounter(
+  initialValue = 0,
+  options: UseCounterOptions = {},
+): UseCounterReturn {
+  const { min, max } = options;
+
+  const [count, setCount] = useState<number>(() =>
+    clamp(initialValue, min, max),
+  );
+
+  const set = useEventCallback((value: SetStateAction<number>) => {
+    setCount((prev) => {
+      const nextValue = typeof value === 'function' ? value(prev) : value;
+      return clamp(nextValue, min, max);
+    });
+  });
+
+  const inc = useEventCallback((delta = 1) => {
+    set((prev) => prev + delta);
+  });
+
+  const dec = useEventCallback((delta = 1) => {
+    set((prev) => prev - delta);
+  });
+
+  const reset = useEventCallback(() => {
+    setCount(clamp(initialValue, min, max));
+  });
+
+  return { count, inc, dec, set, reset };
+}
