@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { type EventListenerTarget } from './useEventListener';
+import {
+  type EventListenerTarget,
+  resolveTargetElement,
+} from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import {
   type UseResizeObserverOptions,
@@ -12,20 +15,8 @@ export interface ElementSize {
 }
 
 export interface UseElementSizeOptions extends UseResizeObserverOptions {
-  initialWidth?: number;
-  initialHeight?: number;
-}
-
-function resolveElement<T extends Element>(
-  target: EventListenerTarget<T>,
-): T | null {
-  if (target === null || target === undefined) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
+  initialWidth?: number | undefined;
+  initialHeight?: number | undefined;
 }
 
 function measureElement(
@@ -97,7 +88,7 @@ export function useElementSize<T extends Element = HTMLElement>(
       return;
     }
 
-    const element = resolveElement(target);
+    const element = resolveTargetElement(target);
     if (!element) {
       return;
     }
