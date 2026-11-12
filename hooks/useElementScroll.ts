@@ -1,11 +1,13 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useEventCallback } from './useEventCallback';
 import {
   type EventListenerTarget,
+  resolveTargetElement,
   useEventListener,
 } from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useThrottleCallback } from './useThrottleCallback';
+import { useUnmount } from './useUnmount';
 
 export interface ScrollDirections {
   left: boolean;
@@ -22,20 +24,22 @@ export interface ScrollArrivedState {
 }
 
 export interface ScrollOffset {
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
+  top?: number | undefined;
+  bottom?: number | undefined;
+  left?: number | undefined;
+  right?: number | undefined;
 }
 
 export interface UseElementScrollOptions {
-  throttleMs?: number;
-  offset?: ScrollOffset;
+  throttleMs?: number | undefined;
+  idleDelayMs?: number | undefined;
+  offset?: ScrollOffset | undefined;
 }
 
 export interface UseElementScrollReturn {
   x: number;
   y: number;
+  isScrolling: boolean;
   directions: ScrollDirections;
   arrived: ScrollArrivedState;
   scrollTo: (xOrOptions: number | ScrollToOptions, y?: number) => void;
@@ -55,23 +59,11 @@ const INITIAL_ARRIVED: ScrollArrivedState = {
   right: false,
 };
 
-function resolveElement<T extends HTMLElement>(
-  target: EventListenerTarget<T>,
-): T | null {
-  if (!target) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
-}
-
 export function useElementScroll<T extends HTMLElement = HTMLElement>(
   target: EventListenerTarget<T>,
   options: UseElementScrollOptions = {},
 ): UseElementScrollReturn {
-  const { throttleMs = 0, offset } = options;
+  const { throttleMs = 0, idleDelayMs = 150, offset } = options;
   const topOffset = offset?.top ?? 0;
   const bottomOffset = offset?.bottom ?? 0;
   const leftOffset = offset?.left ?? 0;
@@ -80,19 +72,29 @@ export function useElementScroll<T extends HTMLElement = HTMLElement>(
   const [state, setState] = useState<{
     x: number;
     y: number;
+    isScrolling: boolean;
     directions: ScrollDirections;
     arrived: ScrollArrivedState;
   }>({
     x: 0,
     y: 0,
+    isScrolling: false,
     directions: INITIAL_DIRECTIONS,
     arrived: INITIAL_ARRIVED,
   });
 
   const prevScrollRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const updateScroll = useEventCallback(() => {
-    const element = resolveElement(target);
+  const clearIdleTimer = (): void => {
+    if (idleTimerRef.current !== null) {
+      clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    }
+  };
+
+  const measureScroll = useEventCallback((fromScrollEvent: boolean) => {
+    const element = resolveTargetElement(target);
     if (!element) {
       return;
     }
@@ -102,12 +104,14 @@ export function useElementScroll<T extends HTMLElement = HTMLElement>(
     const prevX = prevScrollRef.current.x;
     const prevY = prevScrollRef.current.y;
 
-    const directions: ScrollDirections = {
-      left: x < prevX,
-      right: x > prevX,
-      top: y < prevY,
-      bottom: y > prevY,
-    };
+    const directions: ScrollDirections = fromScrollEvent
+      ? {
+          left: x < prevX,
+          right: x > prevX,
+          top: y < prevY,
+          bottom: y > prevY,
+        }
+      : INITIAL_DIRECTIONS;
 
     const arrived: ScrollArrivedState = {
       top: y <= topOffset,
@@ -122,10 +126,24 @@ export function useElementScroll<T extends HTMLElement = HTMLElement>(
 
     prevScrollRef.current = { x, y };
 
+    if (fromScrollEvent) {
+      clearIdleTimer();
+      idleTimerRef.current = setTimeout(() => {
+        setState((prev) =>
+          prev.isScrolling
+            ? { ...prev, isScrolling: false, directions: INITIAL_DIRECTIONS }
+            : prev,
+        );
+      }, Math.max(0, idleDelayMs));
+    }
+
+    const nextIsScrolling = fromScrollEvent ? true : state.isScrolling;
+
     setState((prev) => {
       if (
         prev.x === x &&
         prev.y === y &&
+        prev.isScrolling === nextIsScrolling &&
         prev.arrived.top === arrived.top &&
         prev.arrived.bottom === arrived.bottom &&
         prev.arrived.left === arrived.left &&
@@ -137,29 +155,47 @@ export function useElementScroll<T extends HTMLElement = HTMLElement>(
       ) {
         return prev;
       }
-      return { x, y, directions, arrived };
+      return {
+        x,
+        y,
+        isScrolling: nextIsScrolling,
+        directions,
+        arrived,
+      };
     });
   });
 
-  const throttledUpdate = useThrottleCallback(updateScroll, throttleMs);
+  const onScrollUpdate = useEventCallback(() => {
+    measureScroll(true);
+  });
+
+  const throttledUpdate = useThrottleCallback(onScrollUpdate, throttleMs);
+
+  useEffect(() => {
+    if (throttleMs <= 0) {
+      throttledUpdate.cancel();
+    }
+  }, [throttleMs, throttledUpdate]);
 
   const handleScroll = (): void => {
     if (throttleMs > 0) {
       throttledUpdate();
     } else {
-      updateScroll();
+      onScrollUpdate();
     }
   };
 
   useEventListener('scroll', handleScroll, target, { passive: true });
 
   useIsomorphicLayoutEffect(() => {
-    updateScroll();
+    measureScroll(false);
   }, [target, topOffset, bottomOffset, leftOffset, rightOffset]);
+
+  useUnmount(clearIdleTimer);
 
   const scrollTo = useEventCallback(
     (xOrOptions: number | ScrollToOptions, y?: number) => {
-      const element = resolveElement(target);
+      const element = resolveTargetElement(target);
       if (!element) {
         return;
       }
@@ -175,6 +211,7 @@ export function useElementScroll<T extends HTMLElement = HTMLElement>(
   return {
     x: state.x,
     y: state.y,
+    isScrolling: state.isScrolling,
     directions: state.directions,
     arrived: state.arrived,
     scrollTo,
