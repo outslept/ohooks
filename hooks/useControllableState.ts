@@ -1,68 +1,93 @@
 import {
-  type Dispatch,
-  type SetStateAction,
+  Dispatch,
+  SetStateAction,
+  useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
-import { useEventCallback } from './useEventCallback';
+import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useLatest } from './useLatest';
 
-export interface UseControllableStateParams<T> {
-  value?: T;
-  defaultValue?: T | (() => T);
-  onChange?: (value: T) => void;
-}
-
-export function useControllableState<T>(params: {
+export interface UseControllableStateOptions<T> {
   value?: T;
   defaultValue: T | (() => T);
   onChange?: (value: T) => void;
-}): [T, Dispatch<SetStateAction<T>>];
+  shouldUpdate?: (prev: T, next: T) => boolean;
+}
 
 export function useControllableState<T>(
-  params: UseControllableStateParams<T>,
-): [T | undefined, Dispatch<SetStateAction<T | undefined>>];
-
-export function useControllableState<T>({
-  value,
-  defaultValue,
-  onChange,
-}: UseControllableStateParams<T>): [
-  T | undefined,
-  Dispatch<SetStateAction<T | undefined>>,
+  options: UseControllableStateOptions<T>
+): [
+  value: T,
+  setValue: Dispatch<SetStateAction<T>>,
+  isControlled: boolean,
 ] {
-  const [uncontrolledValue, setUncontrolledValue] = useState<T | undefined>(
+  const {
+    value: controlledValue,
     defaultValue,
-  );
-  const isControlled = value !== undefined;
-  const currentValue = isControlled ? value : uncontrolledValue;
+    onChange,
+    shouldUpdate = Object.is,
+  } = options;
 
-  const prevUncontrolledRef = useRef(uncontrolledValue);
-  const onChangeRef = useLatest(onChange);
+  const isControlled = controlledValue !== undefined;
+  const wasControlledRef: { current: boolean } = useRef(isControlled);
 
   useEffect(() => {
-    if (!Object.is(prevUncontrolledRef.current, uncontrolledValue)) {
-      onChangeRef.current?.(uncontrolledValue as T);
-      prevUncontrolledRef.current = uncontrolledValue;
+    if (
+      typeof process !== 'undefined' &&
+      process.env?.NODE_ENV !== 'production'
+    ) {
+      if (wasControlledRef.current !== isControlled) {
+        console.warn(
+          `Warning: useControllableState switched from ${
+            wasControlledRef.current ? 'controlled' : 'uncontrolled'
+          } to ${
+            isControlled ? 'controlled' : 'uncontrolled'
+          } mode. Components should not switch between controlled and uncontrolled during their lifetime.`
+        );
+      }
     }
-  }, [uncontrolledValue, onChangeRef]);
+    wasControlledRef.current = isControlled;
+  }, [isControlled]);
 
-  const setValue: Dispatch<SetStateAction<T | undefined>> = useEventCallback(
-    (next) => {
-      if (isControlled) {
-        const resolver = next as (prevState?: T) => T;
-        const nextValue =
-          typeof next === 'function' ? resolver(value) : next;
+  const [uncontrolledValue, setUncontrolledValue] = useState<T>(defaultValue);
+  const currentValue = isControlled
+    ? (controlledValue as T)
+    : uncontrolledValue;
 
-        if (!Object.is(nextValue, value)) {
-          onChangeRef.current?.(nextValue as T);
-        }
-      } else {
+  const valueRef: { current: T } = useRef(currentValue);
+  useIsomorphicLayoutEffect(() => {
+    valueRef.current = currentValue;
+  });
+
+  const isControlledRef = useLatest(isControlled);
+  const onChangeRef = useLatest(onChange);
+  const shouldUpdateRef = useLatest(shouldUpdate);
+
+  const setValue: Dispatch<SetStateAction<T>> = useCallback(
+    (nextAction: SetStateAction<T>) => {
+      const prev = valueRef.current;
+      const next =
+        typeof nextAction === 'function'
+          ? (nextAction as (prevState: T) => T)(prev)
+          : nextAction;
+
+      if (shouldUpdateRef.current(prev, next)) {
+        return;
+      }
+
+      if (!isControlledRef.current) {
+        valueRef.current = next;
         setUncontrolledValue(next);
       }
+
+      onChangeRef.current?.(next);
     },
+    [isControlledRef, onChangeRef, shouldUpdateRef]
   );
 
-  return [currentValue, setValue];
+  return [currentValue, setValue, isControlled];
 }
+
+export default useControllableState;
