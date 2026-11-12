@@ -1,33 +1,30 @@
 import { useEffect } from 'react';
-import { type EventListenerTarget } from './useEventListener';
+import {
+  EventListenerTarget,
+  resolveTargetElement,
+} from './useEventListener';
 import { useLatest } from './useLatest';
 
 export interface UseMutationObserverOptions extends MutationObserverInit {
   enabled?: boolean;
 }
 
-function resolveNode<T extends Node>(
-  target: EventListenerTarget<T>,
-): T | null {
-  if (target === null || target === undefined) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
-}
+const DEFAULT_OPTIONS: MutationObserverInit = {
+  attributes: true,
+  childList: true,
+  subtree: false,
+};
 
-export function useMutationObserver<T extends Node = HTMLElement>(
-  target: EventListenerTarget<T>,
+export function useMutationObserver(
+  target: EventListenerTarget<Node>,
   callback: MutationCallback,
-  options: UseMutationObserverOptions = {},
+  options: UseMutationObserverOptions = DEFAULT_OPTIONS
 ): void {
   const {
     enabled = true,
     attributes,
-    attributeOldValue,
     attributeFilter,
+    attributeOldValue,
     characterData,
     characterDataOldValue,
     childList,
@@ -35,26 +32,32 @@ export function useMutationObserver<T extends Node = HTMLElement>(
   } = options;
 
   const callbackRef = useLatest(callback);
-  const attributeFilterKey = attributeFilter
-    ? attributeFilter.join(',')
-    : undefined;
+  const attributeFilterKey = attributeFilter ? attributeFilter.join(',') : '';
 
   useEffect(() => {
-    const node = resolveNode(target);
-
-    if (
-      !enabled ||
-      !node ||
-      typeof window === 'undefined' ||
-      typeof window.MutationObserver !== 'function'
-    ) {
+    if (!enabled || typeof MutationObserver === 'undefined') {
       return;
     }
 
-    const hasValidTargetType =
-      Boolean(childList) || Boolean(attributes) || Boolean(characterData);
+    const targetNode = resolveTargetElement(target);
+    if (!targetNode) {
+      return;
+    }
 
-    if (!hasValidTargetType) {
+    const hasImplicitAttributes =
+      attributeFilter !== undefined || attributeOldValue === true;
+    const hasImplicitCharacterData = characterDataOldValue === true;
+
+    const resolvedAttributes =
+      attributes ?? (hasImplicitAttributes ? true : undefined);
+    const resolvedCharacterData =
+      characterData ?? (hasImplicitCharacterData ? true : undefined);
+
+    if (
+      !resolvedAttributes &&
+      !childList &&
+      !resolvedCharacterData
+    ) {
       return;
     }
 
@@ -62,15 +65,23 @@ export function useMutationObserver<T extends Node = HTMLElement>(
       callbackRef.current(mutations, obs);
     });
 
-    observer.observe(node, {
-      attributes,
-      attributeOldValue,
-      attributeFilter,
-      characterData,
-      characterDataOldValue,
-      childList,
-      subtree,
-    });
+    const init: MutationObserverInit = {
+      ...(resolvedAttributes !== undefined
+        ? { attributes: resolvedAttributes }
+        : {}),
+      ...(attributeFilter !== undefined ? { attributeFilter } : {}),
+      ...(attributeOldValue !== undefined ? { attributeOldValue } : {}),
+      ...(resolvedCharacterData !== undefined
+        ? { characterData: resolvedCharacterData }
+        : {}),
+      ...(characterDataOldValue !== undefined
+        ? { characterDataOldValue }
+        : {}),
+      ...(childList !== undefined ? { childList } : {}),
+      ...(subtree !== undefined ? { subtree } : {}),
+    };
+
+    observer.observe(targetNode, init);
 
     return () => {
       observer.disconnect();
@@ -79,8 +90,8 @@ export function useMutationObserver<T extends Node = HTMLElement>(
     target,
     enabled,
     attributes,
-    attributeOldValue,
     attributeFilterKey,
+    attributeOldValue,
     characterData,
     characterDataOldValue,
     childList,
@@ -88,3 +99,5 @@ export function useMutationObserver<T extends Node = HTMLElement>(
     callbackRef,
   ]);
 }
+
+export default useMutationObserver;
