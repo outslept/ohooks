@@ -1,96 +1,102 @@
-import { useEventCallback } from './useEventCallback';
-import { type EventListenerTarget } from './useEventListener';
+import { useCallback, useEffect } from 'react';
+import {
+  EventListenerTarget,
+  resolveTargetElement,
+} from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useLatest } from './useLatest';
-import { useResizeObserver } from './useResizeObserver';
 
 export interface UseTextareaAutosizeOptions {
-  minRows?: number;
-  maxRows?: number;
-  enabled?: boolean;
+  minHeight?: number;
+  maxHeight?: number;
   onResize?: (height: number) => void;
 }
 
-function resolveTextarea(
-  target: EventListenerTarget<HTMLTextAreaElement>,
-): HTMLTextAreaElement | null {
-  if (!target) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
+export interface UseTextareaAutosizeReturn {
+  resize: () => void;
 }
 
 export function useTextareaAutosize(
   target: EventListenerTarget<HTMLTextAreaElement>,
-  value: string,
-  options: UseTextareaAutosizeOptions = {},
-): void {
-  const { minRows = 1, maxRows = Infinity, enabled = true, onResize } = options;
+  value?: string,
+  options: UseTextareaAutosizeOptions = {}
+): UseTextareaAutosizeReturn {
+  const { minHeight, maxHeight, onResize } = options;
   const onResizeRef = useLatest(onResize);
 
-  const resizeTextarea = useEventCallback(() => {
-    if (
-      !enabled ||
-      typeof window === 'undefined' ||
-      typeof window.getComputedStyle !== 'function'
-    ) {
+  const resize = useCallback(() => {
+    if (typeof window === 'undefined') {
       return;
     }
 
-    const textarea = resolveTextarea(target);
+    const textarea = resolveTargetElement(target);
     if (!textarea) {
       return;
     }
 
-    const style = window.getComputedStyle(textarea);
-    const isBorderBox = style.boxSizing === 'border-box';
-    const paddingSize =
-      (parseFloat(style.paddingTop) || 0) +
-      (parseFloat(style.paddingBottom) || 0);
-    const borderSize =
-      (parseFloat(style.borderTopWidth) || 0) +
-      (parseFloat(style.borderBottomWidth) || 0);
-    const lineHeight =
-      parseFloat(style.lineHeight) ||
-      (parseFloat(style.fontSize) || 16) * 1.2;
+    const computedStyle = window.getComputedStyle(textarea);
+    const isBorderBox = computedStyle.boxSizing === 'border-box';
+    const borderTop = parseFloat(computedStyle.borderTopWidth) || 0;
+    const borderBottom = parseFloat(computedStyle.borderBottomWidth) || 0;
+    const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
+    const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
 
     const previousOverflow = textarea.style.overflowY;
-    textarea.style.overflowY = 'hidden';
     textarea.style.height = 'auto';
+    textarea.style.overflowY = 'hidden';
 
-    const contentScrollHeight = textarea.scrollHeight - paddingSize;
-    const minContentHeight = Math.max(1, minRows) * lineHeight;
-    const maxContentHeight =
-      maxRows < Infinity ? Math.max(minRows, maxRows) * lineHeight : Infinity;
+    let nextHeight = textarea.scrollHeight;
 
-    const clampedContentHeight = Math.min(
-      Math.max(contentScrollHeight, minContentHeight),
-      maxContentHeight,
-    );
+    if (isBorderBox) {
+      nextHeight += borderTop + borderBottom;
+    } else {
+      nextHeight -= paddingTop + paddingBottom;
+    }
 
-    const finalHeight = isBorderBox
-      ? clampedContentHeight + paddingSize + borderSize
-      : clampedContentHeight;
+    if (minHeight !== undefined) {
+      nextHeight = Math.max(nextHeight, minHeight);
+    }
 
-    textarea.style.height = `${finalHeight}px`;
-    textarea.style.overflowY =
-      contentScrollHeight > maxContentHeight ? 'auto' : previousOverflow || 'hidden';
+    let shouldScroll = false;
+    if (maxHeight !== undefined && nextHeight > maxHeight) {
+      nextHeight = maxHeight;
+      shouldScroll = true;
+    }
 
-    onResizeRef.current?.(finalHeight);
-  });
+    textarea.style.height = `${nextHeight}px`;
+    textarea.style.overflowY = shouldScroll
+      ? 'auto'
+      : previousOverflow === 'auto'
+        ? 'hidden'
+        : previousOverflow;
+
+    onResizeRef.current?.(nextHeight);
+  }, [target, minHeight, maxHeight, onResizeRef]);
 
   useIsomorphicLayoutEffect(() => {
-    resizeTextarea();
-  }, [target, value, minRows, maxRows, enabled]);
+    resize();
+  }, [value, resize]);
 
-  useResizeObserver(
-    target,
-    () => {
-      resizeTextarea();
-    },
-    { enabled, box: 'border-box' },
-  );
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const textarea = resolveTargetElement(target);
+    if (!textarea) {
+      return;
+    }
+
+    textarea.addEventListener('input', resize);
+    window.addEventListener('resize', resize);
+
+    return () => {
+      textarea.removeEventListener('input', resize);
+      window.removeEventListener('resize', resize);
+    };
+  }, [target, resize]);
+
+  return { resize };
 }
+
+export default useTextareaAutosize;
