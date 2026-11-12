@@ -1,79 +1,71 @@
+// hooks/useIntersectionObserver.ts
 import { useEffect, useState } from 'react';
-import { type EventListenerTarget } from './useEventListener';
+import {
+  EventListenerTarget,
+  resolveTargetElement,
+} from './useEventListener';
 import { useLatest } from './useLatest';
 
-export interface UseIntersectionObserverOptions
-  extends IntersectionObserverInit {
+export interface UseIntersectionObserverOptions {
+  root?: EventListenerTarget<Element | Document>;
+  rootMargin?: string;
+  threshold?: number | number[];
   freezeOnceVisible?: boolean;
-  initialIsIntersecting?: boolean;
-  onChange?: (
-    isIntersecting: boolean,
-    entry: IntersectionObserverEntry,
-  ) => void;
+  enabled?: boolean;
+  onChange?: (entry: IntersectionObserverEntry) => void;
 }
 
-export interface UseIntersectionObserverReturn {
-  isIntersecting: boolean;
-  entry: IntersectionObserverEntry | null;
-}
-
-function resolveElement<T extends Element>(
-  target: EventListenerTarget<T>,
-): T | null {
-  if (target === null || target === undefined) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
-}
-
-export function useIntersectionObserver<T extends Element = Element>(
-  target: EventListenerTarget<T>,
-  options: UseIntersectionObserverOptions = {},
-): UseIntersectionObserverReturn {
+export function useIntersectionObserver(
+  target: EventListenerTarget<Element>,
+  options: UseIntersectionObserverOptions = {}
+): IntersectionObserverEntry | null {
   const {
-    threshold = 0,
     root = null,
     rootMargin = '0px',
+    threshold = 0,
     freezeOnceVisible = false,
-    initialIsIntersecting = false,
+    enabled = true,
     onChange,
   } = options;
 
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
   const onChangeRef = useLatest(onChange);
 
-  const isIntersecting = entry?.isIntersecting ?? initialIsIntersecting;
-  const frozen = freezeOnceVisible && isIntersecting;
+  const frozen = Boolean(entry?.isIntersecting && freezeOnceVisible);
   const thresholdKey = Array.isArray(threshold)
     ? threshold.join(',')
     : String(threshold);
 
   useEffect(() => {
-    const element = resolveElement(target);
-
     if (
+      !enabled ||
       frozen ||
-      !element ||
       typeof window === 'undefined' ||
-      typeof window.IntersectionObserver !== 'function'
+      typeof IntersectionObserver === 'undefined'
     ) {
       return;
     }
 
+    const element = resolveTargetElement(target);
+    if (!element) {
+      return;
+    }
+
+    const rootNode = resolveTargetElement(root);
+
     const observer = new IntersectionObserver(
       (entries) => {
         const latestEntry = entries[entries.length - 1];
-        if (!latestEntry) {
-          return;
+        if (latestEntry) {
+          setEntry(latestEntry);
+          onChangeRef.current?.(latestEntry);
         }
-
-        setEntry(latestEntry);
-        onChangeRef.current?.(latestEntry.isIntersecting, latestEntry);
       },
-      { threshold, root, rootMargin },
+      {
+        root: rootNode,
+        rootMargin,
+        threshold,
+      }
     );
 
     observer.observe(element);
@@ -81,7 +73,17 @@ export function useIntersectionObserver<T extends Element = Element>(
     return () => {
       observer.disconnect();
     };
-  }, [target, thresholdKey, root, rootMargin, frozen, onChangeRef]);
+  }, [
+    target,
+    root,
+    rootMargin,
+    thresholdKey,
+    frozen,
+    enabled,
+    onChangeRef,
+  ]);
 
-  return { isIntersecting, entry };
+  return entry;
 }
+
+export default useIntersectionObserver;
