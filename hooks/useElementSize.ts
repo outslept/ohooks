@@ -11,8 +11,7 @@ export interface ElementSize {
   height: number;
 }
 
-export interface UseElementSizeOptions
-  extends Omit<UseResizeObserverOptions, 'onResize'> {
+export interface UseElementSizeOptions extends UseResizeObserverOptions {
   initialWidth?: number;
   initialHeight?: number;
 }
@@ -27,6 +26,54 @@ function resolveElement<T extends Element>(
     return target.current;
   }
   return target;
+}
+
+function measureElement(
+  element: Element,
+  box: ResizeObserverBoxOptions,
+): ElementSize {
+  const rect = element.getBoundingClientRect();
+
+  if (box === 'border-box') {
+    return { width: rect.width, height: rect.height };
+  }
+
+  if (
+    typeof window === 'undefined' ||
+    typeof window.getComputedStyle !== 'function'
+  ) {
+    return { width: rect.width, height: rect.height };
+  }
+
+  const style = window.getComputedStyle(element);
+  const paddingX =
+    (parseFloat(style.paddingLeft) || 0) +
+    (parseFloat(style.paddingRight) || 0);
+  const paddingY =
+    (parseFloat(style.paddingTop) || 0) +
+    (parseFloat(style.paddingBottom) || 0);
+  const borderX =
+    (parseFloat(style.borderLeftWidth) || 0) +
+    (parseFloat(style.borderRightWidth) || 0);
+  const borderY =
+    (parseFloat(style.borderTopWidth) || 0) +
+    (parseFloat(style.borderBottomWidth) || 0);
+
+  const contentWidth = Math.max(0, rect.width - paddingX - borderX);
+  const contentHeight = Math.max(0, rect.height - paddingY - borderY);
+
+  if (box === 'device-pixel-content-box') {
+    const dpr = window.devicePixelRatio || 1;
+    return {
+      width: Math.round(contentWidth * dpr),
+      height: Math.round(contentHeight * dpr),
+    };
+  }
+
+  return {
+    width: contentWidth,
+    height: contentHeight,
+  };
 }
 
 export function useElementSize<T extends Element = HTMLElement>(
@@ -55,19 +102,23 @@ export function useElementSize<T extends Element = HTMLElement>(
       return;
     }
 
-    const rect = element.getBoundingClientRect();
+    const measured = measureElement(element, box);
     setSize((prev) => {
-      if (prev.width === rect.width && prev.height === rect.height) {
+      if (prev.width === measured.width && prev.height === measured.height) {
         return prev;
       }
-      return { width: rect.width, height: rect.height };
+      return measured;
     });
-  }, [target, enabled]);
+  }, [target, box, enabled]);
 
-  useResizeObserver(target, {
-    box,
-    enabled,
-    onResize: (entry) => {
+  useResizeObserver(
+    target,
+    (entries) => {
+      const entry = entries[0];
+      if (!entry) {
+        return;
+      }
+
       let nextWidth = entry.contentRect.width;
       let nextHeight = entry.contentRect.height;
 
@@ -86,7 +137,7 @@ export function useElementSize<T extends Element = HTMLElement>(
           nextWidth = boxSize.inlineSize;
           nextHeight = boxSize.blockSize;
         }
-      } else if (entry.contentBoxSize?.length > 0) {
+      } else if (box === 'content-box' && entry.contentBoxSize?.length > 0) {
         const boxSize = entry.contentBoxSize[0];
         if (boxSize) {
           nextWidth = boxSize.inlineSize;
@@ -101,7 +152,8 @@ export function useElementSize<T extends Element = HTMLElement>(
         return { width: nextWidth, height: nextHeight };
       });
     },
-  });
+    { box, enabled },
+  );
 
   return size;
 }
