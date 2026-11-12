@@ -1,6 +1,11 @@
-import { type PointerEvent as ReactPointerEvent, useRef, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
-import { useUnmount } from './useUnmount';
+import { useEffect, useRef, useState } from 'react';
+import {
+  EventListenerTarget,
+  resolveTargetElement,
+} from './useEventListener';
+import { useLatest } from './useLatest';
+
+export type PointerDragAxis = 'both' | 'x' | 'y';
 
 export interface PointerDragState {
   isDragging: boolean;
@@ -14,28 +19,18 @@ export interface PointerDragState {
   movementY: number;
 }
 
-export interface UsePointerDragOptions<T = Element> {
-  disabled?: boolean;
-  lockUserSelect?: boolean;
+export interface UsePointerDragOptions {
+  enabled?: boolean;
+  axis?: PointerDragAxis;
+  threshold?: number;
+  preventUserSelect?: boolean;
   preventDefault?: boolean;
-  onStart?: (state: PointerDragState, event: ReactPointerEvent<T>) => void;
-  onMove?: (state: PointerDragState, event: ReactPointerEvent<T>) => void;
-  onEnd?: (state: PointerDragState, event: ReactPointerEvent<T>) => void;
+  onDragStart?: (state: PointerDragState, event: PointerEvent) => void;
+  onDragMove?: (state: PointerDragState, event: PointerEvent) => void;
+  onDragEnd?: (state: PointerDragState, event: PointerEvent) => void;
 }
 
-export interface UsePointerDragBindings<T = Element> {
-  onPointerDown: (event: ReactPointerEvent<T>) => void;
-  onPointerMove: (event: ReactPointerEvent<T>) => void;
-  onPointerUp: (event: ReactPointerEvent<T>) => void;
-  onPointerCancel: (event: ReactPointerEvent<T>) => void;
-  onLostPointerCapture: (event: ReactPointerEvent<T>) => void;
-}
-
-export interface UsePointerDragReturn<T = Element> extends PointerDragState {
-  bindings: UsePointerDragBindings<T>;
-}
-
-const INITIAL_DRAG_STATE: PointerDragState = {
+const INITIAL_STATE: PointerDragState = {
   isDragging: false,
   x: 0,
   y: 0,
@@ -47,142 +42,219 @@ const INITIAL_DRAG_STATE: PointerDragState = {
   movementY: 0,
 };
 
-export function usePointerDrag<T extends Element = HTMLElement>(
-  options: UsePointerDragOptions<T> = {},
-): UsePointerDragReturn<T> {
+export function usePointerDrag(
+  target: EventListenerTarget<HTMLElement>,
+  options: UsePointerDragOptions = {}
+): PointerDragState {
   const {
-    disabled = false,
-    lockUserSelect = true,
+    enabled = true,
+    axis = 'both',
+    threshold = 0,
+    preventUserSelect = true,
     preventDefault = false,
-    onStart,
-    onMove,
-    onEnd,
   } = options;
 
-  const [state, setState] = useState<PointerDragState>(INITIAL_DRAG_STATE);
+  const optionsRef = useLatest(options);
+  const [dragState, setDragState] = useState<PointerDragState>(INITIAL_STATE);
 
-  const activePointerIdRef = useRef<number | null>(null);
-  const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const lastPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const savedUserSelectRef = useRef<string | null>(null);
-
-  const restoreUserSelect = (): void => {
-    if (
-      savedUserSelectRef.current !== null &&
-      typeof document !== 'undefined'
-    ) {
-      document.body.style.userSelect = savedUserSelectRef.current;
-      savedUserSelectRef.current = null;
-    }
-  };
-
-  const onPointerDown = useEventCallback((event: ReactPointerEvent<T>) => {
-    if (disabled || (event.pointerType === 'mouse' && event.button !== 0)) {
-      return;
-    }
-
-    if (preventDefault) {
-      event.preventDefault();
-    }
-
-    try {
-      event.currentTarget.setPointerCapture(event.pointerId);
-    } catch {
-      // Ignore if synthetic target does not support pointer capture
-    }
-
-    if (lockUserSelect && typeof document !== 'undefined') {
-      savedUserSelectRef.current = document.body.style.userSelect;
-      document.body.style.userSelect = 'none';
-    }
-
-    activePointerIdRef.current = event.pointerId;
-    startPosRef.current = { x: event.clientX, y: event.clientY };
-    lastPosRef.current = { x: event.clientX, y: event.clientY };
-
-    const nextState: PointerDragState = {
-      isDragging: true,
-      x: event.clientX,
-      y: event.clientY,
-      startX: event.clientX,
-      startY: event.clientY,
-      deltaX: 0,
-      deltaY: 0,
-      movementX: 0,
-      movementY: 0,
-    };
-
-    setState(nextState);
-    onStart?.(nextState, event);
+  const activePointerIdRef: { current: number | null } = useRef(null);
+  const hasExceededThresholdRef: { current: boolean } = useRef(false);
+  const startPointRef: { current: { x: number; y: number } } = useRef({
+    x: 0,
+    y: 0,
   });
-
-  const onPointerMove = useEventCallback((event: ReactPointerEvent<T>) => {
-    if (disabled || activePointerIdRef.current !== event.pointerId) {
-      return;
-    }
-
-    const movementX = event.clientX - lastPosRef.current.x;
-    const movementY = event.clientY - lastPosRef.current.y;
-    lastPosRef.current = { x: event.clientX, y: event.clientY };
-
-    const nextState: PointerDragState = {
-      isDragging: true,
-      x: event.clientX,
-      y: event.clientY,
-      startX: startPosRef.current.x,
-      startY: startPosRef.current.y,
-      deltaX: event.clientX - startPosRef.current.x,
-      deltaY: event.clientY - startPosRef.current.y,
-      movementX,
-      movementY,
-    };
-
-    setState(nextState);
-    onMove?.(nextState, event);
+  const lastPointRef: { current: { x: number; y: number } } = useRef({
+    x: 0,
+    y: 0,
   });
+  const latestStateRef: { current: PointerDragState } = useRef(INITIAL_STATE);
+  const savedUserSelectRef: { current: string | null } = useRef(null);
 
-  const finishDrag = useEventCallback((event: ReactPointerEvent<T>) => {
-    if (activePointerIdRef.current !== event.pointerId) {
+  useEffect(() => {
+    if (!enabled || typeof window === 'undefined') {
       return;
     }
 
-    try {
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-        event.currentTarget.releasePointerCapture(event.pointerId);
+    const element = resolveTargetElement(target);
+    if (!element) {
+      return;
+    }
+
+    const restoreUserSelect = () => {
+      if (
+        savedUserSelectRef.current !== null &&
+        typeof document !== 'undefined'
+      ) {
+        document.body.style.userSelect = savedUserSelectRef.current;
+        savedUserSelectRef.current = null;
       }
-    } catch {
-      // Ignore if already released
-    }
-
-    activePointerIdRef.current = null;
-    restoreUserSelect();
-
-    const finalState: PointerDragState = {
-      isDragging: false,
-      x: event.clientX,
-      y: event.clientY,
-      startX: startPosRef.current.x,
-      startY: startPosRef.current.y,
-      deltaX: event.clientX - startPosRef.current.x,
-      deltaY: event.clientY - startPosRef.current.y,
-      movementX: 0,
-      movementY: 0,
     };
 
-    setState(finalState);
-    onEnd?.(finalState, event);
-  });
+    const handlePointerDown = (event: PointerEvent) => {
+      if (activePointerIdRef.current !== null) {
+        return;
+      }
+      if (event.button !== 0 && event.pointerType === 'mouse') {
+        return;
+      }
 
-  useUnmount(restoreUserSelect);
+      if (preventDefault) {
+        event.preventDefault();
+      }
 
-  return {
-    ...state,
-    bindings: {
-      onPointerDown,
-      onPointerMove,
-      onPointerUp: finishDrag,
-      onPointerCancel: finishDrag,
-      onLostPointerCapture: finishDrag,
-    },
-  };
+      activePointerIdRef.current = event.pointerId;
+      hasExceededThresholdRef.current = threshold <= 0;
+      startPointRef.current = { x: event.clientX, y: event.clientY };
+      lastPointRef.current = { x: event.clientX, y: event.clientY };
+
+      if (preventUserSelect && typeof document !== 'undefined') {
+        savedUserSelectRef.current = document.body.style.userSelect;
+        document.body.style.userSelect = 'none';
+      }
+
+      try {
+        element.setPointerCapture?.(event.pointerId);
+      } catch {
+        // noop
+      }
+
+      if (hasExceededThresholdRef.current) {
+        const nextState: PointerDragState = {
+          isDragging: true,
+          x: event.clientX,
+          y: event.clientY,
+          startX: event.clientX,
+          startY: event.clientY,
+          deltaX: 0,
+          deltaY: 0,
+          movementX: 0,
+          movementY: 0,
+        };
+        latestStateRef.current = nextState;
+        setDragState(nextState);
+        optionsRef.current.onDragStart?.(nextState, event);
+      }
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (activePointerIdRef.current !== event.pointerId) {
+        return;
+      }
+
+      const rawDeltaX = event.clientX - startPointRef.current.x;
+      const rawDeltaY = event.clientY - startPointRef.current.y;
+
+      if (!hasExceededThresholdRef.current) {
+        const distance = Math.hypot(rawDeltaX, rawDeltaY);
+        if (distance < threshold) {
+          return;
+        }
+        hasExceededThresholdRef.current = true;
+
+        const startState: PointerDragState = {
+          isDragging: true,
+          x: event.clientX,
+          y: event.clientY,
+          startX: startPointRef.current.x,
+          startY: startPointRef.current.y,
+          deltaX: axis === 'y' ? 0 : rawDeltaX,
+          deltaY: axis === 'x' ? 0 : rawDeltaY,
+          movementX: axis === 'y' ? 0 : rawDeltaX,
+          movementY: axis === 'x' ? 0 : rawDeltaY,
+        };
+        lastPointRef.current = { x: event.clientX, y: event.clientY };
+        latestStateRef.current = startState;
+        setDragState(startState);
+        optionsRef.current.onDragStart?.(startState, event);
+        return;
+      }
+
+      if (preventDefault) {
+        event.preventDefault();
+      }
+
+      const deltaX = axis === 'y' ? 0 : rawDeltaX;
+      const deltaY = axis === 'x' ? 0 : rawDeltaY;
+      const movementX =
+        axis === 'y' ? 0 : event.clientX - lastPointRef.current.x;
+      const movementY =
+        axis === 'x' ? 0 : event.clientY - lastPointRef.current.y;
+
+      lastPointRef.current = { x: event.clientX, y: event.clientY };
+
+      const nextState: PointerDragState = {
+        isDragging: true,
+        x: event.clientX,
+        y: event.clientY,
+        startX: startPointRef.current.x,
+        startY: startPointRef.current.y,
+        deltaX,
+        deltaY,
+        movementX,
+        movementY,
+      };
+
+      latestStateRef.current = nextState;
+      setDragState(nextState);
+      optionsRef.current.onDragMove?.(nextState, event);
+    };
+
+    const handlePointerUpOrCancel = (event: PointerEvent) => {
+      if (activePointerIdRef.current !== event.pointerId) {
+        return;
+      }
+
+      const wasDragging = hasExceededThresholdRef.current;
+      activePointerIdRef.current = null;
+      hasExceededThresholdRef.current = false;
+      restoreUserSelect();
+
+      try {
+        if (element.hasPointerCapture?.(event.pointerId)) {
+          element.releasePointerCapture(event.pointerId);
+        }
+      } catch {
+        // noop
+      }
+
+      if (wasDragging) {
+        const endState: PointerDragState = {
+          ...latestStateRef.current,
+          isDragging: false,
+          movementX: 0,
+          movementY: 0,
+        };
+        latestStateRef.current = endState;
+        setDragState(endState);
+        optionsRef.current.onDragEnd?.(endState, event);
+      }
+    };
+
+    element.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUpOrCancel);
+    window.addEventListener('pointercancel', handlePointerUpOrCancel);
+
+    return () => {
+      element.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUpOrCancel);
+      window.removeEventListener('pointercancel', handlePointerUpOrCancel);
+      activePointerIdRef.current = null;
+      hasExceededThresholdRef.current = false;
+      restoreUserSelect();
+    };
+  }, [
+    target,
+    enabled,
+    axis,
+    threshold,
+    preventUserSelect,
+    preventDefault,
+    optionsRef,
+  ]);
+
+  return dragState;
 }
+
+export default usePointerDrag;
