@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useEventCallback } from './useEventCallback';
 
 export interface UseSetActions<T> {
@@ -62,9 +62,12 @@ export function useSet<T>(
     setSet(() => new Set(initialValue));
   });
 
-  const has = useEventCallback((value: T): boolean => {
-    return set.has(value);
-  });
+  const has = useCallback(
+    (value: T): boolean => {
+      return set.has(value);
+    },
+    [set],
+  );
 
   return [
     set,
