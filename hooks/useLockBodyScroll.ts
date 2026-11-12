@@ -1,68 +1,83 @@
-import { type EventListenerTarget } from './useEventListener';
+import {
+  EventListenerTarget,
+  resolveTargetElement,
+} from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
 export interface UseLockBodyScrollOptions {
-  target?: EventListenerTarget<HTMLElement>;
   reserveScrollBarGap?: boolean;
+  target?: EventListenerTarget<HTMLElement>;
 }
 
-function resolveElement(
-  target?: EventListenerTarget<HTMLElement>,
-): HTMLElement | null {
-  if (typeof document === 'undefined') {
-    return null;
-  }
-  if (target === undefined) {
-    return document.body;
-  }
-  if (target === null) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
+interface LockState {
+  count: number;
+  originalOverflow: string;
+  originalPaddingRight: string;
 }
+
+const lockRegistry = new WeakMap<HTMLElement, LockState>();
 
 export function useLockBodyScroll(
-  locked = true,
-  options: UseLockBodyScrollOptions = {},
+  locked: boolean = true,
+  options: UseLockBodyScrollOptions = {}
 ): void {
-  const { target, reserveScrollBarGap = true } = options;
+  const { reserveScrollBarGap = true, target } = options;
 
   useIsomorphicLayoutEffect(() => {
-    if (!locked || typeof window === 'undefined' || typeof document === 'undefined') {
+    if (!locked || typeof document === 'undefined') {
       return;
     }
 
-    const element = resolveElement(target);
+    const element = resolveTargetElement(target, document.body);
     if (!element) {
       return;
     }
 
-    const originalOverflow = element.style.overflow;
-    const originalPaddingRight = element.style.paddingRight;
+    const existing = lockRegistry.get(element);
 
-    if (reserveScrollBarGap) {
-      const isBody = element === document.body;
-      const scrollBarWidth = isBody
-        ? window.innerWidth - document.documentElement.clientWidth
-        : element.offsetWidth - element.clientWidth;
+    if (existing) {
+      existing.count += 1;
+    } else {
+      const originalOverflow = element.style.overflow;
+      const originalPaddingRight = element.style.paddingRight;
 
-      if (scrollBarWidth > 0) {
-        const computedPaddingRight =
-          parseFloat(window.getComputedStyle(element).paddingRight) || 0;
-        element.style.paddingRight = `${computedPaddingRight + scrollBarWidth}px`;
+      lockRegistry.set(element, {
+        count: 1,
+        originalOverflow,
+        originalPaddingRight,
+      });
+
+      if (reserveScrollBarGap && typeof window !== 'undefined') {
+        const isBody =
+          element === document.body || element === document.documentElement;
+        const scrollBarWidth = isBody
+          ? window.innerWidth - document.documentElement.clientWidth
+          : element.offsetWidth - element.clientWidth;
+
+        if (scrollBarWidth > 0) {
+          const computedPaddingRight =
+            parseFloat(window.getComputedStyle(element).paddingRight) || 0;
+          element.style.paddingRight = `${computedPaddingRight + scrollBarWidth}px`;
+        }
       }
+
+      element.style.overflow = 'hidden';
     }
 
-    element.style.overflow = 'hidden';
-
     return () => {
-      element.style.overflow = originalOverflow;
-      if (reserveScrollBarGap) {
-        element.style.paddingRight = originalPaddingRight;
+      const current = lockRegistry.get(element);
+      if (!current) {
+        return;
+      }
+
+      current.count -= 1;
+      if (current.count <= 0) {
+        element.style.overflow = current.originalOverflow;
+        element.style.paddingRight = current.originalPaddingRight;
+        lockRegistry.delete(element);
       }
     };
-  }, [locked, target, reserveScrollBarGap]);
+  }, [locked, reserveScrollBarGap, target]);
 }
+
+export default useLockBodyScroll;
