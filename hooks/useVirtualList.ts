@@ -1,11 +1,9 @@
-import { useMemo, useState } from 'react';
-import { useElementSize } from './useElementSize';
-import { useEventCallback } from './useEventCallback';
+import { CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  type EventListenerTarget,
-  useEventListener,
+  EventListenerTarget,
+  resolveTargetElement,
 } from './useEventListener';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { useLatest } from './useLatest';
 
 export interface VirtualItem<T> {
   index: number;
@@ -14,37 +12,19 @@ export interface VirtualItem<T> {
   height: number;
 }
 
-export interface ScrollToIndexOptions {
-  align?: 'start' | 'center' | 'end' | 'auto';
-  behavior?: ScrollBehavior;
-}
-
 export interface UseVirtualListOptions {
   containerTarget: EventListenerTarget<HTMLElement>;
   itemHeight: number | ((index: number) => number);
   overscan?: number;
-  initialContainerHeight?: number;
 }
 
 export interface UseVirtualListReturn<T> {
   virtualItems: VirtualItem<T>[];
   totalHeight: number;
-  offsetTop: number;
-  startIndex: number;
-  endIndex: number;
-  scrollToIndex: (index: number, options?: ScrollToIndexOptions) => void;
-}
-
-function resolveElement(
-  target: EventListenerTarget<HTMLElement>,
-): HTMLElement | null {
-  if (!target) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
+  wrapperProps: {
+    style: CSSProperties;
+  };
+  scrollToIndex: (index: number, behavior?: ScrollBehavior) => void;
 }
 
 function findStartIndex(offsets: readonly number[], scrollTop: number): number {
@@ -54,10 +34,10 @@ function findStartIndex(offsets: readonly number[], scrollTop: number): number {
   while (low <= high) {
     const mid = (low + high) >>> 1;
     const midOffset = offsets[mid] ?? 0;
-
     if (midOffset === scrollTop) {
       return mid;
-    } else if (midOffset < scrollTop) {
+    }
+    if (midOffset < scrollTop) {
       low = mid + 1;
     } else {
       high = mid - 1;
@@ -69,155 +49,158 @@ function findStartIndex(offsets: readonly number[], scrollTop: number): number {
 
 export function useVirtualList<T>(
   items: readonly T[],
-  options: UseVirtualListOptions,
+  options: UseVirtualListOptions
 ): UseVirtualListReturn<T> {
-  const {
-    containerTarget,
-    itemHeight,
-    overscan = 5,
-    initialContainerHeight = 0,
-  } = options;
+  const { containerTarget, itemHeight, overscan = 5 } = options;
 
-  const [scrollTop, setScrollTop] = useState(0);
+  const [scrollTop, setScrollTop] = useState<number>(0);
+  const [viewportHeight, setViewportHeight] = useState<number>(0);
+  const itemHeightRef = useLatest(itemHeight);
 
-  const { height: measuredHeight } = useElementSize(containerTarget, {
-    initialHeight: initialContainerHeight,
-  });
-  const containerHeight = measuredHeight || initialContainerHeight;
-
-  useEventListener(
-    'scroll',
-    () => {
-      const container = resolveElement(containerTarget);
-      if (container) {
-        setScrollTop(container.scrollTop);
-      }
-    },
-    containerTarget,
-    { passive: true },
-  );
-
-  useIsomorphicLayoutEffect(() => {
-    const container = resolveElement(containerTarget);
-    if (container) {
-      setScrollTop(container.scrollTop);
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
     }
+
+    const container = resolveTargetElement(containerTarget);
+    if (!container) {
+      return;
+    }
+
+    const syncMetrics = () => {
+      setScrollTop(container.scrollTop);
+      setViewportHeight(container.clientHeight);
+    };
+
+    syncMetrics();
+
+    const handleScroll = () => {
+      setScrollTop(container.scrollTop);
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        setViewportHeight(container.clientHeight);
+      });
+      resizeObserver.observe(container);
+    } else {
+      window.addEventListener('resize', syncMetrics);
+    }
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      } else {
+        window.removeEventListener('resize', syncMetrics);
+      }
+    };
   }, [containerTarget]);
 
-  const layout = useMemo(() => {
+  const { offsets, heights, totalHeight } = useMemo(() => {
     const count = items.length;
-    if (count === 0) {
-      return {
-        offsets: [] as number[],
-        heights: [] as number[],
-        totalHeight: 0,
-      };
-    }
+    const itemOffsets = new Array<number>(count);
+    const itemHeights = new Array<number>(count);
+    let runningTotal = 0;
 
-    const offsets = new Array<number>(count);
-    const heights = new Array<number>(count);
-    let runningOffset = 0;
-
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < count; i += 1) {
+      itemOffsets[i] = runningTotal;
       const h =
-        typeof itemHeight === 'function' ? itemHeight(i) : itemHeight;
-      offsets[i] = runningOffset;
-      heights[i] = h;
-      runningOffset += h;
+        typeof itemHeight === 'function'
+          ? itemHeight(i)
+          : itemHeight;
+      const safeHeight = Math.max(0, h);
+      itemHeights[i] = safeHeight;
+      runningTotal += safeHeight;
     }
 
     return {
-      offsets,
-      heights,
-      totalHeight: runningOffset,
+      offsets: itemOffsets,
+      heights: itemHeights,
+      totalHeight: runningTotal,
     };
   }, [items.length, itemHeight]);
 
-  const { startIndex, endIndex, virtualItems, offsetTop } = useMemo(() => {
+  const virtualItems = useMemo<VirtualItem<T>[]>(() => {
     const count = items.length;
     if (count === 0) {
-      return {
-        startIndex: 0,
-        endIndex: -1,
-        virtualItems: [] as VirtualItem<T>[],
-        offsetTop: 0,
-      };
+      return [];
     }
 
-    const rawStart = findStartIndex(layout.offsets, scrollTop);
-    const viewportBottom = scrollTop + containerHeight;
+    const rawStartIndex = findStartIndex(offsets, scrollTop);
+    const visibleEndScroll = scrollTop + Math.max(viewportHeight, 1);
 
-    let rawEnd = rawStart;
+    let rawEndIndex = rawStartIndex;
     while (
-      rawEnd < count - 1 &&
-      (layout.offsets[rawEnd] ?? 0) < viewportBottom
+      rawEndIndex < count - 1 &&
+      (offsets[rawEndIndex] ?? 0) < visibleEndScroll
     ) {
-      rawEnd += 1;
+      rawEndIndex += 1;
     }
 
-    const start = Math.max(0, rawStart - overscan);
-    const end = Math.min(count - 1, rawEnd + overscan);
+    const startIndex = Math.max(0, rawStartIndex - overscan);
+    const endIndex = Math.min(count - 1, rawEndIndex + overscan);
 
-    const sliced: VirtualItem<T>[] = [];
-    for (let i = start; i <= end; i++) {
-      sliced.push({
+    const result: VirtualItem<T>[] = [];
+    for (let i = startIndex; i <= endIndex; i += 1) {
+      result.push({
         index: i,
         data: items[i] as T,
-        offsetTop: layout.offsets[i] ?? 0,
-        height: layout.heights[i] ?? 0,
+        offsetTop: offsets[i] ?? 0,
+        height: heights[i] ?? 0,
       });
     }
 
-    return {
-      startIndex: start,
-      endIndex: end,
-      virtualItems: sliced,
-      offsetTop: layout.offsets[start] ?? 0,
-    };
-  }, [items, layout, scrollTop, containerHeight, overscan]);
+    return result;
+  }, [items, offsets, heights, scrollTop, viewportHeight, overscan]);
 
-  const scrollToIndex = useEventCallback(
-    (index: number, scrollOptions: ScrollToIndexOptions = {}) => {
-      const container = resolveElement(containerTarget);
+  const scrollToIndex = useCallback(
+    (index: number, behavior: ScrollBehavior = 'auto') => {
+      const container = resolveTargetElement(containerTarget);
       if (!container || items.length === 0) {
         return;
       }
 
-      const { align = 'auto', behavior = 'auto' } = scrollOptions;
-      const clampedIndex = Math.max(0, Math.min(items.length - 1, index));
-      const itemTop = layout.offsets[clampedIndex] ?? 0;
-      const itemSize = layout.heights[clampedIndex] ?? 0;
-      const itemBottom = itemTop + itemSize;
+      const clampedIndex = Math.max(0, Math.min(index, items.length - 1));
+      let targetTop = 0;
+      const currentItemHeight = itemHeightRef.current;
 
-      let nextScrollTop = container.scrollTop;
-
-      if (align === 'start') {
-        nextScrollTop = itemTop;
-      } else if (align === 'end') {
-        nextScrollTop = itemBottom - containerHeight;
-      } else if (align === 'center') {
-        nextScrollTop = itemTop - (containerHeight - itemSize) / 2;
+      if (typeof currentItemHeight === 'number') {
+        targetTop = clampedIndex * currentItemHeight;
       } else {
-        if (itemTop < container.scrollTop) {
-          nextScrollTop = itemTop;
-        } else if (itemBottom > container.scrollTop + containerHeight) {
-          nextScrollTop = itemBottom - containerHeight;
+        for (let i = 0; i < clampedIndex; i += 1) {
+          targetTop += Math.max(0, currentItemHeight(i));
         }
       }
 
       container.scrollTo({
-        top: Math.max(0, nextScrollTop),
+        top: targetTop,
         behavior,
       });
     },
+    [containerTarget, items.length, itemHeightRef]
+  );
+
+  const wrapperProps = useMemo(
+    () => ({
+      style: {
+        position: 'relative' as const,
+        width: '100%',
+        height: `${totalHeight}px`,
+      },
+    }),
+    [totalHeight]
   );
 
   return {
     virtualItems,
-    totalHeight: layout.totalHeight,
-    offsetTop,
-    startIndex,
-    endIndex,
+    totalHeight,
+    wrapperProps,
     scrollToIndex,
   };
 }
+
+export default useVirtualList;
