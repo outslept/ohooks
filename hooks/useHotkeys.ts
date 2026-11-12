@@ -1,20 +1,23 @@
+import { useEffect } from 'react';
 import {
-  type EventListenerTarget,
-  useEventListener,
+  EventListenerTarget,
+  resolveTargetElement,
 } from './useEventListener';
+import { useLatest } from './useLatest';
+
+export type HotkeyCallback = (event: KeyboardEvent, combo: string) => void;
 
 export interface UseHotkeysOptions {
   enabled?: boolean;
   preventDefault?: boolean;
   stopPropagation?: boolean;
   enableOnFormTags?: boolean;
-  enableOnContentEditable?: boolean;
-  ignoreRepeated?: boolean;
   event?: 'keydown' | 'keyup';
-  target?: EventListenerTarget<EventTarget>;
+  target?: EventListenerTarget<HTMLElement | Document | Window>;
 }
 
 interface ParsedHotkey {
+  raw: string;
   ctrl: boolean;
   shift: boolean;
   alt: boolean;
@@ -34,26 +37,54 @@ const KEY_ALIASES: Record<string, string> = {
   right: 'arrowright',
   del: 'delete',
   ins: 'insert',
-  pgup: 'pageup',
-  pgdn: 'pagedown',
   plus: '+',
 };
 
-const FORM_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
+const MODIFIER_EVENT_KEYS = new Set([
+  'control',
+  'shift',
+  'alt',
+  'meta',
+]);
 
-function normalizeKey(rawKey: string): string {
-  const lower = rawKey.trim().toLowerCase();
+function isMacPlatform(): boolean {
+  if (typeof navigator === 'undefined') {
+    return false;
+  }
+  return /Mac|iPod|iPhone|iPad/i.test(
+    navigator.platform || navigator.userAgent
+  );
+}
+
+function normalizeKeyName(key: string): string {
+  const lower = key.toLowerCase();
   return KEY_ALIASES[lower] ?? lower;
 }
 
-function parseHotkey(hotkey: string): ParsedHotkey {
-  const tokens = hotkey
-    .toLowerCase()
+function tokenizeCombo(combo: string): string[] {
+  const trimmed = combo.trim().toLowerCase();
+  if (!trimmed) return [];
+  if (trimmed === '+') return ['+'];
+
+  const hasTrailingPlusKey = trimmed.endsWith('++');
+  const body = hasTrailingPlusKey ? trimmed.slice(0, -2) : trimmed;
+  const tokens = body
     .split('+')
     .map((part) => part.trim())
     .filter(Boolean);
 
+  if (hasTrailingPlusKey) {
+    tokens.push('+');
+  }
+
+  return tokens;
+}
+
+function parseHotkey(combo: string): ParsedHotkey {
+  const tokens = tokenizeCombo(combo);
+
   const parsed: ParsedHotkey = {
+    raw: combo.trim(),
     ctrl: false,
     shift: false,
     alt: false,
@@ -63,166 +94,161 @@ function parseHotkey(hotkey: string): ParsedHotkey {
   };
 
   for (const token of tokens) {
-    if (token === 'ctrl' || token === 'control') {
-      parsed.ctrl = true;
-    } else if (token === 'shift') {
-      parsed.shift = true;
-    } else if (token === 'alt' || token === 'option') {
-      parsed.alt = true;
-    } else if (
-      token === 'meta' ||
-      token === 'cmd' ||
-      token === 'command' ||
-      token === 'win' ||
-      token === 'super'
-    ) {
-      parsed.meta = true;
-    } else if (token === 'mod') {
-      parsed.mod = true;
-    } else {
-      parsed.key = normalizeKey(token);
+    switch (token) {
+      case 'ctrl':
+      case 'control':
+        parsed.ctrl = true;
+        break;
+      case 'shift':
+        parsed.shift = true;
+        break;
+      case 'alt':
+      case 'option':
+        parsed.alt = true;
+        break;
+      case 'meta':
+      case 'cmd':
+      case 'command':
+      case 'win':
+      case 'super':
+        parsed.meta = true;
+        break;
+      case 'mod':
+        parsed.mod = true;
+        break;
+      default:
+        parsed.key = normalizeKeyName(token);
+        break;
     }
   }
 
   return parsed;
 }
 
-function isMacPlatform(): boolean {
-  if (typeof navigator === 'undefined') {
+function isEditableElement(target: EventTarget | null): boolean {
+  if (!target || !(target instanceof HTMLElement)) {
     return false;
   }
-  return /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+  const tagName = target.tagName.toLowerCase();
+  return (
+    target.isContentEditable ||
+    tagName === 'input' ||
+    tagName === 'textarea' ||
+    tagName === 'select'
+  );
 }
 
-function matchesEventKey(expectedKey: string, event: KeyboardEvent): boolean {
-  const eventKey = normalizeKey(event.key);
-  if (eventKey === expectedKey) {
+function matchesHotkey(
+  event: KeyboardEvent,
+  parsed: ParsedHotkey,
+  isMac: boolean
+): boolean {
+  const expectCtrl = parsed.ctrl || (parsed.mod && !isMac);
+  const expectMeta = parsed.meta || (parsed.mod && isMac);
+
+  if (event.ctrlKey !== expectCtrl) return false;
+  if (event.metaKey !== expectMeta) return false;
+  if (event.shiftKey !== parsed.shift) return false;
+  if (event.altKey !== parsed.alt) return false;
+
+  const eventKey = normalizeKeyName(event.key);
+
+  if (parsed.key === null) {
+    const hasAnyModifier =
+      expectCtrl || expectMeta || parsed.shift || parsed.alt;
+    return hasAnyModifier && MODIFIER_EVENT_KEYS.has(eventKey);
+  }
+
+  if (eventKey === parsed.key) {
     return true;
   }
 
-  if (event.code) {
-    const codeLower = event.code.toLowerCase();
-    if (codeLower === expectedKey) {
-      return true;
-    }
-    if (
-      codeLower.startsWith('key') &&
-      codeLower.slice(3) === expectedKey
-    ) {
-      return true;
-    }
-    if (
-      codeLower.startsWith('digit') &&
-      codeLower.slice(5) === expectedKey
-    ) {
-      return true;
-    }
+  const code = event.code.toLowerCase();
+  if (code === `key${parsed.key}` || code === `digit${parsed.key}`) {
+    return true;
   }
 
   return false;
 }
 
-export function matchesHotkey(
-  hotkey: string,
-  event: KeyboardEvent,
-): boolean {
-  const parsed = parseHotkey(hotkey);
-  const isMac = isMacPlatform();
-
-  const expectedCtrl = parsed.ctrl || (!isMac && parsed.mod);
-  const expectedMeta = parsed.meta || (isMac && parsed.mod);
-
-  if (event.ctrlKey !== expectedCtrl) {
-    return false;
-  }
-  if (event.metaKey !== expectedMeta) {
-    return false;
-  }
-  if (event.shiftKey !== parsed.shift) {
-    return false;
-  }
-  if (event.altKey !== parsed.alt) {
-    return false;
-  }
-
-  if (parsed.key === null) {
-    return true;
-  }
-
-  return matchesEventKey(parsed.key, event);
-}
-
-function isEditableElement(target: EventTarget | null): {
-  isFormTag: boolean;
-  isContentEditable: boolean;
-} {
-  if (!target || !(target instanceof HTMLElement)) {
-    return { isFormTag: false, isContentEditable: false };
-  }
-
-  return {
-    isFormTag: FORM_TAGS.has(target.tagName),
-    isContentEditable: target.isContentEditable,
-  };
-}
-
 export function useHotkeys(
-  keys: string | ReadonlyArray<string>,
-  callback: (event: KeyboardEvent, hotkey: string) => void,
-  options: UseHotkeysOptions = {},
+  keys: string | readonly string[],
+  callback: HotkeyCallback,
+  options: UseHotkeysOptions = {}
 ): void {
   const {
     enabled = true,
-    preventDefault = false,
+    preventDefault = true,
     stopPropagation = false,
     enableOnFormTags = false,
-    enableOnContentEditable = false,
-    ignoreRepeated = true,
-    event: eventName = 'keydown',
+    event: eventType = 'keydown',
     target,
   } = options;
 
-  useEventListener(
-    eventName,
-    (event: Event) => {
-      if (!enabled || !(event instanceof KeyboardEvent)) {
+  const callbackRef = useLatest(callback);
+  const keysString = Array.isArray(keys) ? keys.join(',') : (keys as string);
+
+  useEffect(() => {
+    if (!enabled || typeof window === 'undefined') {
+      return;
+    }
+
+    const targetNode = resolveTargetElement<HTMLElement | Document | Window>(
+      target,
+      window
+    );
+    if (!targetNode) {
+      return;
+    }
+
+    const combos = keysString
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean)
+      .map(parseHotkey);
+
+    if (combos.length === 0) {
+      return;
+    }
+
+    const isMac = isMacPlatform();
+
+    const handleKeyEvent = (rawEvent: Event) => {
+      const keyboardEvent = rawEvent as KeyboardEvent;
+
+      if (!enableOnFormTags && isEditableElement(keyboardEvent.target)) {
         return;
       }
 
-      if (ignoreRepeated && event.repeat) {
-        return;
-      }
-
-      const { isFormTag, isContentEditable } = isEditableElement(
-        event.target,
-      );
-
-      if (isFormTag && !enableOnFormTags) {
-        return;
-      }
-
-      if (isContentEditable && !enableOnContentEditable) {
-        return;
-      }
-
-      const rawList = typeof keys === 'string' ? keys.split(',') : keys;
-      const hotkeys = rawList
-        .map((k: string) => k.trim())
-        .filter(Boolean);
-
-      for (const hotkey of hotkeys) {
-        if (matchesHotkey(hotkey, event)) {
+      for (const parsed of combos) {
+        if (matchesHotkey(keyboardEvent, parsed, isMac)) {
           if (preventDefault) {
-            event.preventDefault();
+            keyboardEvent.preventDefault();
           }
           if (stopPropagation) {
-            event.stopPropagation();
+            keyboardEvent.stopPropagation();
           }
-          callback(event, hotkey);
+          callbackRef.current(keyboardEvent, parsed.raw);
           break;
         }
       }
-    },
+    };
+
+    targetNode.addEventListener(eventType, handleKeyEvent);
+
+    return () => {
+      targetNode.removeEventListener(eventType, handleKeyEvent);
+    };
+  }, [
+    enabled,
+    keysString,
+    preventDefault,
+    stopPropagation,
+    enableOnFormTags,
+    eventType,
     target,
-  );
+    callbackRef,
+  ]);
 }
+
+export default useHotkeys;
