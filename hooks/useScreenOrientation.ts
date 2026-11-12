@@ -1,112 +1,127 @@
-import { useSyncExternalStore } from 'react';
-import { useEventCallback } from './useEventCallback';
+import { useCallback, useRef, useSyncExternalStore } from 'react';
 
-export type ScreenOrientationLockType =
-  | 'any'
-  | 'natural'
-  | 'landscape'
-  | 'portrait'
-  | 'portrait-primary'
-  | 'portrait-secondary'
-  | 'landscape-primary'
-  | 'landscape-secondary';
-
-export interface ScreenOrientationSnapshot {
-  isSupported: boolean;
+export interface ScreenOrientationState {
   type: OrientationType;
   angle: number;
+  isSupported: boolean;
 }
 
-export interface UseScreenOrientationReturn extends ScreenOrientationSnapshot {
-  lock: (orientation: ScreenOrientationLockType) => Promise<void>;
+export interface UseScreenOrientationReturn extends ScreenOrientationState {
+  lock: (orientation: string) => Promise<void>;
   unlock: () => void;
 }
 
-interface ScreenOrientationWithLock extends ScreenOrientation {
-  lock?: (orientation: ScreenOrientationLockType) => Promise<void>;
-}
-
-const SERVER_SNAPSHOT: ScreenOrientationSnapshot = {
-  isSupported: false,
-  type: 'landscape-primary',
+const SERVER_SNAPSHOT: ScreenOrientationState = Object.freeze({
+  type: 'portrait-primary',
   angle: 0,
-};
+  isSupported: false,
+});
 
-let cachedSnapshot: ScreenOrientationSnapshot = SERVER_SNAPSHOT;
-
-function subscribe(onStoreChange: () => void): () => void {
-  if (typeof window === 'undefined' || !window.screen?.orientation) {
-    return () => {};
-  }
-
-  const orientation = window.screen.orientation;
-  orientation.addEventListener('change', onStoreChange);
-
-  return () => {
-    orientation.removeEventListener('change', onStoreChange);
-  };
-}
-
-function getSnapshot(): ScreenOrientationSnapshot {
-  if (typeof window === 'undefined' || !window.screen?.orientation) {
-    return SERVER_SNAPSHOT;
-  }
-
-  const { type, angle } = window.screen.orientation;
-
-  if (
-    cachedSnapshot.isSupported &&
-    cachedSnapshot.type === type &&
-    cachedSnapshot.angle === angle
-  ) {
-    return cachedSnapshot;
-  }
-
-  cachedSnapshot = {
-    isSupported: true,
-    type,
-    angle,
-  };
-
-  return cachedSnapshot;
-}
-
-function getServerSnapshot(): ScreenOrientationSnapshot {
+function getServerSnapshot(): ScreenOrientationState {
   return SERVER_SNAPSHOT;
 }
 
-export function useScreenOrientation(): UseScreenOrientationReturn {
-  const snapshot = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot,
-  );
+function readOrientationState(): ScreenOrientationState {
+  if (typeof window === 'undefined' || typeof screen === 'undefined') {
+    return SERVER_SNAPSHOT;
+  }
 
-  const lock = useEventCallback(
-    async (orientation: ScreenOrientationLockType): Promise<void> => {
-      if (typeof window === 'undefined' || !window.screen?.orientation) {
-        return;
-      }
-      const screenOrientation = window.screen
-        .orientation as ScreenOrientationWithLock;
-      if (typeof screenOrientation.lock === 'function') {
-        await screenOrientation.lock(orientation);
-      }
-    },
-  );
+  const orientation = screen.orientation;
+  if (orientation) {
+    return {
+      type: orientation.type,
+      angle: orientation.angle,
+      isSupported: true,
+    };
+  }
 
-  const unlock = useEventCallback((): void => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.screen?.orientation?.unlock === 'function'
-    ) {
-      window.screen.orientation.unlock();
-    }
-  });
+  const isLandscape =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(orientation: landscape)').matches;
 
   return {
-    ...snapshot,
+    type: isLandscape ? 'landscape-primary' : 'portrait-primary',
+    angle: isLandscape ? 90 : 0,
+    isSupported: false,
+  };
+}
+
+function subscribe(onStoreChange: () => void): () => void {
+  if (typeof window === 'undefined' || typeof screen === 'undefined') {
+    return () => {};
+  }
+
+  const orientation = screen.orientation;
+  if (orientation && typeof orientation.addEventListener === 'function') {
+    orientation.addEventListener('change', onStoreChange);
+    return () => {
+      orientation.removeEventListener('change', onStoreChange);
+    };
+  }
+
+  window.addEventListener('orientationchange', onStoreChange);
+  window.addEventListener('resize', onStoreChange);
+
+  return () => {
+    window.removeEventListener('orientationchange', onStoreChange);
+    window.removeEventListener('resize', onStoreChange);
+  };
+}
+
+export function useScreenOrientation(): UseScreenOrientationReturn {
+  const cacheRef: { current: ScreenOrientationState } =
+    useRef(SERVER_SNAPSHOT);
+
+  const getSnapshot = useCallback((): ScreenOrientationState => {
+    const next = readOrientationState();
+    const prev = cacheRef.current;
+    if (
+      prev.type === next.type &&
+      prev.angle === next.angle &&
+      prev.isSupported === next.isSupported
+    ) {
+      return prev;
+    }
+    cacheRef.current = next;
+    return next;
+  }, []);
+
+  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  const lock = useCallback(async (orientation: string): Promise<void> => {
+    if (
+      typeof screen === 'undefined' ||
+      !screen.orientation ||
+      typeof (
+        screen.orientation as ScreenOrientation & {
+          lock?: (o: string) => Promise<void>;
+        }
+      ).lock !== 'function'
+    ) {
+      throw new Error('Screen Orientation lock API is not supported.');
+    }
+    await (
+      screen.orientation as ScreenOrientation & {
+        lock: (o: string) => Promise<void>;
+      }
+    ).lock(orientation);
+  }, []);
+
+  const unlock = useCallback((): void => {
+    if (
+      typeof screen !== 'undefined' &&
+      screen.orientation &&
+      typeof screen.orientation.unlock === 'function'
+    ) {
+      screen.orientation.unlock();
+    }
+  }, []);
+
+  return {
+    ...state,
     lock,
     unlock,
   };
 }
+
+export default useScreenOrientation;
