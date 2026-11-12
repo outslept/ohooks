@@ -1,49 +1,57 @@
 import { useEffect, useState } from 'react';
-import { type EventListenerTarget } from './useEventListener';
+import {
+  EventListenerTarget,
+  isRefObject,
+  resolveTargetElement,
+} from './useEventListener';
 import { useLatest } from './useLatest';
 
+export type ScrollSpyTarget = string | EventListenerTarget<HTMLElement>;
+
 export interface UseScrollSpyOptions {
-  root?: EventListenerTarget<HTMLElement> | null;
+  root?: EventListenerTarget<HTMLElement>;
   rootMargin?: string;
   threshold?: number | number[];
-  defaultActiveId?: string | null;
-  onChange?: (activeId: string | null) => void;
+  offset?: number;
 }
 
-function resolveElement<T extends Element>(
-  target: EventListenerTarget<T> | string | undefined | null,
-): T | null {
-  if (!target) {
+function resolveSectionElement(target: ScrollSpyTarget): HTMLElement | null {
+  if (typeof document === 'undefined') {
     return null;
   }
   if (typeof target === 'string') {
-    if (typeof document === 'undefined') {
-      return null;
-    }
-    const cleanId = target.startsWith('#') ? target.slice(1) : target;
-    return (document.getElementById(cleanId) ??
-      document.querySelector(target)) as T | null;
+    const trimmed = target.trim();
+    if (!trimmed) return null;
+    const id = trimmed.startsWith('#') ? trimmed.slice(1) : trimmed;
+    return (
+      document.getElementById(id) ??
+      document.querySelector<HTMLElement>(trimmed)
+    );
   }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
+  return resolveTargetElement(target);
 }
 
 export function useScrollSpy(
-  targets: ReadonlyArray<EventListenerTarget<HTMLElement> | string>,
-  options: UseScrollSpyOptions = {},
+  targets: readonly ScrollSpyTarget[],
+  options: UseScrollSpyOptions = {}
 ): string | null {
   const {
-    root = null,
-    rootMargin = '0px 0px -70% 0px',
-    threshold = [0, 0.25, 0.5, 0.75, 1],
-    defaultActiveId = null,
-    onChange,
+    root,
+    rootMargin = '0px 0px -80% 0px',
+    threshold = 0,
+    offset = 0,
   } = options;
 
-  const [activeId, setActiveId] = useState<string | null>(defaultActiveId);
-  const onChangeRef = useLatest(onChange);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const targetsRef = useLatest(targets);
+
+  const targetsKey = targets
+    .map((t, index) => {
+      if (typeof t === 'string') return `s:${t}`;
+      if (isRefObject(t)) return `r:${index}:${t.current?.id ?? ''}`;
+      return `e:${t?.id ?? index}`;
+    })
+    .join('|');
 
   const thresholdKey = Array.isArray(threshold)
     ? threshold.join(',')
@@ -52,78 +60,76 @@ export function useScrollSpy(
   useEffect(() => {
     if (
       typeof window === 'undefined' ||
-      typeof window.IntersectionObserver !== 'function'
+      typeof IntersectionObserver === 'undefined'
     ) {
       return;
     }
 
-    const elements = targets
-      .map((t) => resolveElement(t))
+    const elements = targetsRef.current
+      .map(resolveSectionElement)
       .filter((el): el is HTMLElement => el !== null && Boolean(el.id));
 
     if (elements.length === 0) {
+      setActiveId(null);
       return;
     }
 
-    const rootElement = resolveElement(root);
-    const visibleMap = new Map<string, IntersectionObserverEntry>();
+    const rootElement = resolveTargetElement(root);
+    const intersectingIds = new Set<string>();
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          const id = entry.target.id;
-          if (!id) {
-            continue;
-          }
+          const id = (entry.target as HTMLElement).id;
+          if (!id) continue;
           if (entry.isIntersecting) {
-            visibleMap.set(id, entry);
+            intersectingIds.add(id);
           } else {
-            visibleMap.delete(id);
+            intersectingIds.delete(id);
           }
         }
 
-        if (visibleMap.size === 0) {
+        if (intersectingIds.size === 0) {
           return;
         }
 
-        let nextId: string | null = null;
-        let bestTop = Infinity;
+        const rootTop = rootElement
+          ? rootElement.getBoundingClientRect().top
+          : 0;
+
+        let bestId: string | null = null;
+        let bestTop = Number.POSITIVE_INFINITY;
 
         for (const el of elements) {
-          const entry = visibleMap.get(el.id);
-          if (entry) {
-            const top = Math.abs(entry.boundingClientRect.top);
-            if (top < bestTop) {
-              bestTop = top;
-              nextId = el.id;
-            }
+          if (!intersectingIds.has(el.id)) continue;
+          const relativeTop = el.getBoundingClientRect().top - rootTop - offset;
+          if (relativeTop < bestTop) {
+            bestTop = relativeTop;
+            bestId = el.id;
           }
         }
 
-        if (nextId !== null) {
-          setActiveId((prev) => {
-            if (prev !== nextId) {
-              onChangeRef.current?.(nextId);
-            }
-            return nextId;
-          });
+        if (bestId !== null) {
+          setActiveId(bestId);
         }
       },
       {
         root: rootElement,
         rootMargin,
         threshold,
-      },
+      }
     );
 
-    for (const el of elements) {
-      observer.observe(el);
+    for (const element of elements) {
+      observer.observe(element);
     }
 
     return () => {
       observer.disconnect();
     };
-  }, [targets, root, rootMargin, thresholdKey, onChangeRef]);
+  }, [targetsKey, root, rootMargin, thresholdKey, offset]);
 
   return activeId;
 }
+
+export default useScrollSpy;
