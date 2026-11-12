@@ -1,55 +1,48 @@
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { useEffect } from 'react';
 import { useLatest } from './useLatest';
 
-export type EventListenerTarget<T> =
-  | T
-  | { readonly current: T | null }
-  | null;
+export type EventListenerTarget<T> = T | { readonly current: T | null } | null;
 
 export function isRefObject<T>(
-  target: EventListenerTarget<T> | undefined,
+  target: EventListenerTarget<T> | undefined
 ): target is { readonly current: T | null } {
   return (
-    target !== null &&
-    target !== undefined &&
     typeof target === 'object' &&
+    target !== null &&
     'current' in target &&
-    !(
-      'addEventListener' in target &&
-      typeof (target as unknown as EventTarget).addEventListener === 'function'
-    ) &&
-    !(
-      'nodeType' in target &&
-      typeof (target as unknown as Node).nodeType === 'number'
-    )
+    !('addEventListener' in target) &&
+    !('nodeType' in target)
   );
 }
 
 export function resolveTargetElement<T>(
   target: EventListenerTarget<T> | undefined,
-  fallback?: T | null,
+  fallback: T | null = null
 ): T | null {
   if (target === undefined) {
-    return fallback ?? null;
+    return fallback;
   }
   if (target === null) {
     return null;
   }
-  return isRefObject(target) ? target.current : target;
+  if (isRefObject(target)) {
+    return target.current ?? null;
+  }
+  return target;
 }
 
 export function useEventListener<K extends keyof WindowEventMap>(
   eventName: K,
   handler: (event: WindowEventMap[K]) => void,
-  element?: EventListenerTarget<Window> | undefined,
-  options?: boolean | AddEventListenerOptions | undefined,
+  element?: EventListenerTarget<Window>,
+  options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener<K extends keyof DocumentEventMap>(
   eventName: K,
   handler: (event: DocumentEventMap[K]) => void,
   element: EventListenerTarget<Document>,
-  options?: boolean | AddEventListenerOptions | undefined,
+  options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener<
@@ -59,7 +52,7 @@ export function useEventListener<
   eventName: K,
   handler: (event: HTMLElementEventMap[K]) => void,
   element: EventListenerTarget<T>,
-  options?: boolean | AddEventListenerOptions | undefined,
+  options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener<
@@ -69,68 +62,74 @@ export function useEventListener<
   eventName: K,
   handler: (event: SVGElementEventMap[K]) => void,
   element: EventListenerTarget<T>,
-  options?: boolean | AddEventListenerOptions | undefined,
+  options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener<K extends keyof MediaQueryListEventMap>(
   eventName: K,
   handler: (event: MediaQueryListEventMap[K]) => void,
   element: EventListenerTarget<MediaQueryList>,
-  options?: boolean | AddEventListenerOptions | undefined,
+  options?: boolean | AddEventListenerOptions
 ): void;
 
-export function useEventListener<K extends string, E extends Event = Event>(
+export function useEventListener<
+  K extends string,
+  T extends EventTarget = EventTarget,
+  E extends Event = Event,
+>(
   eventName: K,
   handler: (event: E) => void,
-  element?: EventListenerTarget<EventTarget> | undefined,
-  options?: boolean | AddEventListenerOptions | undefined,
+  element: EventListenerTarget<
+    T extends HTMLElement | SVGElement | Window | Document | MediaQueryList
+      ? never
+      : T
+  >,
+  options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener(
   eventName: string,
-  handler: (event: never) => void,
-  element?: EventListenerTarget<EventTarget> | undefined,
-  options?: boolean | AddEventListenerOptions | undefined,
+  handler: (event: Event) => void,
+  element?: EventListenerTarget<EventTarget>,
+  options?: boolean | AddEventListenerOptions
 ): void {
   const savedHandler = useLatest(handler);
 
   const isBooleanOptions = typeof options === 'boolean';
   const capture = isBooleanOptions ? options : options?.capture;
-  const passive = isBooleanOptions ? undefined : options?.passive;
   const once = isBooleanOptions ? undefined : options?.once;
+  const passive = isBooleanOptions ? undefined : options?.passive;
   const signal = isBooleanOptions ? undefined : options?.signal;
 
-  useIsomorphicLayoutEffect(() => {
-    const defaultWindow =
-      typeof window !== 'undefined' ? (window as EventTarget) : null;
-    const targetElement = resolveTargetElement(element, defaultWindow);
+  useEffect(() => {
+    const defaultTarget = typeof window !== 'undefined' ? window : null;
+    const targetElement = resolveTargetElement<EventTarget>(
+      element,
+      defaultTarget
+    );
 
-    if (
-      !targetElement ||
-      typeof targetElement.addEventListener !== 'function'
-    ) {
+    if (!targetElement || typeof targetElement.addEventListener !== 'function') {
       return;
     }
 
-    let listenerOptions: boolean | AddEventListenerOptions | undefined;
-    if (isBooleanOptions) {
-      listenerOptions = capture;
-    } else if (
-      capture !== undefined ||
-      passive !== undefined ||
-      once !== undefined ||
-      signal !== undefined
-    ) {
-      listenerOptions = {};
-      if (capture !== undefined) listenerOptions.capture = capture;
-      if (passive !== undefined) listenerOptions.passive = passive;
-      if (once !== undefined) listenerOptions.once = once;
-      if (signal !== undefined) listenerOptions.signal = signal;
-    }
-
-    const listener: EventListener = (event) => {
-      (savedHandler.current as (event: Event) => void)(event);
+    const listener: EventListener = (event: Event) => {
+      savedHandler.current(event);
     };
+
+    const listenerOptions: boolean | AddEventListenerOptions | undefined =
+      isBooleanOptions
+        ? options
+        : capture !== undefined ||
+            once !== undefined ||
+            passive !== undefined ||
+            signal !== undefined
+          ? {
+              ...(capture !== undefined ? { capture } : {}),
+              ...(once !== undefined ? { once } : {}),
+              ...(passive !== undefined ? { passive } : {}),
+              ...(signal !== undefined ? { signal } : {}),
+            }
+          : undefined;
 
     targetElement.addEventListener(eventName, listener, listenerOptions);
 
@@ -141,10 +140,13 @@ export function useEventListener(
     eventName,
     element,
     isBooleanOptions,
+    options,
     capture,
-    passive,
     once,
+    passive,
     signal,
     savedHandler,
   ]);
 }
+
+export default useEventListener;
