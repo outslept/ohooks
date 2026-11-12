@@ -1,130 +1,146 @@
-import { useMemo, useRef, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
-import { useUnmount } from './useUnmount';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLatest } from './useLatest';
 
 export interface UseFileDialogOptions {
-  accept?: string;
   multiple?: boolean;
-  capture?: string | boolean;
+  accept?: string;
+  capture?: string;
   directory?: boolean;
-  resetOnOpen?: boolean;
+  reset?: boolean;
   onChange?: (files: FileList | null) => void;
   onCancel?: () => void;
 }
 
 export interface UseFileDialogReturn {
   files: FileList | null;
-  fileArray: File[];
   open: (localOptions?: Partial<UseFileDialogOptions>) => void;
   reset: () => void;
 }
 
-interface DirectoryInputElement extends HTMLInputElement {
-  webkitdirectory?: boolean;
-}
+const DEFAULT_OPTIONS: Required<
+  Pick<
+    UseFileDialogOptions,
+    'multiple' | 'accept' | 'directory' | 'reset'
+  >
+> = {
+  multiple: true,
+  accept: '*',
+  directory: false,
+  reset: false,
+};
 
 export function useFileDialog(
-  options: UseFileDialogOptions = {},
+  options: UseFileDialogOptions = {}
 ): UseFileDialogReturn {
-  const {
-    accept = '*',
-    multiple = true,
-    capture,
-    directory = false,
-    resetOnOpen = false,
-    onChange,
-    onCancel,
-  } = options;
-
   const [files, setFiles] = useState<FileList | null>(null);
-  const inputRef = useRef<DirectoryInputElement | null>(null);
+  const inputRef: { current: HTMLInputElement | null } = useRef(null);
+  const optionsRef = useLatest(options);
+  const localOptionsRef: {
+    current: Partial<UseFileDialogOptions> | undefined;
+  } = useRef(undefined);
 
-  const fileArray = useMemo(
-    () => (files ? Array.from(files) : []),
-    [files],
-  );
-
-  const reset = useEventCallback(() => {
+  const reset = useCallback(() => {
     setFiles(null);
     if (inputRef.current) {
       inputRef.current.value = '';
     }
-  });
+  }, []);
 
-  const open = useEventCallback(
+  const getOrCreateInput = useCallback((): HTMLInputElement | null => {
+    if (typeof document === 'undefined') {
+      return null;
+    }
+
+    if (!inputRef.current) {
+      const input = document.createElement('input');
+      input.type = 'file';
+
+      input.onchange = (event: Event) => {
+        const target = event.target as HTMLInputElement;
+        const selectedFiles = target.files;
+        setFiles(selectedFiles);
+
+        const localOnChange = localOptionsRef.current?.onChange;
+        const globalOnChange = optionsRef.current.onChange;
+
+        if (localOnChange) {
+          localOnChange(selectedFiles);
+        }
+        if (globalOnChange && globalOnChange !== localOnChange) {
+          globalOnChange(selectedFiles);
+        }
+      };
+
+      input.oncancel = () => {
+        const localOnCancel = localOptionsRef.current?.onCancel;
+        const globalOnCancel = optionsRef.current.onCancel;
+
+        if (localOnCancel) {
+          localOnCancel();
+        }
+        if (globalOnCancel && globalOnCancel !== localOnCancel) {
+          globalOnCancel();
+        }
+      };
+
+      inputRef.current = input;
+    }
+
+    return inputRef.current;
+  }, [optionsRef]);
+
+  const open = useCallback(
     (localOptions?: Partial<UseFileDialogOptions>) => {
-      if (typeof document === 'undefined') {
-        return;
-      }
+      const input = getOrCreateInput();
+      if (!input) return;
 
-      const merged = {
-        accept,
-        multiple,
-        capture,
-        directory,
-        resetOnOpen,
+      localOptionsRef.current = localOptions;
+
+      const merged: UseFileDialogOptions = {
+        ...DEFAULT_OPTIONS,
+        ...optionsRef.current,
         ...localOptions,
       };
 
-      if (merged.resetOnOpen) {
+      if (merged.reset) {
         reset();
       }
 
-      if (!inputRef.current) {
-        const input = document.createElement('input') as DirectoryInputElement;
-        input.type = 'file';
-        input.style.display = 'none';
+      input.multiple = Boolean(merged.multiple);
+      input.accept = merged.accept ?? '*';
 
-        input.addEventListener('change', () => {
-          const selectedFiles = input.files;
-          setFiles(selectedFiles);
-          onChange?.(selectedFiles);
-        });
-
-        input.addEventListener('cancel', () => {
-          onCancel?.();
-        });
-
-        inputRef.current = input;
-      }
-
-      const input = inputRef.current;
-      input.value = '';
-      input.accept = merged.accept;
-      input.multiple = merged.multiple;
-
-      if (merged.directory) {
-        input.webkitdirectory = true;
-        input.setAttribute('webkitdirectory', '');
-      } else {
-        input.webkitdirectory = false;
-        input.removeAttribute('webkitdirectory');
-      }
-
-      if (merged.capture !== undefined && merged.capture !== false) {
-        input.setAttribute(
-          'capture',
-          typeof merged.capture === 'string' ? merged.capture : '',
-        );
+      if (merged.capture !== undefined) {
+        input.setAttribute('capture', merged.capture);
       } else {
         input.removeAttribute('capture');
       }
 
+      if (merged.directory) {
+        input.setAttribute('webkitdirectory', '');
+      } else {
+        input.removeAttribute('webkitdirectory');
+      }
+
       input.click();
     },
+    [getOrCreateInput, optionsRef, reset]
   );
 
-  useUnmount(() => {
-    if (inputRef.current) {
-      inputRef.current.remove();
-      inputRef.current = null;
-    }
-  });
+  useEffect(() => {
+    return () => {
+      if (inputRef.current) {
+        inputRef.current.onchange = null;
+        inputRef.current.oncancel = null;
+        inputRef.current = null;
+      }
+    };
+  }, []);
 
   return {
     files,
-    fileArray,
     open,
     reset,
   };
 }
+
+export default useFileDialog;
