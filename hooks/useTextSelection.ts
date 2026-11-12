@@ -1,117 +1,144 @@
-import { useState } from 'react';
-import { useEventCallback } from './useEventCallback';
+import { useEffect, useState } from 'react';
 import {
-  type EventListenerTarget,
-  useEventListener,
+  EventListenerTarget,
+  resolveTargetElement,
 } from './useEventListener';
 
 export interface TextSelectionState {
   text: string;
   rect: DOMRect | null;
-  rects: DOMRect[];
   ranges: Range[];
   selection: Selection | null;
 }
 
-const INITIAL_SELECTION_STATE: TextSelectionState = {
+const EMPTY_STATE: TextSelectionState = {
   text: '',
   rect: null,
-  rects: [],
   ranges: [],
   selection: null,
 };
 
-function resolveElement<T extends Node>(
-  target?: EventListenerTarget<T>,
-): T | null {
-  if (!target) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
+function isSameRect(a: DOMRect | null, b: DOMRect | null): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return (
+    a.top === b.top &&
+    a.left === b.left &&
+    a.width === b.width &&
+    a.height === b.height
+  );
 }
 
-export function useTextSelection<T extends HTMLElement = HTMLElement>(
-  target?: EventListenerTarget<T>,
-): TextSelectionState {
-  const [state, setState] = useState<TextSelectionState>(
-    INITIAL_SELECTION_STATE,
-  );
-
-  const updateSelection = useEventCallback(() => {
+function isSameRanges(a: Range[], b: Range[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    const rA = a[i];
+    const rB = b[i];
     if (
-      typeof window === 'undefined' ||
-      typeof window.getSelection !== 'function'
+      !rA ||
+      !rB ||
+      rA.startContainer !== rB.startContainer ||
+      rA.startOffset !== rB.startOffset ||
+      rA.endContainer !== rB.endContainer ||
+      rA.endOffset !== rB.endOffset
     ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function isSameSelectionState(
+  prev: TextSelectionState,
+  next: TextSelectionState
+): boolean {
+  if (prev === next) return true;
+  if (prev.text === '' && next.text === '' && prev.ranges.length === 0 && next.ranges.length === 0) {
+    return true;
+  }
+  return (
+    prev.text === next.text &&
+    isSameRect(prev.rect, next.rect) &&
+    isSameRanges(prev.ranges, next.ranges)
+  );
+}
+
+export function useTextSelection(
+  target?: EventListenerTarget<HTMLElement>
+): TextSelectionState {
+  const [state, setState] = useState<TextSelectionState>(EMPTY_STATE);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
       return;
     }
 
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) {
-      setState((prev) =>
-        prev.text === '' && prev.ranges.length === 0
-          ? prev
-          : INITIAL_SELECTION_STATE,
-      );
-      return;
-    }
-
-    const text = selection.toString();
-    const element = resolveElement(target);
-
-    if (element) {
-      const anchorNode = selection.anchorNode;
-      const focusNode = selection.focusNode;
-      const isInside =
-        anchorNode !== null &&
-        focusNode !== null &&
-        element.contains(anchorNode) &&
-        element.contains(focusNode);
-
-      if (!isInside) {
+    const updateSelection = () => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
         setState((prev) =>
-          prev.text === '' && prev.ranges.length === 0
-            ? prev
-            : INITIAL_SELECTION_STATE,
+          isSameSelectionState(prev, EMPTY_STATE) ? prev : EMPTY_STATE
         );
         return;
       }
-    }
 
-    if (!text) {
+      const text = sel.toString();
+      if (!text) {
+        setState((prev) =>
+          isSameSelectionState(prev, EMPTY_STATE) ? prev : EMPTY_STATE
+        );
+        return;
+      }
+
+      const containerElement = resolveTargetElement(target);
+      if (containerElement) {
+        const anchorNode = sel.anchorNode;
+        const focusNode = sel.focusNode;
+        const containsAnchor =
+          anchorNode !== null && containerElement.contains(anchorNode);
+        const containsFocus =
+          focusNode !== null && containerElement.contains(focusNode);
+
+        if (!containsAnchor && !containsFocus) {
+          setState((prev) =>
+            isSameSelectionState(prev, EMPTY_STATE) ? prev : EMPTY_STATE
+          );
+          return;
+        }
+      }
+
+      const ranges: Range[] = [];
+      for (let i = 0; i < sel.rangeCount; i += 1) {
+        ranges.push(sel.getRangeAt(i).cloneRange());
+      }
+
+      const firstRange = ranges[0];
+      const rect = firstRange ? firstRange.getBoundingClientRect() : null;
+
+      const nextState: TextSelectionState = {
+        text,
+        rect,
+        ranges,
+        selection: sel,
+      };
+
       setState((prev) =>
-        prev.text === '' && prev.ranges.length === 0
-          ? prev
-          : INITIAL_SELECTION_STATE,
+        isSameSelectionState(prev, nextState) ? prev : nextState
       );
-      return;
-    }
+    };
 
-    const ranges: Range[] = [];
-    const rects: DOMRect[] = [];
+    document.addEventListener('selectionchange', updateSelection);
+    window.addEventListener('mouseup', updateSelection);
+    window.addEventListener('keyup', updateSelection);
 
-    for (let i = 0; i < selection.rangeCount; i++) {
-      const range = selection.getRangeAt(i);
-      ranges.push(range);
-      rects.push(range.getBoundingClientRect());
-    }
-
-    setState({
-      text,
-      rect: rects[0] ?? null,
-      rects,
-      ranges,
-      selection,
-    });
-  });
-
-  const doc = typeof document !== 'undefined' ? document : null;
-
-  useEventListener('selectionchange', updateSelection, doc);
-  useEventListener('mouseup', updateSelection, doc);
-  useEventListener('keyup', updateSelection, doc);
+    return () => {
+      document.removeEventListener('selectionchange', updateSelection);
+      window.removeEventListener('mouseup', updateSelection);
+      window.removeEventListener('keyup', updateSelection);
+    };
+  }, [target]);
 
   return state;
 }
+
+export default useTextSelection;
