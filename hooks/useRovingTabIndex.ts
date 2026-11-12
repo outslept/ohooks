@@ -1,27 +1,30 @@
 import {
   type FocusEvent as ReactFocusEvent,
   type KeyboardEvent as ReactKeyboardEvent,
+  useCallback,
   useRef,
+  useState,
 } from 'react';
 import { useControllableState } from './useControllableState';
 import { useEventCallback } from './useEventCallback';
+import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
 export type RovingOrientation = 'horizontal' | 'vertical' | 'both';
 
 export interface UseRovingTabIndexOptions {
-  count?: number;
-  activeIndex?: number;
-  defaultActiveIndex?: number;
-  orientation?: RovingOrientation;
-  loop?: boolean;
-  rtl?: boolean;
-  onActiveIndexChange?: (index: number) => void;
+  count?: number | undefined;
+  activeIndex?: number | undefined;
+  defaultActiveIndex?: number | undefined;
+  orientation?: RovingOrientation | undefined;
+  loop?: boolean | undefined;
+  rtl?: boolean | undefined;
+  onActiveIndexChange?: ((index: number) => void) | undefined;
 }
 
 export interface RovingItemOptions<T extends HTMLElement = HTMLElement> {
-  disabled?: boolean;
-  onKeyDown?: (event: ReactKeyboardEvent<T>) => void;
-  onFocus?: (event: ReactFocusEvent<T>) => void;
+  disabled?: boolean | undefined;
+  onKeyDown?: ((event: ReactKeyboardEvent<T>) => void) | undefined;
+  onFocus?: ((event: ReactFocusEvent<T>) => void) | undefined;
 }
 
 export interface RovingTabIndexItemProps<T extends HTMLElement = HTMLElement> {
@@ -39,6 +42,11 @@ export interface UseRovingTabIndexReturn {
     index: number,
     options?: RovingItemOptions<T>,
   ) => RovingTabIndexItemProps<T>;
+}
+
+interface RegisteredItem {
+  element: HTMLElement;
+  disabled: boolean;
 }
 
 export function useRovingTabIndex(
@@ -60,8 +68,8 @@ export function useRovingTabIndex(
     onChange: onActiveIndexChange,
   });
 
-  const itemsRef = useRef<Map<number, HTMLElement>>(new Map());
-  const disabledMapRef = useRef<Map<number, boolean>>(new Map());
+  const [fallbackIndex, setFallbackIndex] = useState<number | null>(null);
+  const itemsRef = useRef<Map<number, RegisteredItem>>(new Map());
 
   const getTotalCount = (): number => {
     if (count !== undefined) {
@@ -77,24 +85,41 @@ export function useRovingTabIndex(
   };
 
   const isIndexDisabled = (index: number): boolean => {
-    if (disabledMapRef.current.get(index)) {
-      return true;
-    }
-    const el = itemsRef.current.get(index);
-    if (!el) {
+    const entry = itemsRef.current.get(index);
+    if (!entry) {
       return false;
     }
+    if (entry.disabled) {
+      return true;
+    }
     return (
-      el.hasAttribute('disabled') ||
-      el.getAttribute('aria-disabled') === 'true'
+      entry.element.hasAttribute('disabled') ||
+      entry.element.getAttribute('aria-disabled') === 'true'
     );
   };
 
-  const focusItem = useEventCallback((index: number) => {
-    setActiveIndexState(index);
-    const element = itemsRef.current.get(index);
-    element?.focus();
-  });
+  const findBoundaryEnabledIndex = (fromStart: boolean): number | null => {
+    const total = getTotalCount();
+    if (total <= 0) {
+      return null;
+    }
+
+    if (fromStart) {
+      for (let i = 0; i < total; i++) {
+        if (itemsRef.current.has(i) && !isIndexDisabled(i)) {
+          return i;
+        }
+      }
+    } else {
+      for (let i = total - 1; i >= 0; i--) {
+        if (itemsRef.current.has(i) && !isIndexDisabled(i)) {
+          return i;
+        }
+      }
+    }
+
+    return null;
+  };
 
   const findNextEnabledIndex = (
     currentIndex: number,
@@ -125,42 +150,80 @@ export function useRovingTabIndex(
     return currentIndex;
   };
 
-  const findBoundaryEnabledIndex = (fromStart: boolean): number => {
-    const total = getTotalCount();
-    if (total <= 0) {
-      return activeIndex;
+  useIsomorphicLayoutEffect(() => {
+    if (itemsRef.current.size === 0) {
+      return;
     }
 
-    if (fromStart) {
-      for (let i = 0; i < total; i++) {
-        if (!isIndexDisabled(i)) return i;
-      }
-    } else {
-      for (let i = total - 1; i >= 0; i--) {
-        if (!isIndexDisabled(i)) return i;
-      }
+    if (isIndexDisabled(activeIndex)) {
+      const firstEnabled = findBoundaryEnabledIndex(true);
+      setFallbackIndex((prev) =>
+        prev === firstEnabled ? prev : firstEnabled,
+      );
+    } else if (fallbackIndex !== null) {
+      setFallbackIndex(null);
     }
+  });
 
-    return activeIndex;
-  };
+  const focusItem = useEventCallback((index: number) => {
+    setActiveIndexState(index);
+    const entry = itemsRef.current.get(index);
+    entry?.element.focus();
+  });
 
-  const getItemProps = useEventCallback(
+  const handleKeyNavigation = useEventCallback(
+    (index: number, event: ReactKeyboardEvent<HTMLElement>) => {
+      const isHorizontal =
+        orientation === 'horizontal' || orientation === 'both';
+      const isVertical =
+        orientation === 'vertical' || orientation === 'both';
+
+      const nextKey = rtl ? 'ArrowLeft' : 'ArrowRight';
+      const prevKey = rtl ? 'ArrowRight' : 'ArrowLeft';
+
+      let targetIndex: number | null = null;
+
+      if (
+        (isHorizontal && event.key === nextKey) ||
+        (isVertical && event.key === 'ArrowDown')
+      ) {
+        targetIndex = findNextEnabledIndex(index, 1);
+      } else if (
+        (isHorizontal && event.key === prevKey) ||
+        (isVertical && event.key === 'ArrowUp')
+      ) {
+        targetIndex = findNextEnabledIndex(index, -1);
+      } else if (event.key === 'Home') {
+        targetIndex = findBoundaryEnabledIndex(true);
+      } else if (event.key === 'End') {
+        targetIndex = findBoundaryEnabledIndex(false);
+      }
+
+      if (targetIndex !== null && targetIndex !== index) {
+        event.preventDefault();
+        focusItem(targetIndex);
+      }
+    },
+  );
+
+  const tabbableIndex = fallbackIndex ?? activeIndex;
+
+  const getItemProps = useCallback(
     <T extends HTMLElement = HTMLElement>(
       index: number,
       itemOptions: RovingItemOptions<T> = {},
     ): RovingTabIndexItemProps<T> => {
       const { disabled = false, onKeyDown, onFocus } = itemOptions;
-      disabledMapRef.current.set(index, disabled);
 
       return {
         ref: (node: T | null) => {
           if (node) {
-            itemsRef.current.set(index, node);
+            itemsRef.current.set(index, { element: node, disabled });
           } else {
             itemsRef.current.delete(index);
           }
         },
-        tabIndex: !disabled && activeIndex === index ? 0 : -1,
+        tabIndex: !disabled && tabbableIndex === index ? 0 : -1,
         onFocus: (event: ReactFocusEvent<T>) => {
           if (!disabled && activeIndex !== index) {
             setActiveIndexState(index);
@@ -172,40 +235,11 @@ export function useRovingTabIndex(
           if (event.defaultPrevented || disabled) {
             return;
           }
-
-          const isHorizontal =
-            orientation === 'horizontal' || orientation === 'both';
-          const isVertical =
-            orientation === 'vertical' || orientation === 'both';
-
-          const nextKey = rtl ? 'ArrowLeft' : 'ArrowRight';
-          const prevKey = rtl ? 'ArrowRight' : 'ArrowLeft';
-
-          let targetIndex: number | null = null;
-
-          if (
-            (isHorizontal && event.key === nextKey) ||
-            (isVertical && event.key === 'ArrowDown')
-          ) {
-            targetIndex = findNextEnabledIndex(index, 1);
-          } else if (
-            (isHorizontal && event.key === prevKey) ||
-            (isVertical && event.key === 'ArrowUp')
-          ) {
-            targetIndex = findNextEnabledIndex(index, -1);
-          } else if (event.key === 'Home') {
-            targetIndex = findBoundaryEnabledIndex(true);
-          } else if (event.key === 'End') {
-            targetIndex = findBoundaryEnabledIndex(false);
-          }
-
-          if (targetIndex !== null && targetIndex !== index) {
-            event.preventDefault();
-            focusItem(targetIndex);
-          }
+          handleKeyNavigation(index, event);
         },
       };
     },
+    [activeIndex, tabbableIndex, setActiveIndexState, handleKeyNavigation],
   );
 
   return {
