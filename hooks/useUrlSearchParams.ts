@@ -1,38 +1,38 @@
-import { useCallback, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useEventCallback } from './useEventCallback';
-
-export type UrlSearchParamPrimitive = string | number | boolean;
-
-export type UrlSearchParamsRecord = Record<
-  string,
-  | UrlSearchParamPrimitive
-  | ReadonlyArray<UrlSearchParamPrimitive>
-  | null
-  | undefined
->;
 
 export type UrlSearchParamsInit =
   | string
   | URLSearchParams
-  | ReadonlyArray<readonly [string, UrlSearchParamPrimitive]>
-  | UrlSearchParamsRecord;
+  | Record<string, string | number | boolean | null | undefined>
+  | ReadonlyArray<readonly [string, string]>;
+
+export interface UseUrlSearchParamsOptions {
+  historyMode?: 'push' | 'replace';
+  initialValue?: UrlSearchParamsInit;
+}
 
 export type SetUrlSearchParamsAction =
   | UrlSearchParamsInit
   | ((prev: URLSearchParams) => UrlSearchParamsInit);
 
-export interface SetUrlSearchParamsOptions {
-  replace?: boolean;
-  state?: unknown;
+export type UseUrlSearchParamsReturn = [
+  params: URLSearchParams,
+  setParams: (
+    nextInit: SetUrlSearchParamsAction,
+    overrideOptions?: { historyMode?: 'push' | 'replace' }
+  ) => void,
+];
+
+const URL_SEARCH_CHANGE_EVENT = 'custom-url-search-params-change';
+
+function isTupleArray(
+  init: UrlSearchParamsInit
+): init is ReadonlyArray<readonly [string, string]> {
+  return Array.isArray(init);
 }
 
-export interface UseUrlSearchParamsOptions {
-  defaultInit?: UrlSearchParamsInit;
-}
-
-const CUSTOM_SEARCH_PARAMS_EVENT = 'custom-url-search-params';
-
-function createUrlSearchParams(init?: UrlSearchParamsInit): URLSearchParams {
+function createSearchParams(init?: UrlSearchParamsInit): URLSearchParams {
   if (!init) {
     return new URLSearchParams();
   }
@@ -40,123 +40,90 @@ function createUrlSearchParams(init?: UrlSearchParamsInit): URLSearchParams {
     return new URLSearchParams(init);
   }
   if (init instanceof URLSearchParams) {
-    return new URLSearchParams(init);
+    return new URLSearchParams(init.toString());
   }
-  if (Array.isArray(init)) {
-    const params = new URLSearchParams();
-    for (const [key, value] of init) {
-      params.append(key, String(value));
-    }
-    return params;
+  if (isTupleArray(init)) {
+    return new URLSearchParams(init.map(([key, value]) => [key, value]));
   }
-
   const params = new URLSearchParams();
-  for (const [key, rawValue] of Object.entries(init)) {
-    if (rawValue === undefined || rawValue === null) {
-      continue;
-    }
-    if (Array.isArray(rawValue)) {
-      for (const item of rawValue) {
-        params.append(key, String(item));
-      }
-    } else {
-      params.set(key, String(rawValue));
+  for (const [key, value] of Object.entries(init)) {
+    if (value !== undefined && value !== null) {
+      params.set(key, String(value));
     }
   }
   return params;
 }
 
-function subscribe(onStoreChange: () => void): () => void {
+function readWindowSearch(initialValue?: UrlSearchParamsInit): string {
   if (typeof window === 'undefined') {
-    return () => {};
+    return createSearchParams(initialValue).toString();
   }
-
-  window.addEventListener('popstate', onStoreChange);
-  window.addEventListener(CUSTOM_SEARCH_PARAMS_EVENT, onStoreChange);
-
-  return () => {
-    window.removeEventListener('popstate', onStoreChange);
-    window.removeEventListener(CUSTOM_SEARCH_PARAMS_EVENT, onStoreChange);
-  };
+  const currentSearch = window.location.search.replace(/^\?/, '');
+  if (currentSearch.length > 0) {
+    return currentSearch;
+  }
+  return createSearchParams(initialValue).toString();
 }
 
 export function useUrlSearchParams(
-  options: UseUrlSearchParamsOptions = {},
-): [
-  URLSearchParams,
-  (nextInit: SetUrlSearchParamsAction, navOptions?: SetUrlSearchParamsOptions) => void,
-] {
-  const { defaultInit } = options;
+  options: UseUrlSearchParamsOptions = {}
+): UseUrlSearchParamsReturn {
+  const { historyMode = 'replace', initialValue } = options;
 
-  const cacheRef = useRef<{ raw: string; params: URLSearchParams } | null>(
-    null,
-  );
-  const serverSnapshotRef = useRef<URLSearchParams | null>(null);
-
-  const getSnapshot = useCallback((): URLSearchParams => {
-    if (typeof window === 'undefined') {
-      return createUrlSearchParams(defaultInit);
-    }
-
-    const currentSearch = window.location.search;
-    if (cacheRef.current !== null && cacheRef.current.raw === currentSearch) {
-      return cacheRef.current.params;
-    }
-
-    const params = new URLSearchParams(currentSearch);
-    cacheRef.current = { raw: currentSearch, params };
-    return params;
-  }, [defaultInit]);
-
-  const getServerSnapshot = useCallback((): URLSearchParams => {
-    if (serverSnapshotRef.current === null) {
-      serverSnapshotRef.current = createUrlSearchParams(defaultInit);
-    }
-    return serverSnapshotRef.current;
-  }, [defaultInit]);
-
-  const searchParams = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot,
+  const [rawSearch, setRawSearch] = useState<string>(() =>
+    readWindowSearch(initialValue)
   );
 
-  const setSearchParams = useEventCallback(
+  const params = new URLSearchParams(rawSearch);
+
+  const setParams = useEventCallback(
     (
       nextInit: SetUrlSearchParamsAction,
-      navOptions: SetUrlSearchParamsOptions = {},
+      overrideOptions?: { historyMode?: 'push' | 'replace' }
     ) => {
-      if (typeof window === 'undefined') {
-        return;
-      }
-
-      const { replace = false, state = window.history.state } = navOptions;
-
+      const currentParams = new URLSearchParams(rawSearch);
       const resolvedInit =
-        typeof nextInit === 'function'
-          ? nextInit(new URLSearchParams(window.location.search))
-          : nextInit;
+        typeof nextInit === 'function' ? nextInit(currentParams) : nextInit;
+      const nextParams = createSearchParams(resolvedInit);
+      const nextSearchString = nextParams.toString();
 
-      const nextParams = createUrlSearchParams(resolvedInit);
-      const searchString = nextParams.toString();
-      const nextSearch = searchString ? `?${searchString}` : '';
+      setRawSearch(nextSearchString);
 
-      const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-      const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+      if (typeof window !== 'undefined') {
+        const mode = overrideOptions?.historyMode ?? historyMode;
+        const { pathname, hash } = window.location;
+        const query = nextSearchString ? `?${nextSearchString}` : '';
+        const nextUrl = `${pathname}${query}${hash}`;
 
-      if (currentUrl === nextUrl) {
-        return;
+        if (mode === 'push') {
+          window.history.pushState(window.history.state, '', nextUrl);
+        } else {
+          window.history.replaceState(window.history.state, '', nextUrl);
+        }
+
+        window.dispatchEvent(new Event(URL_SEARCH_CHANGE_EVENT));
       }
-
-      if (replace) {
-        window.history.replaceState(state, '', nextUrl);
-      } else {
-        window.history.pushState(state, '', nextUrl);
-      }
-
-      window.dispatchEvent(new CustomEvent(CUSTOM_SEARCH_PARAMS_EVENT));
-    },
+    }
   );
 
-  return [searchParams, setSearchParams];
+  const syncFromLocation = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    setRawSearch(window.location.search.replace(/^\?/, ''));
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    window.addEventListener('popstate', syncFromLocation);
+    window.addEventListener(URL_SEARCH_CHANGE_EVENT, syncFromLocation);
+
+    return () => {
+      window.removeEventListener('popstate', syncFromLocation);
+      window.removeEventListener(URL_SEARCH_CHANGE_EVENT, syncFromLocation);
+    };
+  }, [syncFromLocation]);
+
+  return [params, setParams];
 }
+
+export default useUrlSearchParams;
