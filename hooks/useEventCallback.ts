@@ -1,14 +1,13 @@
-import { useCallback } from "react";
-import { useLatest } from "./useLatest";
+import { useCallback } from 'react';
+import { useLatest } from './useLatest';
 
-export function useEventCallback<T extends Function>(fn: T): T {
+export function useEventCallback<T extends (...args: never[]) => unknown>(
+  fn: T,
+): T {
   const fnRef = useLatest(fn);
 
   return useCallback(
-    ((...args: unknown[]) =>
-      (fnRef.current as unknown as (...args: unknown[]) => unknown)(
-        ...args,
-      )) as unknown as T,
+    ((...args: never[]) => fnRef.current(...args)) as T,
     [fnRef],
   );
 }
