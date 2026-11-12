@@ -1,97 +1,87 @@
+import { useEffect } from 'react';
 import {
-  type EventListenerTarget,
-  useEventListener,
+  EventListenerTarget,
+  resolveTargetElement,
 } from './useEventListener';
+import { useLatest } from './useLatest';
 
-export type OnClickOutsideEvent = MouseEvent | TouchEvent | FocusEvent;
+export type ClickOutsideEvent = MouseEvent | TouchEvent | PointerEvent;
 
 export interface UseOnClickOutsideOptions {
   enabled?: boolean;
-  detectIframe?: boolean;
+  events?: ReadonlyArray<'mousedown' | 'mouseup' | 'touchstart' | 'touchend' | 'pointerdown' | 'click'>;
+  capture?: boolean;
 }
 
-function resolveElement<T extends Element>(
-  target: EventListenerTarget<T>,
-): T | null {
-  if (target === null || target === undefined) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
-}
+const DEFAULT_EVENTS: ReadonlyArray<
+  'mousedown' | 'mouseup' | 'touchstart' | 'touchend' | 'pointerdown' | 'click'
+> = ['pointerdown'];
 
-export function useOnClickOutside<T extends Element = HTMLElement>(
-  target: EventListenerTarget<T> | ReadonlyArray<EventListenerTarget<T>>,
-  handler: (event: OnClickOutsideEvent) => void,
-  options: UseOnClickOutsideOptions = {},
+export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
+  target:
+    | EventListenerTarget<T>
+    | ReadonlyArray<EventListenerTarget<HTMLElement>>,
+  handler: (event: ClickOutsideEvent) => void,
+  options: UseOnClickOutsideOptions = {}
 ): void {
-  const { enabled = true, detectIframe = false } = options;
+  const {
+    enabled = true,
+    events = DEFAULT_EVENTS,
+    capture = true,
+  } = options;
 
-  const listener = (event: MouseEvent | TouchEvent): void => {
-    if (!enabled) {
+  const handlerRef = useLatest(handler);
+  const targetRef = useLatest(target);
+  const eventsKey = events.join(',');
+
+  useEffect(() => {
+    if (!enabled || typeof document === 'undefined') {
       return;
     }
 
-    const eventTarget = event.target as Node | null;
-    if (!eventTarget || !eventTarget.isConnected) {
-      return;
-    }
-
-    const targets = Array.isArray(target) ? target : [target];
-    const elements = targets
-      .map((item) => resolveElement(item as EventListenerTarget<T>))
-      .filter((el): el is T => el !== null);
-
-    if (elements.length === 0) {
-      return;
-    }
-
-    const composedPath =
-      typeof event.composedPath === 'function' ? event.composedPath() : null;
-
-    const isInside = elements.some((element) => {
-      if (composedPath) {
-        return composedPath.includes(element);
+    const listener = (rawEvent: Event) => {
+      const event = rawEvent as ClickOutsideEvent;
+      const eventTarget = event.target as Node | null;
+      if (!eventTarget || !eventTarget.isConnected) {
+        return;
       }
-      return element.contains(eventTarget);
-    });
 
-    if (!isInside) {
-      handler(event);
+      const rawTargets = targetRef.current;
+      const targetsArray: ReadonlyArray<EventListenerTarget<HTMLElement>> =
+        Array.isArray(rawTargets) ? rawTargets : [rawTargets];
+
+      const composedPath =
+        typeof event.composedPath === 'function'
+          ? event.composedPath()
+          : undefined;
+
+      for (const item of targetsArray) {
+        const element = resolveTargetElement(item);
+        if (!element) {
+          continue;
+        }
+        if (
+          element === eventTarget ||
+          element.contains(eventTarget) ||
+          (composedPath && composedPath.includes(element))
+        ) {
+          return;
+        }
+      }
+
+      handlerRef.current(event);
+    };
+
+    for (const eventName of events) {
+      document.addEventListener(eventName, listener, { capture });
     }
-  };
 
-  const doc = typeof document !== 'undefined' ? document : null;
-
-  useEventListener('mousedown', listener, doc);
-  useEventListener('touchstart', listener, doc, { passive: true });
-
-  useEventListener('blur', (event: FocusEvent) => {
-    if (!enabled || !detectIframe || typeof document === 'undefined') {
-      return;
-    }
-
-    const activeElement = document.activeElement;
-    if (
-      !activeElement ||
-      activeElement.tagName !== 'IFRAME'
-    ) {
-      return;
-    }
-
-    const targets = Array.isArray(target) ? target : [target];
-    const elements = targets
-      .map((item) => resolveElement(item as EventListenerTarget<T>))
-      .filter((el): el is T => el !== null);
-
-    const isInside = elements.some((element) =>
-      element.contains(activeElement),
-    );
-
-    if (!isInside) {
-      handler(event);
-    }
-  });
+    return () => {
+      for (const eventName of events) {
+        document.removeEventListener(eventName, listener, { capture });
+      }
+    };
+  }, [enabled, eventsKey, capture, handlerRef, targetRef]);
 }
+
+export default useOnClickOutside;
