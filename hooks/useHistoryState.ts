@@ -1,162 +1,129 @@
-import { type SetStateAction, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
-
-export interface UseHistoryStateOptions {
-  capacity?: number;
-}
+import { useCallback, useRef, useState } from 'react';
 
 export interface UseHistoryStateReturn<T> {
   state: T;
-  history: readonly T[];
-  pointer: number;
+  past: readonly T[];
+  future: readonly T[];
   canUndo: boolean;
   canRedo: boolean;
-  set: (value: SetStateAction<T>) => void;
-  undo: (steps?: number) => void;
-  redo: (steps?: number) => void;
-  go: (index: number) => void;
+  set: (nextState: T | ((prevPresent: T) => T)) => void;
+  undo: () => void;
+  redo: () => void;
   clear: () => void;
-  reset: (newInitialValue?: T) => void;
+  reset: (...args: [newInitialValue?: T]) => void;
 }
 
 interface HistorySnapshot<T> {
-  history: T[];
-  pointer: number;
+  past: T[];
+  present: T;
+  future: T[];
 }
 
 export function useHistoryState<T>(
-  initialValue: T | (() => T),
-  options: UseHistoryStateOptions = {},
+  initialPresent: T | (() => T),
+  capacity: number = 100
 ): UseHistoryStateReturn<T> {
-  const { capacity = Infinity } = options;
-  const maxCapacity = Math.max(1, capacity);
+  const safeCapacity = Math.max(1, capacity);
 
-  const resolveInitial = (): T =>
-    typeof initialValue === 'function'
-      ? (initialValue as () => T)()
-      : initialValue;
+  const [history, setHistory] = useState<HistorySnapshot<T>>(() => {
+    const resolved =
+      typeof initialPresent === 'function'
+        ? (initialPresent as () => T)()
+        : initialPresent;
+    return {
+      past: [],
+      present: resolved,
+      future: [],
+    };
+  });
 
-  const [snapshot, setSnapshot] = useState<HistorySnapshot<T>>(() => ({
-    history: [resolveInitial()],
-    pointer: 0,
-  }));
+  const initialValueRef: { current: T } = useRef(history.present);
 
-  const state = snapshot.history[snapshot.pointer] as T;
-  const canUndo = snapshot.pointer > 0;
-  const canRedo = snapshot.pointer < snapshot.history.length - 1;
+  const set = useCallback(
+    (nextState: T | ((prevPresent: T) => T)) => {
+      setHistory((curr) => {
+        const resolvedNext =
+          typeof nextState === 'function'
+            ? (nextState as (prevPresent: T) => T)(curr.present)
+            : nextState;
 
-  const set = useEventCallback((value: SetStateAction<T>) => {
-    setSnapshot((prev) => {
-      const current = prev.history[prev.pointer] as T;
-      const nextValue =
-        typeof value === 'function'
-          ? (value as (prevState: T) => T)(current)
-          : value;
+        if (Object.is(resolvedNext, curr.present)) {
+          return curr;
+        }
 
-      if (Object.is(current, nextValue)) {
-        return prev;
-      }
-
-      const nextHistory = [
-        ...prev.history.slice(0, prev.pointer + 1),
-        nextValue,
-      ];
-
-      if (nextHistory.length > maxCapacity) {
-        const overflow = nextHistory.length - maxCapacity;
-        const trimmed = nextHistory.slice(overflow);
+        const nextPast = [...curr.past, curr.present].slice(-safeCapacity);
         return {
-          history: trimmed,
-          pointer: trimmed.length - 1,
+          past: nextPast,
+          present: resolvedNext,
+          future: [],
         };
-      }
+      });
+    },
+    [safeCapacity]
+  );
 
+  const undo = useCallback(() => {
+    setHistory((curr) => {
+      if (curr.past.length === 0) {
+        return curr;
+      }
+      const previous = curr.past[curr.past.length - 1] as T;
+      const newPast = curr.past.slice(0, curr.past.length - 1);
       return {
-        history: nextHistory,
-        pointer: nextHistory.length - 1,
+        past: newPast,
+        present: previous,
+        future: [curr.present, ...curr.future],
       };
     });
-  });
+  }, []);
 
-  const undo = useEventCallback((steps = 1) => {
-    if (steps <= 0) {
-      return;
-    }
-    setSnapshot((prev) => {
-      if (prev.pointer <= 0) {
-        return prev;
+  const redo = useCallback(() => {
+    setHistory((curr) => {
+      if (curr.future.length === 0) {
+        return curr;
       }
+      const next = curr.future[0] as T;
+      const newFuture = curr.future.slice(1);
+      const nextPast = [...curr.past, curr.present].slice(-safeCapacity);
       return {
-        ...prev,
-        pointer: Math.max(0, prev.pointer - steps),
+        past: nextPast,
+        present: next,
+        future: newFuture,
       };
     });
-  });
+  }, [safeCapacity]);
 
-  const redo = useEventCallback((steps = 1) => {
-    if (steps <= 0) {
-      return;
-    }
-    setSnapshot((prev) => {
-      if (prev.pointer >= prev.history.length - 1) {
-        return prev;
-      }
-      return {
-        ...prev,
-        pointer: Math.min(prev.history.length - 1, prev.pointer + steps),
-      };
-    });
-  });
+  const clear = useCallback(() => {
+    setHistory((curr) => ({
+      past: [],
+      present: curr.present,
+      future: [],
+    }));
+  }, []);
 
-  const go = useEventCallback((index: number) => {
-    setSnapshot((prev) => {
-      const clamped = Math.max(
-        0,
-        Math.min(prev.history.length - 1, index),
-      );
-      if (clamped === prev.pointer) {
-        return prev;
-      }
-      return {
-        ...prev,
-        pointer: clamped,
-      };
+  const reset = useCallback((...args: [newInitialValue?: T]) => {
+    const resolvedResetValue =
+      args.length > 0 ? (args[0] as T) : initialValueRef.current;
+    initialValueRef.current = resolvedResetValue;
+    setHistory({
+      past: [],
+      present: resolvedResetValue,
+      future: [],
     });
-  });
-
-  const clear = useEventCallback(() => {
-    setSnapshot((prev) => {
-      if (prev.history.length === 1 && prev.pointer === 0) {
-        return prev;
-      }
-      const current = prev.history[prev.pointer] as T;
-      return {
-        history: [current],
-        pointer: 0,
-      };
-    });
-  });
-
-  const reset = useEventCallback((newInitialValue?: T) => {
-    const nextInitial =
-      newInitialValue !== undefined ? newInitialValue : resolveInitial();
-    setSnapshot({
-      history: [nextInitial],
-      pointer: 0,
-    });
-  });
+  }, []);
 
   return {
-    state,
-    history: snapshot.history,
-    pointer: snapshot.pointer,
-    canUndo,
-    canRedo,
+    state: history.present,
+    past: history.past,
+    future: history.future,
+    canUndo: history.past.length > 0,
+    canRedo: history.future.length > 0,
     set,
     undo,
     redo,
-    go,
     clear,
     reset,
   };
 }
+
+export default useHistoryState;
