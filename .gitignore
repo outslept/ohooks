@@ -5,6 +5,7 @@
 .source
 
 # test & build
+.vitest
 /coverage
 /.next/
 /out/

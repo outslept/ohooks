@@ -1,13 +1,21 @@
 {
-  "name": ".",
-  "version": "0.0.59",
+  "name": "hooks",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
     "types:check": "next typegen && tsc --noEmit",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --project=chromium",
+    "test:chromium": "vitest run --project=chromium",
+    "test:firefox": "vitest run --project=firefox",
+    "test:webkit": "vitest run --project=webkit",
+    "test:silent": "vitest run --silent --reporter=dot"
   },
   "dependencies": {
     "cn": "^0.5.2",
@@ -25,9 +33,15 @@
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "@vitest/browser-playwright": "^5.1.0",
+    "@vitest/coverage-istanbul": "^5.1.0",
+    "oxlint": "^1.92.0",
+    "playwright": "^1.65.0",
     "postcss": "^8.5.32",
     "tailwindcss": "^4.3.5",
     "typescript": "^7.0.2",
-    "oxlint": "^1.92.0"
+    "vitest": "^5.1.0",
+    "vitest-browser-react": "^2.3.0"
   }
 }
