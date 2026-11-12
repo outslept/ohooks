@@ -46,7 +46,6 @@ export function useDarkMode(
   const isHydrated = useHydrated();
   const isSystemDark = useMediaQuery(COLOR_SCHEME_QUERY, {
     defaultValue,
-    initializeWithValue,
   });
 
   const [preference, setPreference] = useLocalStorage<ColorSchemePreference>(

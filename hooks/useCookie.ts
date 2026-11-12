@@ -14,14 +14,9 @@ export interface UseCookieOptions extends CookieAttributes {
   defaultValue?: string | null;
 }
 
-interface CookieStoreLike extends EventTarget {
-
-
-}
-
-interface WindowWithCookieStore extends Window {
-  cookieStore?: CookieStoreLike;
-}
+type WindowWithCookieStore = Omit<Window, 'cookieStore'> & {
+  readonly cookieStore?: EventTarget | undefined;
+};
 
 const CUSTOM_COOKIE_EVENT = 'custom-cookie-change';
 
@@ -52,7 +47,7 @@ function readCookieFromDocument(name: string): string | null {
 function writeCookieToDocument(
   name: string,
   value: string,
-  attrs: CookieAttributes,
+  attrs: CookieAttributes
 ): void {
   if (typeof document === 'undefined') {
     return;
@@ -112,7 +107,7 @@ function subscribe(onStoreChange: () => void): () => void {
 
 export function useCookie(
   name: string,
-  options: UseCookieOptions = {},
+  options: UseCookieOptions = {}
 ): [
   string | null,
   (value: string, attrs?: CookieAttributes) => void,
@@ -145,7 +140,7 @@ export function useCookie(
       });
 
       window.dispatchEvent(new Event(CUSTOM_COOKIE_EVENT));
-    },
+    }
   );
 
   const deleteCookie = useEventCallback((overrideAttrs?: CookieAttributes) => {
@@ -165,3 +160,5 @@ export function useCookie(
 
   return [value, setCookie, deleteCookie];
 }
+
+export default useCookie;

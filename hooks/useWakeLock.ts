@@ -18,11 +18,13 @@ interface WakeLockSentinelLike extends EventTarget {
   release: () => Promise<void>;
 }
 
-interface NavigatorWithWakeLock extends Navigator {
-  readonly wakeLock?: {
-    request: (type: 'screen') => Promise<WakeLockSentinelLike>;
-  };
-}
+type NavigatorWithWakeLock = Omit<Navigator, 'wakeLock'> & {
+  readonly wakeLock?:
+    | {
+        request: (type: 'screen') => Promise<WakeLockSentinelLike>;
+      }
+    | undefined;
+};
 
 function isWakeLockSupported(): boolean {
   return (
@@ -34,7 +36,7 @@ function isWakeLockSupported(): boolean {
 
 export function useWakeLock(
   enabled = true,
-  options: UseWakeLockOptions = {},
+  options: UseWakeLockOptions = {}
 ): UseWakeLockReturn {
   const { reacquireOnVisible = true, onError } = options;
 
@@ -114,7 +116,7 @@ export function useWakeLock(
       if (reacquireOnVisible) {
         document.removeEventListener(
           'visibilitychange',
-          handleVisibilityChange,
+          handleVisibilityChange
         );
       }
       if (sentinel) {
@@ -132,3 +134,5 @@ export function useWakeLock(
     error,
   };
 }
+
+export default useWakeLock;

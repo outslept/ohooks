@@ -104,12 +104,7 @@ export function useElementSize<T extends Element = HTMLElement>(
 
   useResizeObserver(
     target,
-    (entries) => {
-      const entry = entries[0];
-      if (!entry) {
-        return;
-      }
-
+    (entry) => {
       let nextWidth = entry.contentRect.width;
       let nextHeight = entry.contentRect.height;
 
@@ -148,3 +143,5 @@ export function useElementSize<T extends Element = HTMLElement>(
 
   return size;
 }
+
+export default useElementSize;

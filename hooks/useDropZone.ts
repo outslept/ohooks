@@ -1,4 +1,3 @@
-// hooks/useDropZone.ts
 import {
   DragEvent as ReactDragEvent,
   HTMLAttributes,

@@ -1,4 +1,3 @@
-// hooks/useIntersectionObserver.ts
 import { useEffect, useState } from 'react';
 import {
   EventListenerTarget,
