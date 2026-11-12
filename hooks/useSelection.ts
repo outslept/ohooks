@@ -1,13 +1,13 @@
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useControllableState } from './useControllableState';
 import { useEventCallback } from './useEventCallback';
 
 export interface UseSelectionOptions<T, TKey = T> {
-  getKey?: (item: T) => TKey;
-  value?: ReadonlyArray<TKey>;
-  defaultValue?: ReadonlyArray<TKey>;
-  multiple?: boolean;
-  onChange?: (selectedKeys: TKey[]) => void;
+  getKey?: ((item: T) => TKey) | undefined;
+  multiple?: boolean | undefined;
+  value?: readonly TKey[] | undefined;
+  defaultValue?: readonly TKey[] | undefined;
+  onChange?: ((selectedKeys: TKey[]) => void) | undefined;
 }
 
 export interface UseSelectionReturn<T, TKey = T> {
@@ -21,111 +21,81 @@ export interface UseSelectionReturn<T, TKey = T> {
   select: (key: TKey) => void;
   deselect: (key: TKey) => void;
   toggle: (key: TKey) => void;
-  toggleAll: () => void;
-  selectRange: (toKey: TKey, fromKey?: TKey) => void;
+  selectRange: (fromKey: TKey, toKey: TKey) => void;
   selectAll: () => void;
   clear: () => void;
-  setSelectedKeys: (keys: ReadonlyArray<TKey>) => void;
+  toggleAll: () => void;
+  setSelectedKeys: (keys: TKey[]) => void;
 }
 
-const defaultGetKey = <T, TKey>(item: T): TKey => item as unknown as TKey;
-
 export function useSelection<T, TKey = T>(
-  items: ReadonlyArray<T>,
+  items: readonly T[],
   options: UseSelectionOptions<T, TKey> = {},
 ): UseSelectionReturn<T, TKey> {
   const {
-    getKey = defaultGetKey,
+    getKey = (item: T) => item as unknown as TKey,
+    multiple = true,
     value,
     defaultValue = [],
-    multiple = true,
     onChange,
   } = options;
 
-  const [selectedKeys, setInternalKeys] = useControllableState<
-    ReadonlyArray<TKey>
+  const [selectedKeys = [], setSelectedKeysState] = useControllableState<
+    TKey[]
   >({
-    value,
-    defaultValue,
-    onChange: (next) => {
-      onChange?.([...next]);
-    },
+    value: value ? [...value] : undefined,
+    defaultValue: () => [...defaultValue],
+    onChange,
   });
 
-  const anchorKeyRef = useRef<TKey | null>(null);
+  const itemKeys = useMemo(
+    () => items.map((item) => getKey(item)),
+    [items, getKey],
+  );
 
-  const selectedSet = useMemo<ReadonlySet<TKey>>(
-    () => new Set(selectedKeys),
+  const selectedSet = useMemo(
+    () => new Set<TKey>(selectedKeys),
     [selectedKeys],
   );
 
-  const itemKeys = useMemo<TKey[]>(() => {
-    const seen = new Set<TKey>();
-    const keys: TKey[] = [];
-    for (const item of items) {
-      const key = getKey(item);
-      if (!seen.has(key)) {
-        seen.add(key);
-        keys.push(key);
-      }
-    }
-    return keys;
-  }, [items, getKey]);
-
-  const selectedItems = useMemo<T[]>(
+  const selectedItems = useMemo(
     () => items.filter((item) => selectedSet.has(getKey(item))),
     [items, selectedSet, getKey],
   );
 
-  const selectedCountInItems = useMemo<number>(() => {
-    let count = 0;
-    for (const key of itemKeys) {
-      if (selectedSet.has(key)) {
-        count += 1;
-      }
-    }
-    return count;
-  }, [itemKeys, selectedSet]);
+  const selectedItemCount = useMemo(
+    () => itemKeys.filter((k) => selectedSet.has(k)).length,
+    [itemKeys, selectedSet],
+  );
 
   const isAllSelected =
-    multiple &&
-    itemKeys.length > 0 &&
-    selectedCountInItems === itemKeys.length;
-  const isNoneSelected = selectedCountInItems === 0;
+    itemKeys.length > 0 && selectedItemCount === itemKeys.length;
+  const isNoneSelected = selectedItemCount === 0;
   const isPartiallySelected = !isNoneSelected && !isAllSelected;
 
-  const isSelected = useEventCallback((key: TKey): boolean => {
-    return selectedSet.has(key);
-  });
-
-  const setSelectedKeys = useEventCallback((keys: ReadonlyArray<TKey>) => {
-    const deduplicated = Array.from(new Set(keys));
-    const normalized = multiple ? deduplicated : deduplicated.slice(0, 1);
-    setInternalKeys(normalized);
-  });
+  const isSelected = useCallback(
+    (key: TKey): boolean => {
+      return selectedSet.has(key);
+    },
+    [selectedSet],
+  );
 
   const select = useEventCallback((key: TKey) => {
-    anchorKeyRef.current = key;
-
-    if (!multiple) {
-      if (selectedKeys.length === 1 && Object.is(selectedKeys[0], key)) {
-        return;
-      }
-      setInternalKeys([key]);
-      return;
-    }
-
     if (selectedSet.has(key)) {
       return;
     }
-    setInternalKeys([...selectedKeys, key]);
+    if (!multiple) {
+      setSelectedKeysState([key]);
+      return;
+    }
+    setSelectedKeysState([...selectedKeys, key]);
   });
 
   const deselect = useEventCallback((key: TKey) => {
     if (!selectedSet.has(key)) {
       return;
     }
-    setInternalKeys(selectedKeys.filter((k) => !Object.is(k, key)));
+    setSelectedKeysState(selectedKeys.filter((k) => !Object.is(k, key)));
   });
 
   const toggle = useEventCallback((key: TKey) => {
@@ -136,80 +106,54 @@ export function useSelection<T, TKey = T>(
     }
   });
 
-  const selectRange = useEventCallback((toKey: TKey, fromKey?: TKey) => {
+  const selectRange = useEventCallback((fromKey: TKey, toKey: TKey) => {
     if (!multiple) {
       select(toKey);
       return;
     }
 
-    const startKey = fromKey !== undefined ? fromKey : anchorKeyRef.current;
-    if (startKey === null) {
-      select(toKey);
+    const startIndex = itemKeys.findIndex((k) => Object.is(k, fromKey));
+    const endIndex = itemKeys.findIndex((k) => Object.is(k, toKey));
+
+    if (startIndex === -1 || endIndex === -1) {
       return;
     }
 
-    const startIdx = itemKeys.findIndex((k) => Object.is(k, startKey));
-    const endIdx = itemKeys.findIndex((k) => Object.is(k, toKey));
-
-    if (startIdx === -1 || endIdx === -1) {
-      select(toKey);
-      return;
-    }
-
-    const low = Math.min(startIdx, endIdx);
-    const high = Math.max(startIdx, endIdx);
+    const low = Math.min(startIndex, endIndex);
+    const high = Math.max(startIndex, endIndex);
     const rangeKeys = itemKeys.slice(low, high + 1);
 
-    const merged = new Set<TKey>(selectedKeys);
-    let changed = false;
+    const nextSet = new Set<TKey>(selectedKeys);
     for (const k of rangeKeys) {
-      if (!merged.has(k)) {
-        merged.add(k);
-        changed = true;
-      }
+      nextSet.add(k);
     }
-
-    anchorKeyRef.current = toKey;
-    if (changed) {
-      setInternalKeys(Array.from(merged));
-    }
+    setSelectedKeysState(Array.from(nextSet));
   });
 
   const selectAll = useEventCallback(() => {
-    if (!multiple || itemKeys.length === 0) {
-      return;
-    }
-    const merged = new Set<TKey>(selectedKeys);
-    let changed = false;
-    for (const key of itemKeys) {
-      if (!merged.has(key)) {
-        merged.add(key);
-        changed = true;
-      }
-    }
-    if (changed) {
-      setInternalKeys(Array.from(merged));
-    }
-  });
-
-  const clear = useEventCallback(() => {
-    anchorKeyRef.current = null;
-    if (selectedKeys.length === 0) {
-      return;
-    }
-    setInternalKeys([]);
-  });
-
-  const toggleAll = useEventCallback(() => {
     if (!multiple) {
       return;
     }
+    setSelectedKeysState([...itemKeys]);
+  });
+
+  const clear = useEventCallback(() => {
+    if (selectedKeys.length === 0) {
+      return;
+    }
+    setSelectedKeysState([]);
+  });
+
+  const toggleAll = useEventCallback(() => {
     if (isAllSelected) {
-      const currentItemSet = new Set<TKey>(itemKeys);
-      setInternalKeys(selectedKeys.filter((k) => !currentItemSet.has(k)));
+      clear();
     } else {
       selectAll();
     }
+  });
+
+  const setSelectedKeys = useEventCallback((keys: TKey[]) => {
+    setSelectedKeysState(multiple ? keys : keys.slice(0, 1));
   });
 
   return {
@@ -223,10 +167,10 @@ export function useSelection<T, TKey = T>(
     select,
     deselect,
     toggle,
-    toggleAll,
     selectRange,
     selectAll,
     clear,
+    toggleAll,
     setSelectedKeys,
   };
 }
