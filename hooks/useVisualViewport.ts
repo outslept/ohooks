@@ -1,107 +1,117 @@
-import { useSyncExternalStore } from 'react';
+import { useCallback, useRef, useSyncExternalStore } from 'react';
 
 export interface VisualViewportState {
-  isSupported: boolean;
   width: number;
   height: number;
-  offsetTop: number;
   offsetLeft: number;
-  pageTop: number;
+  offsetTop: number;
   pageLeft: number;
+  pageTop: number;
   scale: number;
+  isSupported: boolean;
 }
 
-const SERVER_SNAPSHOT: VisualViewportState = {
-  isSupported: false,
+const SERVER_SNAPSHOT: VisualViewportState = Object.freeze({
   width: 0,
   height: 0,
-  offsetTop: 0,
   offsetLeft: 0,
-  pageTop: 0,
+  offsetTop: 0,
   pageLeft: 0,
+  pageTop: 0,
   scale: 1,
-};
-
-let cachedSnapshot: VisualViewportState = SERVER_SNAPSHOT;
-
-function subscribe(onStoreChange: () => void): () => void {
-  if (typeof window === 'undefined' || !window.visualViewport) {
-    return () => {};
-  }
-
-  const vv = window.visualViewport;
-  vv.addEventListener('resize', onStoreChange);
-  vv.addEventListener('scroll', onStoreChange);
-
-  return () => {
-    vv.removeEventListener('resize', onStoreChange);
-    vv.removeEventListener('scroll', onStoreChange);
-  };
-}
-
-function getSnapshot(): VisualViewportState {
-  if (typeof window === 'undefined') {
-    return SERVER_SNAPSHOT;
-  }
-
-  const vv = window.visualViewport;
-  if (!vv) {
-    const fallback: VisualViewportState = {
-      isSupported: false,
-      width: window.innerWidth,
-      height: window.innerHeight,
-      offsetTop: 0,
-      offsetLeft: 0,
-      pageTop: window.scrollY,
-      pageLeft: window.scrollX,
-      scale: 1,
-    };
-
-    if (
-      cachedSnapshot.isSupported === fallback.isSupported &&
-      cachedSnapshot.width === fallback.width &&
-      cachedSnapshot.height === fallback.height &&
-      cachedSnapshot.pageTop === fallback.pageTop &&
-      cachedSnapshot.pageLeft === fallback.pageLeft
-    ) {
-      return cachedSnapshot;
-    }
-
-    cachedSnapshot = fallback;
-    return cachedSnapshot;
-  }
-
-  if (
-    cachedSnapshot.isSupported &&
-    cachedSnapshot.width === vv.width &&
-    cachedSnapshot.height === vv.height &&
-    cachedSnapshot.offsetTop === vv.offsetTop &&
-    cachedSnapshot.offsetLeft === vv.offsetLeft &&
-    cachedSnapshot.pageTop === vv.pageTop &&
-    cachedSnapshot.pageLeft === vv.pageLeft &&
-    cachedSnapshot.scale === vv.scale
-  ) {
-    return cachedSnapshot;
-  }
-
-  cachedSnapshot = {
-    isSupported: true,
-    width: vv.width,
-    height: vv.height,
-    offsetTop: vv.offsetTop,
-    offsetLeft: vv.offsetLeft,
-    pageTop: vv.pageTop,
-    pageLeft: vv.pageLeft,
-    scale: vv.scale,
-  };
-
-  return cachedSnapshot;
-}
+  isSupported: false,
+});
 
 function getServerSnapshot(): VisualViewportState {
   return SERVER_SNAPSHOT;
 }
 
+function isSameViewportState(
+  a: VisualViewportState,
+  b: VisualViewportState
+): boolean {
+  return (
+    a.width === b.width &&
+    a.height === b.height &&
+    a.offsetLeft === b.offsetLeft &&
+    a.offsetTop === b.offsetTop &&
+    a.pageLeft === b.pageLeft &&
+    a.pageTop === b.pageTop &&
+    a.scale === b.scale &&
+    a.isSupported === b.isSupported
+  );
+}
+
+function readViewportState(): VisualViewportState {
+  if (typeof window === 'undefined') {
+    return SERVER_SNAPSHOT;
+  }
+
+  const vv = window.visualViewport;
+  if (vv) {
+    return {
+      width: vv.width,
+      height: vv.height,
+      offsetLeft: vv.offsetLeft,
+      offsetTop: vv.offsetTop,
+      pageLeft: vv.pageLeft,
+      pageTop: vv.pageTop,
+      scale: vv.scale,
+      isSupported: true,
+    };
+  }
+
+  return {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    offsetLeft: 0,
+    offsetTop: 0,
+    pageLeft: window.scrollX,
+    pageTop: window.scrollY,
+    scale: 1,
+    isSupported: false,
+  };
+}
+
+function subscribe(onStoreChange: () => void): () => void {
+  if (typeof window === 'undefined') {
+    return () => {};
+  }
+
+  const vv = window.visualViewport;
+  if (vv) {
+    vv.addEventListener('resize', onStoreChange, { passive: true });
+    vv.addEventListener('scroll', onStoreChange, { passive: true });
+
+    return () => {
+      vv.removeEventListener('resize', onStoreChange);
+      vv.removeEventListener('scroll', onStoreChange);
+    };
+  }
+
+  window.addEventListener('resize', onStoreChange, { passive: true });
+  window.addEventListener('scroll', onStoreChange, { passive: true });
+
+  return () => {
+    window.removeEventListener('resize', onStoreChange);
+    window.removeEventListener('scroll', onStoreChange);
+  };
+}
+
 export function useVisualViewport(): VisualViewportState {
+  const cacheRef: { current: VisualViewportState } = useRef(SERVER_SNAPSHOT);
+
+  const getSnapshot = useCallback((): VisualViewportState => {
+    const next = readViewportState();
+    const prev = cacheRef.current;
+    if (isSameViewportState(prev, next)) {
+      return prev;
+    }
+    cacheRef.current = next;
+    return next;
+  }, []);
+
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
+
+export default useVisualViewport;
