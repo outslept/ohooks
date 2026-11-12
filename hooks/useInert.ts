@@ -1,107 +1,113 @@
-import { type EventListenerTarget } from './useEventListener';
+import {
+  EventListenerTarget,
+  resolveTargetElement,
+} from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
-interface InertRestoreRecord {
+interface InertRestoreState {
   count: number;
-  originalInert: boolean;
+  hadInertAttr: boolean;
+  originalInertProp: boolean;
   originalAriaHidden: string | null;
 }
 
-const inertRegistry = new WeakMap<HTMLElement, InertRestoreRecord>();
+const inertRegistry = new WeakMap<HTMLElement, InertRestoreState>();
 
-const IGNORED_TAGS = new Set(['SCRIPT', 'STYLE', 'LINK', 'TEMPLATE']);
-
-function resolveElement<T extends HTMLElement>(
-  target: EventListenerTarget<T>,
-): T | null {
-  if (!target) {
-    return null;
-  }
-  if (typeof target === 'object' && 'current' in target) {
-    return target.current;
-  }
-  return target;
-}
-
-function lockElementInert(element: HTMLElement): void {
+function applyInertToElement(element: HTMLElement): void {
   const existing = inertRegistry.get(element);
   if (existing) {
     existing.count += 1;
     return;
   }
 
+  const elementWithInert = element as HTMLElement & { inert?: boolean };
   inertRegistry.set(element, {
     count: 1,
-    originalInert: Boolean(element.inert),
+    hadInertAttr: element.hasAttribute('inert'),
+    originalInertProp: Boolean(elementWithInert.inert),
     originalAriaHidden: element.getAttribute('aria-hidden'),
   });
 
-  element.inert = true;
+  elementWithInert.inert = true;
+  element.setAttribute('inert', '');
   element.setAttribute('aria-hidden', 'true');
 }
 
-function unlockElementInert(element: HTMLElement): void {
-  const existing = inertRegistry.get(element);
-  if (!existing) {
+function releaseInertFromElement(element: HTMLElement): void {
+  const state = inertRegistry.get(element);
+  if (!state) {
     return;
   }
 
-  existing.count -= 1;
-  if (existing.count > 0) {
+  state.count -= 1;
+  if (state.count > 0) {
     return;
+  }
+
+  const elementWithInert = element as HTMLElement & { inert?: boolean };
+  elementWithInert.inert = state.originalInertProp;
+
+  if (state.hadInertAttr) {
+    element.setAttribute('inert', '');
+  } else {
+    element.removeAttribute('inert');
+  }
+
+  if (state.originalAriaHidden !== null) {
+    element.setAttribute('aria-hidden', state.originalAriaHidden);
+  } else {
+    element.removeAttribute('aria-hidden');
   }
 
   inertRegistry.delete(element);
-  element.inert = existing.originalInert;
-
-  if (existing.originalAriaHidden === null) {
-    element.removeAttribute('aria-hidden');
-  } else {
-    element.setAttribute('aria-hidden', existing.originalAriaHidden);
-  }
 }
 
-export function useInert<T extends HTMLElement = HTMLElement>(
-  target: EventListenerTarget<T>,
-  enabled = true,
+export function useInert(
+  target: EventListenerTarget<HTMLElement>,
+  inert: boolean = true,
+  options: {
+    trapSiblings?: boolean;
+  } = {}
 ): void {
+  const { trapSiblings = false } = options;
+
   useIsomorphicLayoutEffect(() => {
-    if (!enabled || typeof document === 'undefined') {
+    if (!inert || typeof document === 'undefined') {
       return;
     }
 
-    const activeContainer = resolveElement(target);
-    if (!activeContainer || !document.body.contains(activeContainer)) {
+    const targetElement = resolveTargetElement(target);
+    if (!targetElement) {
       return;
     }
 
-    const lockedSiblings: HTMLElement[] = [];
-    let current: HTMLElement | null = activeContainer;
+    const affectedElements: HTMLElement[] = [];
 
-    while (current && current !== document.body) {
-      const parent: HTMLElement | null = current.parentElement;
-      if (!parent) {
-        break;
-      }
-
-      for (const sibling of Array.from(parent.children)) {
+    if (trapSiblings) {
+      const bodyChildren = Array.from(document.body.children);
+      for (const child of bodyChildren) {
         if (
-          sibling !== current &&
-          sibling instanceof HTMLElement &&
-          !IGNORED_TAGS.has(sibling.tagName)
+          child instanceof HTMLElement &&
+          child.tagName !== 'SCRIPT' &&
+          child.tagName !== 'STYLE' &&
+          child !== targetElement &&
+          !child.contains(targetElement)
         ) {
-          lockElementInert(sibling);
-          lockedSiblings.push(sibling);
+          applyInertToElement(child);
+          affectedElements.push(child);
         }
       }
-
-      current = parent;
+    } else {
+      applyInertToElement(targetElement);
+      affectedElements.push(targetElement);
     }
 
     return () => {
-      for (const sibling of lockedSiblings) {
-        unlockElementInert(sibling);
+      for (const el of affectedElements) {
+        releaseInertFromElement(el);
       }
     };
-  }, [target, enabled]);
+  }, [target, inert, trapSiblings]);
 }
+
+export default useInert;
