@@ -1,133 +1,146 @@
-import { useEffect } from 'react';
-import { type EventListenerTarget } from './useEventListener';
+import { useEffect, useRef } from 'react';
+import {
+  EventListenerTarget,
+  resolveTargetElement,
+} from './useEventListener';
+import { useLatest } from './useLatest';
 
 export interface UseFocusTrapOptions {
   enabled?: boolean;
-  autoFocus?: boolean;
+  initialFocus?: EventListenerTarget<HTMLElement> | string;
   restoreFocus?: boolean;
-  initialFocus?: EventListenerTarget<HTMLElement>;
+  onEscape?: (event: KeyboardEvent) => void;
 }
 
 const FOCUSABLE_SELECTOR = [
   'a[href]',
   'area[href]',
-  'button:not([disabled])',
   'input:not([disabled]):not([type="hidden"])',
   'select:not([disabled])',
   'textarea:not([disabled])',
+  'button:not([disabled])',
   'iframe',
   'object',
   'embed',
-  '[contenteditable="true"]',
-  '[contenteditable=""]',
+  '[contenteditable]',
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
-function resolveElement<T extends HTMLElement>(
-  target?: EventListenerTarget<T>,
-): T | null {
-  if (!target) {
-    return null;
-  }
-  if (
-    typeof target === 'object' &&
-    'current' in target &&
-    !('addEventListener' in target)
-  ) {
-    return target.current;
-  }
-  return target as T;
-}
-
-function getTabbableElements(container: HTMLElement): HTMLElement[] {
-  const candidates = Array.from(
-    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  const nodes = Array.from(
+    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
   );
-
-  return candidates.filter((el) => {
-    if (el.hidden || el.closest('[inert]')) {
-      return false;
-    }
-    if (typeof window !== 'undefined') {
-      const style = window.getComputedStyle(el);
-      if (style.display === 'none' || style.visibility === 'hidden') {
-        return false;
-      }
-    }
-    return true;
-  });
+  return nodes.filter(
+    (el) =>
+      !el.hasAttribute('disabled') &&
+      el.getAttribute('aria-hidden') !== 'true' &&
+      !el.hasAttribute('inert') &&
+      (el.offsetWidth > 0 ||
+        el.offsetHeight > 0 ||
+        el.getClientRects().length > 0)
+  );
 }
 
-export function useFocusTrap<T extends HTMLElement = HTMLElement>(
-  target: EventListenerTarget<T>,
-  options: boolean | UseFocusTrapOptions = true,
+export function useFocusTrap(
+  target: EventListenerTarget<HTMLElement>,
+  options: UseFocusTrapOptions = {}
 ): void {
-  const normalizedOptions: UseFocusTrapOptions =
-    typeof options === 'boolean' ? { enabled: options } : options;
-
   const {
     enabled = true,
-    autoFocus = true,
-    restoreFocus = true,
     initialFocus,
-  } = normalizedOptions;
+    restoreFocus = true,
+    onEscape,
+  } = options;
+
+  const onEscapeRef = useLatest(onEscape);
+  const initialFocusRef = useLatest(initialFocus);
+  const previousActiveElementRef: { current: HTMLElement | null } =
+    useRef(null);
 
   useEffect(() => {
     if (!enabled || typeof document === 'undefined') {
       return;
     }
 
-    const container = resolveElement(target);
+    const container = resolveTargetElement(target);
     if (!container) {
       return;
     }
 
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    let addedTabIndex = false;
+    previousActiveElementRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
 
-    if (autoFocus) {
-      const preferredInitial = resolveElement(initialFocus);
-      if (preferredInitial && container.contains(preferredInitial)) {
-        preferredInitial.focus();
-      } else if (!container.contains(document.activeElement)) {
-        const tabbables = getTabbableElements(container);
-        const firstTabbable = tabbables[0];
-        if (firstTabbable) {
-          firstTabbable.focus();
-        } else {
-          if (!container.hasAttribute('tabindex')) {
-            container.setAttribute('tabindex', '-1');
-            addedTabIndex = true;
+    const focusInitialElement = () => {
+      const configuredInitial = initialFocusRef.current;
+      if (configuredInitial) {
+        if (typeof configuredInitial === 'string') {
+          const found =
+            container.querySelector<HTMLElement>(configuredInitial);
+          if (found) {
+            found.focus();
+            return;
           }
-          container.focus();
+        } else {
+          const resolvedInitial = resolveTargetElement(configuredInitial);
+          if (resolvedInitial) {
+            resolvedInitial.focus();
+            return;
+          }
         }
       }
-    }
 
-    const handleKeyDown = (event: KeyboardEvent): void => {
+      const focusable = getFocusableElements(container);
+      if (focusable.length > 0) {
+        focusable[0]?.focus();
+      } else {
+        if (!container.hasAttribute('tabindex')) {
+          container.setAttribute('tabindex', '-1');
+        }
+        container.focus();
+      }
+    };
+
+    focusInitialElement();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onEscapeRef.current?.(event);
+        return;
+      }
+
       if (event.key !== 'Tab') {
         return;
       }
 
-      const tabbables = getTabbableElements(container);
-      if (tabbables.length === 0) {
+      const focusable = getFocusableElements(container);
+      if (focusable.length === 0) {
         event.preventDefault();
         return;
       }
 
-      const first = tabbables[0] as HTMLElement;
-      const last = tabbables[tabbables.length - 1] as HTMLElement;
-      const active = document.activeElement as HTMLElement | null;
+      const firstElement = focusable[0] as HTMLElement;
+      const lastElement = focusable[focusable.length - 1] as HTMLElement;
+      const activeElement = document.activeElement as HTMLElement | null;
 
       if (event.shiftKey) {
-        if (active === first || !active || !container.contains(active)) {
+        if (
+          activeElement === firstElement ||
+          !activeElement ||
+          !container.contains(activeElement)
+        ) {
           event.preventDefault();
-          last.focus();
+          lastElement.focus();
         }
       } else {
-        if (active === last || !active || !container.contains(active)) {
+        if (
+          activeElement === lastElement ||
+          !activeElement ||
+          !container.contains(activeElement)
+        ) {
           event.preventDefault();
-          first.focus();
+          firstElement.focus();
         }
       }
     };
@@ -137,18 +150,15 @@ export function useFocusTrap<T extends HTMLElement = HTMLElement>(
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
 
-      if (addedTabIndex) {
-        container.removeAttribute('tabindex');
-      }
-
-      if (
-        restoreFocus &&
-        previouslyFocused &&
-        previouslyFocused.isConnected &&
-        typeof previouslyFocused.focus === 'function'
-      ) {
-        previouslyFocused.focus();
+      if (restoreFocus && previousActiveElementRef.current) {
+        try {
+          previousActiveElementRef.current.focus();
+        } catch {
+          // ignore if previous element was detached from DOM
+        }
       }
     };
-  }, [target, enabled, autoFocus, restoreFocus, initialFocus]);
+  }, [target, enabled, restoreFocus, initialFocusRef, onEscapeRef]);
 }
+
+export default useFocusTrap;
