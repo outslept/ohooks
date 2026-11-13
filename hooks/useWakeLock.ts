@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useLatest } from './useLatest';
 
+/** Configuration options for `useWakeLock`. */
 export interface UseWakeLockOptions {
+  /** Automatically re-acquire the screen wake lock when the document becomes visible again (default: `true`). */
   reacquireOnVisible?: boolean;
+  /** Callback fired if requesting the wake lock fails. */
   onError?: (error: Error) => void;
 }
 
+/** State returned by `useWakeLock`. */
 export interface UseWakeLockReturn {
+  /** Whether the Screen Wake Lock API (`navigator.wakeLock`) is supported. */
   isSupported: boolean;
+  /** Whether a screen wake lock is currently active. */
   isLocked: boolean;
+  /** Most recent error thrown while requesting the wake lock, or `null`. */
   error: Error | null;
 }
 
@@ -34,6 +41,19 @@ function isWakeLockSupported(): boolean {
   );
 }
 
+/**
+ * Prevents the device screen from dimming or locking using the Screen Wake Lock API.
+ *
+ * @category Browser
+ * @param enabled - Whether the wake lock should be held (default: `true`)
+ * @param options - Visibility re-acquisition and error handler options
+ * @returns `{ isSupported, isLocked, error }`
+ *
+ * @example
+ * ```tsx
+ * const { isLocked, isSupported } = useWakeLock(isPlayingVideo);
+ * ```
+ */
 export function useWakeLock(
   enabled = true,
   options: UseWakeLockOptions = {}

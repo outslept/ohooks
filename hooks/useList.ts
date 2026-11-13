@@ -2,19 +2,40 @@ import { type Dispatch, type SetStateAction, useState } from 'react';
 import { useEventCallback } from './useEventCallback';
 
 export interface UseListActions<T> {
+  /** Standard React state setter for replacing or updating the array */
   set: Dispatch<SetStateAction<T[]>>;
+  /** Appends one or more items to the end of the list */
   push: (...items: T[]) => void;
+  /** Replaces the item at `index` (supports negative indices) */
   updateAt: (index: number, item: T) => void;
+  /** Inserts an item at `index` (clamped to list bounds, supports negative indices) */
   insertAt: (index: number, item: T) => void;
+  /** Removes the item at `index` (supports negative indices) */
   removeAt: (index: number) => void;
+  /** Keeps only items that satisfy the predicate function */
   filter: (
     predicate: (value: T, index: number, array: T[]) => boolean,
   ) => void;
+  /** Sorts the list in place (immutably) using an optional comparator */
   sort: (compareFn?: (a: T, b: T) => number) => void;
+  /** Empties the list */
   clear: () => void;
+  /** Resets the list back to `initialValue` */
   reset: () => void;
 }
 
+/**
+ * Manages an array state with immutable helper methods for pushing, inserting, updating, removing, filtering, and sorting items.
+ *
+ * @category State
+ * @param initialValue - Initial array or lazy initializer function (default: `[]`)
+ * @returns Tuple of `[list, actions]`
+ *
+ * @example
+ * ```tsx
+ * const [items, { push, removeAt, clear }] = useList<string>(['a', 'b']);
+ * ```
+ */
 export function useList<T>(
   initialValue: T[] | (() => T[]) = [],
 ): [T[], UseListActions<T>] {

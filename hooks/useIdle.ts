@@ -4,8 +4,11 @@ import { useEventCallback } from './useEventCallback';
 import { useThrottleCallback } from './useThrottleCallback';
 
 export interface UseIdleOptions {
+  /** Initial idle state before the first timeout elapses (default: `false`) */
   initialState?: boolean;
+  /** Window events that reset the idle timer */
   events?: ReadonlyArray<keyof WindowEventMap>;
+  /** Throttle interval in milliseconds for activity event listeners (default: `200`) */
   throttleMs?: number;
 }
 
@@ -18,6 +21,19 @@ const DEFAULT_EVENTS: ReadonlyArray<keyof WindowEventMap> = [
   'wheel',
 ];
 
+/**
+ * Tracks whether the user has been inactive for a given duration by listening to window interaction events.
+ *
+ * @category Sensors
+ * @param timeout - Inactivity timeout in milliseconds before marking the user as idle (default: `60000`)
+ * @param options - Configuration for initial state, monitored DOM events, and listener throttling
+ * @returns `true` when the user is idle, `false` when active
+ *
+ * @example
+ * ```tsx
+ * const isIdle = useIdle(30_000);
+ * ```
+ */
 export function useIdle(
   timeout = 60_000,
   options: UseIdleOptions = {},

@@ -2,18 +2,41 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useLatest } from './useLatest';
 
 export interface DebounceOptions {
+  /** Invoke the callback on the leading edge of the timeout (default: `false`) */
   leading?: boolean;
+  /** Invoke the callback on the trailing edge of the timeout (default: `true`) */
   trailing?: boolean;
+  /** Maximum time in milliseconds the callback is allowed to be delayed before it is invoked */
   maxWait?: number;
 }
 
 export interface DebouncedFunction<T extends (...args: never[]) => unknown> {
+  /** Invokes the debounced function */
   (...args: Parameters<T>): ReturnType<T> | undefined;
+  /** Cancels any pending delayed invocation */
   cancel: () => void;
+  /** Immediately invokes any pending delayed invocation and returns the result */
   flush: () => ReturnType<T> | undefined;
+  /** Returns `true` if there is a pending delayed invocation */
   isPending: () => boolean;
 }
 
+/**
+ * Creates a debounced version of a callback function with `leading`, `trailing`, `maxWait`, `cancel`, and `flush` support.
+ *
+ * @category Effects
+ * @param fn - Callback function to debounce
+ * @param delay - Delay in milliseconds
+ * @param options - Debounce behavior options (`leading`, `trailing`, `maxWait`)
+ * @returns Debounced function with `.cancel()`, `.flush()`, and `.isPending()` methods
+ *
+ * @example
+ * ```tsx
+ * const handleSearch = useDebounceCallback((query: string) => {
+ *   fetchResults(query);
+ * }, 300);
+ * ```
+ */
 export function useDebounceCallback<T extends (...args: never[]) => unknown>(
   fn: T,
   delay: number,

@@ -2,18 +2,28 @@ import { type RefCallback, useCallback, useEffect, useState } from 'react';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
 export interface MeasureRect {
+  /** Horizontal offset of the measured box in pixels */
   x: number;
+  /** Vertical offset of the measured box in pixels */
   y: number;
+  /** Width of the measured box in pixels */
   width: number;
+  /** Height of the measured box in pixels */
   height: number;
+  /** Top inset of the measured box in pixels */
   top: number;
+  /** Right edge coordinate (`left + width`) in pixels */
   right: number;
+  /** Bottom edge coordinate (`top + height`) in pixels */
   bottom: number;
+  /** Left inset of the measured box in pixels */
   left: number;
 }
 
 export interface UseMeasureOptions {
+  /** CSS box model to observe (default: `'content-box'`) */
   box?: ResizeObserverBoxOptions;
+  /** Whether measurement observation is active (default: `true`) */
   enabled?: boolean;
 }
 
@@ -118,6 +128,18 @@ function readInitialRect(
   };
 }
 
+/**
+ * Measures the dimensions and box insets of a DOM element via a callback ref and `ResizeObserver`.
+ *
+ * @category DOM
+ * @param options - Configuration for the observed CSS box model and `enabled` flag
+ * @returns Tuple of `[refCallback, rect]`
+ *
+ * @example
+ * ```tsx
+ * const [ref, { width, height }] = useMeasure<HTMLDivElement>();
+ * ```
+ */
 export function useMeasure<T extends Element = HTMLElement>(
   options: UseMeasureOptions = {},
 ): UseMeasureReturn<T> {

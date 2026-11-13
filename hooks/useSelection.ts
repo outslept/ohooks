@@ -2,32 +2,69 @@ import { useCallback, useMemo } from 'react';
 import { useControllableState } from './useControllableState';
 import { useEventCallback } from './useEventCallback';
 
+/** Configuration options for `useSelection`. */
 export interface UseSelectionOptions<T, TKey = T> {
+  /** Extracts a unique key for each item (defaults to identity). */
   getKey?: ((item: T) => TKey) | undefined;
+  /** Allow selecting multiple items simultaneously (default: `true`). */
   multiple?: boolean | undefined;
+  /** Controlled array of selected keys. */
   value?: readonly TKey[] | undefined;
+  /** Initial selected keys in uncontrolled mode (default: `[]`). */
   defaultValue?: readonly TKey[] | undefined;
+  /** Callback fired whenever the selected keys change. */
   onChange?: ((selectedKeys: TKey[]) => void) | undefined;
 }
 
+/** Selection state and actions returned by `useSelection`. */
 export interface UseSelectionReturn<T, TKey = T> {
+  /** Array of currently selected item keys. */
   selectedKeys: readonly TKey[];
+  /** `Set` of currently selected item keys for O(1) lookups. */
   selectedSet: ReadonlySet<TKey>;
+  /** Array of items from `items` whose keys are currently selected. */
   selectedItems: T[];
+  /** Returns `true` if `key` is currently selected. */
   isSelected: (key: TKey) => boolean;
+  /** Whether every item in `items` is selected. */
   isAllSelected: boolean;
+  /** Whether some, but not all, items in `items` are selected. */
   isPartiallySelected: boolean;
+  /** Whether zero items in `items` are selected. */
   isNoneSelected: boolean;
+  /** Selects the item with the given `key`. */
   select: (key: TKey) => void;
+  /** Deselects the item with the given `key`. */
   deselect: (key: TKey) => void;
+  /** Toggles selection for the given `key`. */
   toggle: (key: TKey) => void;
+  /** Selects all items between `fromKey` and `toKey` inclusive. */
   selectRange: (fromKey: TKey, toKey: TKey) => void;
+  /** Selects all items in `items` (when `multiple` is `true`). */
   selectAll: () => void;
+  /** Clears all selected keys. */
   clear: () => void;
+  /** Selects all items if not all are selected, otherwise clears the selection. */
   toggleAll: () => void;
+  /** Replaces the entire selection with `keys`. */
   setSelectedKeys: (keys: TKey[]) => void;
 }
 
+/**
+ * Manages single or multi-item selection state with range selection and bulk toggle helpers.
+ *
+ * @category State
+ * @param items - Collection of selectable items
+ * @param options - Key extractor, selection mode, and controlled/uncontrolled options
+ * @returns Selected keys/items, status flags, and selection actions
+ *
+ * @example
+ * ```tsx
+ * const { isSelected, toggle, toggleAll, isAllSelected } = useSelection(users, {
+ *   getKey: (u) => u.id,
+ * });
+ * ```
+ */
 export function useSelection<T, TKey = T>(
   items: readonly T[],
   options: UseSelectionOptions<T, TKey> = {},

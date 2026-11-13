@@ -83,6 +83,19 @@ export function mergeRefs<T>(
   };
 }
 
+/**
+ * Combines multiple React refs (callback refs, `RefObject`s, or `null`/`undefined`) into a single stable callback ref with React 19 cleanup support.
+ *
+ * @category DOM
+ * @param refs - Refs to merge into a single callback ref
+ * @returns Referentially stable `RefCallback<T>`
+ *
+ * @example
+ * ```tsx
+ * const mergedRef = useMergeRefs(localRef, forwardedRef);
+ * // <div ref={mergedRef} />
+ * ```
+ */
 export function useMergeRefs<T>(
   ...refs: ReadonlyArray<PossibleRef<T>>
 ): RefCallback<T> {

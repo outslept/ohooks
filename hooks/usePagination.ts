@@ -5,28 +5,48 @@ import { useEventCallback } from './useEventCallback';
 export type PaginationItem = number | 'ellipsis';
 
 export interface UsePaginationOptions {
+  /** Total number of items across all pages (used with `pageSize` when `totalPages` is not set) */
   totalItems?: number;
+  /** Number of items per page (default: `10`) */
   pageSize?: number;
+  /** Explicit total number of pages (overrides `totalItems` / `pageSize` calculation) */
   totalPages?: number;
+  /** Controlled current page number (`1`-indexed) */
   page?: number;
+  /** Initial page number in uncontrolled mode (default: `1`) */
   defaultPage?: number;
+  /** Number of sibling pages shown on each side of the current page (default: `1`) */
   siblingCount?: number;
+  /** Number of boundary pages always shown at the start and end (default: `1`) */
   boundaryCount?: number;
+  /** Callback fired when the active page changes */
   onChange?: (page: number) => void;
 }
 
 export interface UsePaginationReturn {
+  /** Current active page number (`1`-indexed) */
   page: number;
+  /** Total number of pages */
   totalPages: number;
+  /** Sequence of page numbers and `'ellipsis'` markers for rendering pagination controls */
   items: PaginationItem[];
+  /** Whether a previous page exists (`page > 1`) */
   hasPrevPage: boolean;
+  /** Whether a next page exists (`page < totalPages`) */
   hasNextPage: boolean;
+  /** Zero-based start index for slicing the current page's data */
   startIndex: number;
+  /** Exclusive end index for slicing the current page's data */
   endIndex: number;
+  /** Navigates to a specific page number (clamped to `[1, totalPages]`) */
   setPage: (page: number) => void;
+  /** Advances to the next page */
   nextPage: () => void;
+  /** Moves back to the previous page */
   prevPage: () => void;
+  /** Jumps to page `1` */
   firstPage: () => void;
+  /** Jumps to `totalPages` */
   lastPage: () => void;
 }
 
@@ -38,6 +58,21 @@ function createRange(start: number, end: number): number[] {
   return Array.from({ length }, (_, idx) => start + idx);
 }
 
+/**
+ * Computes pagination state, page ranges with ellipsis markers, data slice indices, and navigation helpers.
+ *
+ * @category State
+ * @param options - Total items/pages, page size, controlled/default page, and sibling/boundary counts
+ * @returns Pagination state (`page`, `totalPages`, `items`, `startIndex`, `endIndex`) and navigation methods
+ *
+ * @example
+ * ```tsx
+ * const { page, items, nextPage, prevPage, setPage } = usePagination({
+ *   totalItems: 250,
+ *   pageSize: 20,
+ * });
+ * ```
+ */
 export function usePagination(
   options: UsePaginationOptions = {},
 ): UsePaginationReturn {

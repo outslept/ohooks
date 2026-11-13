@@ -1,20 +1,32 @@
 import { useEffect, useState } from 'react';
 
 export interface UseGeolocationOptions extends PositionOptions {
+  /** Whether geolocation watching is active (default: `true`) */
   enabled?: boolean;
 }
 
 export interface GeolocationState {
+  /** Whether `navigator.geolocation` is supported in the current environment */
   isSupported: boolean;
+  /** Whether the initial position is currently being resolved */
   loading: boolean;
+  /** Accuracy of latitude and longitude coordinates in meters */
   accuracy: number | null;
+  /** Altitude in meters above the WGS84 ellipsoid, or `null` */
   altitude: number | null;
+  /** Accuracy of the altitude value in meters, or `null` */
   altitudeAccuracy: number | null;
+  /** Direction of travel in degrees (`0`–`360`), or `null` */
   heading: number | null;
+  /** Latitude in decimal degrees, or `null` */
   latitude: number | null;
+  /** Longitude in decimal degrees, or `null` */
   longitude: number | null;
+  /** Velocity in meters per second, or `null` */
   speed: number | null;
+  /** Timestamp when the position was acquired, or `null` */
   timestamp: number | null;
+  /** Latest `GeolocationPositionError`, or `null` */
   error: GeolocationPositionError | null;
 }
 
@@ -30,6 +42,20 @@ const INITIAL_STATE: Omit<GeolocationState, 'isSupported' | 'loading'> = {
   error: null,
 };
 
+/**
+ * Watches the user's geographic location reactively using `navigator.geolocation.watchPosition`.
+ *
+ * @category Sensors
+ * @param options - Geolocation `PositionOptions` (`enableHighAccuracy`, `maximumAge`, `timeout`) and `enabled` flag
+ * @returns Reactive geolocation coordinates, loading flag, support status, and error state
+ *
+ * @example
+ * ```tsx
+ * const { latitude, longitude, loading, error } = useGeolocation({
+ *   enableHighAccuracy: true,
+ * });
+ * ```
+ */
 export function useGeolocation(
   options: UseGeolocationOptions = {},
 ): GeolocationState {

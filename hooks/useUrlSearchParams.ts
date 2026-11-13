@@ -1,21 +1,27 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useEventCallback } from './useEventCallback';
 
+/** Accepted initializer formats for URL search parameters. */
 export type UrlSearchParamsInit =
   | string
   | URLSearchParams
   | Record<string, string | number | boolean | null | undefined>
   | ReadonlyArray<readonly [string, string]>;
 
+/** Configuration options for `useUrlSearchParams`. */
 export interface UseUrlSearchParamsOptions {
+  /** History API update mode (`'replace'` or `'push'`, default: `'replace'`). */
   historyMode?: 'push' | 'replace';
+  /** Fallback query parameters when `window.location.search` is empty or during SSR. */
   initialValue?: UrlSearchParamsInit;
 }
 
+/** Updater value or function accepted by `setParams`. */
 export type SetUrlSearchParamsAction =
   | UrlSearchParamsInit
   | ((prev: URLSearchParams) => UrlSearchParamsInit);
 
+/** Tuple returned by `useUrlSearchParams`. */
 export type UseUrlSearchParamsReturn = [
   params: URLSearchParams,
   setParams: (
@@ -65,6 +71,19 @@ function readWindowSearch(initialValue?: UrlSearchParamsInit): string {
   return createSearchParams(initialValue).toString();
 }
 
+/**
+ * Reads and updates `window.location.search` as reactive `URLSearchParams` synchronized with browser history.
+ *
+ * @category Storage
+ * @param options - Default history mode and fallback `initialValue` options
+ * @returns A tuple of `[params, setParams]`
+ *
+ * @example
+ * ```tsx
+ * const [searchParams, setSearchParams] = useUrlSearchParams();
+ * const query = searchParams.get('q') ?? '';
+ * ```
+ */
 export function useUrlSearchParams(
   options: UseUrlSearchParamsOptions = {}
 ): UseUrlSearchParamsReturn {

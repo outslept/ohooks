@@ -11,12 +11,26 @@ export type ExtendedPermissionName =
   | 'window-management';
 
 export interface ExtendedPermissionDescriptor {
+  /** Name of the browser permission to query */
   name: ExtendedPermissionName;
+  /** Additional descriptor properties required by specific permissions (e.g., `userVisibleOnly`, `sysex`) */
   [key: string]: unknown;
 }
 
 export type UsePermissionState = PermissionState | 'loading' | 'unsupported';
 
+/**
+ * Queries and subscribes to browser permission status changes via `navigator.permissions.query`.
+ *
+ * @category Browser
+ * @param permission - Permission name string (e.g., `'camera'`, `'geolocation'`) or `PermissionDescriptor` object
+ * @returns Current permission status (`'granted'`, `'denied'`, `'prompt'`, `'loading'`, or `'unsupported'`)
+ *
+ * @example
+ * ```tsx
+ * const cameraPermission = usePermission('camera');
+ * ```
+ */
 export function usePermission(
   permission: ExtendedPermissionName | ExtendedPermissionDescriptor,
 ): UsePermissionState {

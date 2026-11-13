@@ -1,13 +1,22 @@
 import { useCallback, useRef, useSyncExternalStore } from 'react';
 
+/** Reactive snapshot of `window.visualViewport` metrics. */
 export interface VisualViewportState {
+  /** Visual viewport width in CSS pixels. */
   width: number;
+  /** Visual viewport height in CSS pixels. */
   height: number;
+  /** Horizontal offset of the visual viewport relative to the layout viewport. */
   offsetLeft: number;
+  /** Vertical offset of the visual viewport relative to the layout viewport. */
   offsetTop: number;
+  /** Horizontal coordinate of the visual viewport relative to the document. */
   pageLeft: number;
+  /** Vertical coordinate of the visual viewport relative to the document. */
   pageTop: number;
+  /** Pinch-zoom scaling factor applied to the visual viewport. */
   scale: number;
+  /** Whether `window.visualViewport` is natively supported in the current browser. */
   isSupported: boolean;
 }
 
@@ -98,6 +107,17 @@ function subscribe(onStoreChange: () => void): () => void {
   };
 }
 
+/**
+ * Tracks the browser's `VisualViewport` dimensions, offsets, and pinch-zoom scale (useful for virtual keyboards).
+ *
+ * @category DOM
+ * @returns Reactive `VisualViewportState` snapshot
+ *
+ * @example
+ * ```tsx
+ * const { width, height, scale } = useVisualViewport();
+ * ```
+ */
 export function useVisualViewport(): VisualViewportState {
   const cacheRef: { current: VisualViewportState } = useRef(SERVER_SNAPSHOT);
 

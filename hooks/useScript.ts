@@ -1,17 +1,29 @@
 import { useEffect, useState } from 'react';
 
+/** Loading status of an external `<script>` tag. */
 export type ScriptStatus = 'idle' | 'loading' | 'ready' | 'error';
 
+/** Configuration options for `useScript`. */
 export interface UseScriptOptions {
+  /** Prevent the script from loading while `true` (default: `false`). */
   shouldPreventLoad?: boolean;
+  /** Remove the `<script>` element when the last consumer unmounts (default: `false`). */
   removeOnUnmount?: boolean;
+  /** Optional `id` attribute for the `<script>` tag. */
   id?: string;
+  /** Set the `async` attribute on the `<script>` tag (default: `true`). */
   async?: boolean;
+  /** Set the `defer` attribute on the `<script>` tag (default: `false`). */
   defer?: boolean;
+  /** CORS setting for the `<script>` element. */
   crossOrigin?: 'anonymous' | 'use-credentials' | '';
+  /** Subresource Integrity (`integrity`) hash. */
   integrity?: string;
+  /** Script `type` attribute (e.g. `'module'`). */
   type?: string;
+  /** Set the `noModule` attribute on the `<script>` tag. */
   noModule?: boolean;
+  /** Referrer policy for fetching the script. */
   referrerPolicy?: ReferrerPolicy;
 }
 
@@ -35,6 +47,19 @@ function findExistingScript(src: string): HTMLScriptElement | null {
   return null;
 }
 
+/**
+ * Dynamically loads an external `<script>` tag, deduplicating across components and tracking its status.
+ *
+ * @category DOM
+ * @param src - Script URL to load, or `null` to stay `'idle'`
+ * @param options - Script attributes and lifecycle options
+ * @returns Current loading status (`'idle' | 'loading' | 'ready' | 'error'`)
+ *
+ * @example
+ * ```tsx
+ * const status = useScript('https://js.stripe.com/v3/');
+ * ```
+ */
 export function useScript(
   src: string | null,
   options: UseScriptOptions = {}

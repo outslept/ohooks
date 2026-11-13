@@ -10,9 +10,13 @@ import { useHydrated } from './useHydrated';
 import { useLatest } from './useLatest';
 
 export interface StorageOptions<T> {
+  /** Custom serializer function (default: `JSON.stringify`) */
   serializer?: (value: T) => string;
+  /** Custom deserializer function (default: `JSON.parse`) */
   deserializer?: (value: string) => T;
+  /** Read from storage immediately on initial client render (default: `true`) */
   initializeWithValue?: boolean;
+  /** Callback invoked when reading, writing, or parsing storage throws an error */
   onError?: (error: unknown) => void;
 }
 
@@ -210,6 +214,20 @@ export function useWebStorage<T>(
   return [storedValue, setValue, removeValue];
 }
 
+/**
+ * Persists and synchronizes state with `window.localStorage` across components and browser tabs.
+ *
+ * @category Storage
+ * @param key - `localStorage` key to read and write
+ * @param initialValue - Fallback initial value or lazy initializer function
+ * @param options - Custom serialization, SSR initialization, and error handling options
+ * @returns Tuple of `[storedValue, setValue, removeValue]`
+ *
+ * @example
+ * ```tsx
+ * const [theme, setTheme, removeTheme] = useLocalStorage('theme', 'light');
+ * ```
+ */
 export function useLocalStorage<T>(
   key: string,
   initialValue: T | (() => T),

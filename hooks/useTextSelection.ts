@@ -4,10 +4,15 @@ import {
   resolveTargetElement,
 } from './useEventListener';
 
+/** Reactive state representing the user's current DOM text selection. */
 export interface TextSelectionState {
+  /** Currently selected plain text string. */
   text: string;
+  /** Bounding client rectangle of the primary selection range, or `null` when empty. */
   rect: DOMRect | null;
+  /** Cloned `Range` objects comprising the current selection. */
   ranges: Range[];
+  /** Underlying browser `Selection` object, or `null` when empty. */
   selection: Selection | null;
 }
 
@@ -63,6 +68,18 @@ function isSameSelectionState(
   );
 }
 
+/**
+ * Tracks the user's current text selection, bounding rectangle, and ranges within the document or a target container.
+ *
+ * @category Sensors
+ * @param target - Optional container element or ref to scope selection tracking to
+ * @returns Current `TextSelectionState` (`text`, `rect`, `ranges`, `selection`)
+ *
+ * @example
+ * ```tsx
+ * const { text, rect } = useTextSelection();
+ * ```
+ */
 export function useTextSelection(
   target?: EventListenerTarget<HTMLElement>
 ): TextSelectionState {

@@ -10,12 +10,32 @@ import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useLatest } from './useLatest';
 
 export interface UseControllableStateOptions<T> {
+  /** Controlled state value; when `undefined`, the hook manages state internally */
   value?: T;
+  /** Initial state value (or lazy initializer) used in uncontrolled mode */
   defaultValue: T | (() => T);
+  /** Callback fired whenever the state value changes */
   onChange?: (value: T) => void;
+  /** Equality comparator to skip redundant updates (default: `Object.is`) */
   shouldUpdate?: (prev: T, next: T) => boolean;
 }
 
+/**
+ * Manages state that can be either controlled externally or uncontrolled with an internal fallback.
+ *
+ * @category State
+ * @param options - Controlled value, default uncontrolled value, and change handler
+ * @returns Tuple of `[value, setValue, isControlled]`
+ *
+ * @example
+ * ```tsx
+ * const [open, setOpen, isControlled] = useControllableState({
+ *   value: props.open,
+ *   defaultValue: false,
+ *   onChange: props.onOpenChange,
+ * });
+ * ```
+ */
 export function useControllableState<T>(
   options: UseControllableStateOptions<T>
 ): [

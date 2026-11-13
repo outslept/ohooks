@@ -4,16 +4,33 @@ import { useEventCallback } from './useEventCallback';
 import { useTimeout } from './useTimeout';
 
 export interface UseCopyToClipboardOptions {
+  /** Time in milliseconds before `isCopied` resets to `false`, or `null` to disable auto-reset (default: `2000`) */
   resetInterval?: number | null;
 }
 
 export interface UseCopyToClipboardReturn {
+  /** Last text successfully copied to the clipboard, or `null` */
   copiedText: string | null;
+  /** Whether text was recently copied (resets after `resetInterval`) */
   isCopied: boolean;
+  /** Writes the given string to the system clipboard */
   copy: (text: string) => Promise<boolean>;
+  /** Clears `copiedText` and resets `isCopied` to `false` */
   reset: () => void;
 }
 
+/**
+ * Copies text to the system clipboard and tracks the copied state with an optional auto-reset timer.
+ *
+ * @category Browser
+ * @param options - Configuration for automatic `isCopied` state reset
+ * @returns Clipboard state (`copiedText`, `isCopied`) and actions (`copy`, `reset`)
+ *
+ * @example
+ * ```tsx
+ * const { isCopied, copy } = useCopyToClipboard({ resetInterval: 2000 });
+ * ```
+ */
 export function useCopyToClipboard(
   options: UseCopyToClipboardOptions = {},
 ): UseCopyToClipboardReturn {

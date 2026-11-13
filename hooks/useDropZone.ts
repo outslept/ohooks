@@ -14,32 +14,50 @@ import {
 import { useLatest } from './useLatest';
 
 export interface UseDropZoneOptions {
+  /** Accepted MIME types or file extensions (e.g., `'image/*,.pdf'` or `['image/png', '.jpg']`) */
   accept?: string | readonly string[];
+  /** Allow dropping multiple files at once (default: `true`) */
   multiple?: boolean;
+  /** Disable drag-and-drop handling (default: `false`) */
   disabled?: boolean;
+  /** Prevent default browser behavior for drops outside the drop zone (default: `false`) */
   preventDefaultForUnhandled?: boolean;
+  /** Callback invoked when valid files are dropped */
   onDrop?: (files: File[], event: DragEvent | ReactDragEvent) => void;
+  /** Callback invoked when dropped files fail MIME/extension or `multiple` validation */
   onDropRejected?: (
     rejectedFiles: File[],
     event: DragEvent | ReactDragEvent
   ) => void;
+  /** Callback invoked when a dragged item enters the drop zone */
   onDragEnter?: (event: DragEvent | ReactDragEvent) => void;
+  /** Callback invoked while a dragged item moves over the drop zone */
   onDragOver?: (event: DragEvent | ReactDragEvent) => void;
+  /** Callback invoked when a dragged item leaves the drop zone */
   onDragLeave?: (event: DragEvent | ReactDragEvent) => void;
 }
 
 export interface DropZoneRootProps extends HTMLAttributes<HTMLElement> {
+  /** Drag enter handler to attach to the drop zone element */
   onDragEnter: (event: ReactDragEvent<HTMLElement>) => void;
+  /** Drag over handler to attach to the drop zone element */
   onDragOver: (event: ReactDragEvent<HTMLElement>) => void;
+  /** Drag leave handler to attach to the drop zone element */
   onDragLeave: (event: ReactDragEvent<HTMLElement>) => void;
+  /** Drop handler to attach to the drop zone element */
   onDrop: (event: ReactDragEvent<HTMLElement>) => void;
 }
 
 export interface UseDropZoneReturn {
+  /** Whether a dragged item is currently hovering over the drop zone */
   isOver: boolean;
+  /** Whether the currently dragged item violates `accept` or `multiple` rules */
   isInvalid: boolean;
+  /** Array of files from the most recent valid drop */
   files: File[];
+  /** Clears the `files` state array */
   clearFiles: () => void;
+  /** Prop getter for binding drag-and-drop handlers directly onto a JSX element */
   getRootProps: <T extends HTMLElement = HTMLElement>(
     userProps?: HTMLAttributes<T>
   ) => DropZoneRootProps;
@@ -149,6 +167,22 @@ function partitionFiles(
   return { accepted, rejected };
 }
 
+/**
+ * Handles file drag-and-drop interactions with MIME/extension filtering via a target ref or `getRootProps`.
+ *
+ * @category DOM
+ * @param target - Optional target element/ref, or options object if no target is passed
+ * @param options - File validation rules and drag/drop event callbacks
+ * @returns Drop zone state (`isOver`, `isInvalid`, `files`), `clearFiles`, and `getRootProps` helper
+ *
+ * @example
+ * ```tsx
+ * const { isOver, files, getRootProps } = useDropZone({
+ *   accept: 'image/*',
+ *   onDrop: (accepted) => console.log(accepted),
+ * });
+ * ```
+ */
 export function useDropZone(
   target?: EventListenerTarget<HTMLElement> | UseDropZoneOptions,
   options?: UseDropZoneOptions

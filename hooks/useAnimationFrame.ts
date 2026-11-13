@@ -2,23 +2,47 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLatest } from './useLatest';
 
 export interface AnimationFrameInfo {
+  /** High-resolution timestamp passed by `requestAnimationFrame` */
   timestamp: DOMHighResTimeStamp;
+  /** Time elapsed in milliseconds since the previous frame */
   deltaTime: number;
+  /** Total time elapsed in milliseconds since the loop started */
   elapsedTime: number;
 }
 
 export interface UseAnimationFrameOptions {
+  /** Start the animation loop immediately on mount (default: `true`) */
   immediate?: boolean;
+  /** Optional maximum frames per second limit */
   fpsLimit?: number;
 }
 
 export interface UseAnimationFrameControls {
+  /** Starts the animation frame loop */
   start: () => void;
+  /** Stops the animation frame loop and resets timing counters */
   stop: () => void;
+  /** Toggles the animation frame loop between active and stopped states */
   toggle: () => void;
+  /** Whether the animation frame loop is currently running */
   isActive: boolean;
 }
 
+/**
+ * Runs a callback on every `requestAnimationFrame` tick with delta time tracking, FPS limiting, and playback controls.
+ *
+ * @category Effects
+ * @param callback - Function invoked on each animation frame with timing metadata
+ * @param options - Configuration for immediate start and FPS throttling
+ * @returns Playback control methods (`start`, `stop`, `toggle`) and `isActive` state
+ *
+ * @example
+ * ```tsx
+ * const { isActive, toggle } = useAnimationFrame(({ deltaTime }) => {
+ *   updatePosition(deltaTime);
+ * }, { fpsLimit: 60 });
+ * ```
+ */
 export function useAnimationFrame(
   callback: (info: AnimationFrameInfo) => void,
   options: UseAnimationFrameOptions = {}

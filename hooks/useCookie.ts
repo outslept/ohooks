@@ -2,15 +2,22 @@ import { useCallback, useSyncExternalStore } from 'react';
 import { useEventCallback } from './useEventCallback';
 
 export interface CookieAttributes {
+  /** Cookie path scope (default: `'/'`) */
   path?: string;
+  /** Domain that the cookie is available to */
   domain?: string;
+  /** Expiration date or number of days until expiration */
   expires?: Date | number;
+  /** Maximum age of the cookie in seconds */
   maxAge?: number;
+  /** Whether the cookie should only be transmitted over HTTPS */
   secure?: boolean;
+  /** Cross-site request forgery protection mode */
   sameSite?: 'strict' | 'lax' | 'none';
 }
 
 export interface UseCookieOptions extends CookieAttributes {
+  /** Fallback value returned when the cookie does not exist (default: `null`) */
   defaultValue?: string | null;
 }
 
@@ -105,6 +112,22 @@ function subscribe(onStoreChange: () => void): () => void {
   };
 }
 
+/**
+ * Reads, writes, and deletes a browser cookie reactively using `useSyncExternalStore`.
+ *
+ * @category Storage
+ * @param name - Name of the cookie to manage
+ * @param options - Default value and cookie attributes (`path`, `expires`, `sameSite`, etc.)
+ * @returns Tuple of `[value, setCookie, deleteCookie]`
+ *
+ * @example
+ * ```tsx
+ * const [token, setToken, deleteToken] = useCookie('auth_token', {
+ *   path: '/',
+ *   sameSite: 'lax',
+ * });
+ * ```
+ */
 export function useCookie(
   name: string,
   options: UseCookieOptions = {}

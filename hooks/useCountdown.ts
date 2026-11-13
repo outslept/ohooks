@@ -5,23 +5,51 @@ import { useInterval } from './useInterval';
 import { useLatest } from './useLatest';
 
 export interface UseCountdownOptions {
+  /** Starting count value */
   countStart: number;
+  /** Target count value where the timer stops (default: `0`) */
   countStop?: number;
+  /** Tick interval in milliseconds (default: `1000`) */
   intervalMs?: number;
+  /** Count up instead of down (default: `false`) */
   isIncrement?: boolean;
+  /** Start the countdown automatically on mount (default: `false`) */
   autoStart?: boolean;
+  /** Callback fired on every tick with the updated count */
   onTick?: (count: number) => void;
+  /** Callback fired when the countdown reaches `countStop` */
   onComplete?: () => void;
 }
 
 export interface UseCountdownReturn {
+  /** Current count value */
   count: number;
+  /** Whether the countdown timer is currently active */
   isRunning: boolean;
+  /** Starts or resumes the countdown */
   start: () => void;
+  /** Pauses the countdown */
   pause: () => void;
+  /** Stops the countdown and resets `count` back to `countStart` */
   reset: () => void;
 }
 
+/**
+ * Manages a configurable countdown (or count-up) timer with start, pause, and reset controls.
+ *
+ * @category Effects
+ * @param options - Countdown boundaries, interval duration, direction, and lifecycle callbacks
+ * @returns Current `count`, `isRunning` flag, and timer control methods (`start`, `pause`, `reset`)
+ *
+ * @example
+ * ```tsx
+ * const { count, isRunning, start, pause, reset } = useCountdown({
+ *   countStart: 60,
+ *   countStop: 0,
+ *   intervalMs: 1000,
+ * });
+ * ```
+ */
 export function useCountdown(
   options: UseCountdownOptions,
 ): UseCountdownReturn {

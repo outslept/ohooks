@@ -6,17 +6,36 @@ import {
 import { useLatest } from './useLatest';
 
 export interface UseFocusOptions {
+  /** Only mark as focused when the element matches `:focus-visible` (default: `false`) */
   focusVisible?: boolean;
+  /** Callback fired when the element receives focus */
   onFocus?: (event: FocusEvent) => void;
+  /** Callback fired when the element loses focus */
   onBlur?: (event: FocusEvent) => void;
 }
 
 export interface UseFocusReturn {
+  /** Whether the target element is currently focused */
   isFocused: boolean;
+  /** Programmatically focuses the target element */
   focus: (options?: FocusOptions) => void;
+  /** Programmatically removes focus from the target element */
   blur: () => void;
 }
 
+/**
+ * Tracks and controls the focus state of a target DOM element, with optional `:focus-visible` filtering.
+ *
+ * @category DOM
+ * @param target - Target DOM element or React ref
+ * @param options - Configuration for `:focus-visible` matching and focus/blur callbacks
+ * @returns Focus state (`isFocused`) and programmatic `focus` / `blur` methods
+ *
+ * @example
+ * ```tsx
+ * const { isFocused, focus, blur } = useFocus(inputRef, { focusVisible: true });
+ * ```
+ */
 export function useFocus<T extends HTMLElement = HTMLElement>(
   target: EventListenerTarget<T>,
   options: UseFocusOptions = {}

@@ -5,28 +5,48 @@ import {
 } from './useEventListener';
 import { useLatest } from './useLatest';
 
+/** Allowed movement axes for pointer dragging. */
 export type PointerDragAxis = 'both' | 'x' | 'y';
 
+/** Reactive state representing the current pointer drag operation. */
 export interface PointerDragState {
+  /** Whether a drag gesture is currently active. */
   isDragging: boolean;
+  /** Current pointer X coordinate (`clientX`). */
   x: number;
+  /** Current pointer Y coordinate (`clientY`). */
   y: number;
+  /** Initial pointer X coordinate where the drag started. */
   startX: number;
+  /** Initial pointer Y coordinate where the drag started. */
   startY: number;
+  /** Total horizontal displacement from `startX`. */
   deltaX: number;
+  /** Total vertical displacement from `startY`. */
   deltaY: number;
+  /** Horizontal distance moved since the previous pointer move event. */
   movementX: number;
+  /** Vertical distance moved since the previous pointer move event. */
   movementY: number;
 }
 
+/** Configuration options for `usePointerDrag`. */
 export interface UsePointerDragOptions {
+  /** Whether pointer drag tracking is enabled (default: `true`). */
   enabled?: boolean;
+  /** Constrain drag deltas to a specific axis (default: `'both'`). */
   axis?: PointerDragAxis;
+  /** Minimum distance in pixels before dragging starts (default: `0`). */
   threshold?: number;
+  /** Disable text selection on `document.body` while dragging (default: `true`). */
   preventUserSelect?: boolean;
+  /** Call `event.preventDefault()` on pointer events (default: `false`). */
   preventDefault?: boolean;
+  /** Callback fired when dragging begins. */
   onDragStart?: (state: PointerDragState, event: PointerEvent) => void;
+  /** Callback fired on each pointer move while dragging. */
   onDragMove?: (state: PointerDragState, event: PointerEvent) => void;
+  /** Callback fired when the drag operation ends or is cancelled. */
   onDragEnd?: (state: PointerDragState, event: PointerEvent) => void;
 }
 
@@ -42,6 +62,20 @@ const INITIAL_STATE: PointerDragState = {
   movementY: 0,
 };
 
+/**
+ * Tracks pointer drag gestures on a target element with axis locking and movement thresholds.
+ *
+ * @category Sensors
+ * @param target - Ref, element, or getter for the draggable element
+ * @param options - Drag configuration and lifecycle callbacks
+ * @returns Current pointer drag coordinates, deltas, and status
+ *
+ * @example
+ * ```tsx
+ * const boxRef = useRef<HTMLDivElement>(null);
+ * const { isDragging, deltaX, deltaY } = usePointerDrag(boxRef);
+ * ```
+ */
 export function usePointerDrag(
   target: EventListenerTarget<HTMLElement>,
   options: UsePointerDragOptions = {}

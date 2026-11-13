@@ -29,13 +29,21 @@ interface VendorNavigator extends Navigator {
 }
 
 export interface NetworkInformationState {
+  /** Whether the browser currently reports being online (`navigator.onLine`) */
   isOnline: boolean;
+  /** Whether the Network Information API (`navigator.connection`) is supported */
   isSupported: boolean;
+  /** Effective bandwidth estimate in megabits per second */
   downlink?: number;
+  /** Maximum downlink speed in megabits per second for the underlying connection technology */
   downlinkMax?: number;
+  /** Effective connection type (`'slow-2g'`, `'2g'`, `'3g'`, or `'4g'`) */
   effectiveType?: EffectiveConnectionType;
+  /** Estimated effective round-trip time of the current connection in milliseconds */
   rtt?: number;
+  /** Whether the user has requested a reduced data usage mode */
   saveData?: boolean;
+  /** Type of connection a device is using to communicate with the network */
   type?: NetworkConnectionType;
 }
 
@@ -90,6 +98,17 @@ function getServerSnapshot(): NetworkInformationState {
   return SERVER_SNAPSHOT;
 }
 
+/**
+ * Tracks network connectivity status and connection quality metrics (`effectiveType`, `downlink`, `rtt`, `saveData`) via the Network Information API.
+ *
+ * @category Sensors
+ * @returns Reactive `NetworkInformationState` object
+ *
+ * @example
+ * ```tsx
+ * const { isOnline, effectiveType, saveData } = useNetworkInformation();
+ * ```
+ */
 export function useNetworkInformation(): NetworkInformationState {
   const cacheRef = useRef<NetworkInformationState>(SERVER_SNAPSHOT);
 

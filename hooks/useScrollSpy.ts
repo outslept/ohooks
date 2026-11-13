@@ -6,12 +6,18 @@ import {
 } from './useEventListener';
 import { useLatest } from './useLatest';
 
+/** Section target accepted by `useScrollSpy` (element ID, CSS selector, ref, or DOM element). */
 export type ScrollSpyTarget = string | EventListenerTarget<HTMLElement>;
 
+/** Configuration options for `useScrollSpy`. */
 export interface UseScrollSpyOptions {
+  /** Scrollable root container (defaults to the browser viewport). */
   root?: EventListenerTarget<HTMLElement>;
+  /** `IntersectionObserver` root margin (default: `'0px 0px -80% 0px'`). */
   rootMargin?: string;
+  /** `IntersectionObserver` visibility threshold(s) (default: `0`). */
   threshold?: number | number[];
+  /** Top pixel offset subtracted when ranking visible sections (default: `0`). */
   offset?: number;
 }
 
@@ -31,6 +37,19 @@ function resolveSectionElement(target: ScrollSpyTarget): HTMLElement | null {
   return resolveTargetElement(target);
 }
 
+/**
+ * Observes a list of page sections and returns the `id` of the currently active section in view.
+ *
+ * @category DOM
+ * @param targets - Array of section IDs, selectors, refs, or elements to observe
+ * @param options - Intersection root, margin, threshold, and top offset options
+ * @returns The `id` of the active section, or `null` if none is active
+ *
+ * @example
+ * ```tsx
+ * const activeId = useScrollSpy(['#intro', '#features', '#pricing']);
+ * ```
+ */
 export function useScrollSpy(
   targets: readonly ScrollSpyTarget[],
   options: UseScrollSpyOptions = {}

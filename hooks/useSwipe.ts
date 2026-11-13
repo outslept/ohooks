@@ -5,25 +5,42 @@ import {
 } from './useEventListener';
 import { useLatest } from './useLatest';
 
+/** Detected cardinal direction of a swipe gesture. */
 export type SwipeDirection = 'up' | 'down' | 'left' | 'right' | 'none';
 
+/** Reactive state representing the current or most recent swipe gesture. */
 export interface SwipeState {
+  /** Whether a pointer swipe gesture is currently in progress. */
   isSwiping: boolean;
+  /** Detected swipe direction once `threshold` is exceeded. */
   direction: SwipeDirection;
+  /** Horizontal distance swiped (`startX - currentX`). */
   lengthX: number;
+  /** Vertical distance swiped (`startY - currentY`). */
   lengthY: number;
 }
 
+/** Configuration options and directional callbacks for `useSwipe`. */
 export interface UseSwipeOptions {
+  /** Minimum distance in pixels required to recognize a swipe direction (default: `50`). */
   threshold?: number;
+  /** Whether swipe detection is active (default: `true`). */
   enabled?: boolean;
+  /** Call `event.preventDefault()` during pointer movement (default: `false`). */
   preventDefault?: boolean;
+  /** Callback fired when a pointer down initiates a swipe. */
   onSwipeStart?: (event: PointerEvent) => void;
+  /** Callback fired during pointer movement once `threshold` is exceeded. */
   onSwipe?: (state: SwipeState, event: PointerEvent) => void;
+  /** Callback fired when the pointer is released or cancelled. */
   onSwipeEnd?: (state: SwipeState, event: PointerEvent) => void;
+  /** Callback fired when a swipe finishes in the `'left'` direction. */
   onSwipeLeft?: (event: PointerEvent) => void;
+  /** Callback fired when a swipe finishes in the `'right'` direction. */
   onSwipeRight?: (event: PointerEvent) => void;
+  /** Callback fired when a swipe finishes in the `'up'` direction. */
   onSwipeUp?: (event: PointerEvent) => void;
+  /** Callback fired when a swipe finishes in the `'down'` direction. */
   onSwipeDown?: (event: PointerEvent) => void;
 }
 
@@ -52,6 +69,23 @@ function computeDirection(
   return lengthY > 0 ? 'up' : 'down';
 }
 
+/**
+ * Detects pointer swipe gestures and directions on a target element.
+ *
+ * @category Sensors
+ * @param target - Ref, element, `document`, or `window` to attach swipe listeners to
+ * @param options - Distance threshold and directional swipe callbacks
+ * @returns Current `SwipeState` (`isSwiping`, `direction`, `lengthX`, `lengthY`)
+ *
+ * @example
+ * ```tsx
+ * const cardRef = useRef<HTMLDivElement>(null);
+ * const { direction } = useSwipe(cardRef, {
+ *   onSwipeLeft: () => nextSlide(),
+ *   onSwipeRight: () => prevSlide(),
+ * });
+ * ```
+ */
 export function useSwipe(
   target: EventListenerTarget<HTMLElement | Document | Window>,
   options: UseSwipeOptions = {}

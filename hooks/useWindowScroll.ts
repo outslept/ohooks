@@ -4,23 +4,43 @@ import { useEventListener } from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useThrottleCallback } from './useThrottleCallback';
 
+/** Window scroll coordinates in pixels. */
 export interface WindowScrollPosition {
+  /** Horizontal scroll offset (`window.scrollX`). */
   x: number;
+  /** Vertical scroll offset (`window.scrollY`). */
   y: number;
 }
 
+/** Configuration options for `useWindowScroll`. */
 export interface UseWindowScrollOptions {
+  /** Read `window.scrollX`/`scrollY` synchronously on initial client render (default: `true`). */
   initializeWithValue?: boolean;
+  /** Optional throttle interval in milliseconds for scroll updates (default: `0`). */
   throttleMs?: number;
 }
 
+/** Window scroll coordinates and programmatic `scrollTo` helper returned by `useWindowScroll`. */
 export interface UseWindowScrollReturn extends WindowScrollPosition {
+  /** Scrolls the window to the given coordinates or `ScrollToOptions`. */
   scrollTo: (
     xOrOptions: number | ScrollToOptions,
     y?: number,
   ) => void;
 }
 
+/**
+ * Tracks the window scroll position (`x`, `y`) and provides a `scrollTo` helper.
+ *
+ * @category Sensors
+ * @param options - SSR initialization and throttle options
+ * @returns `{ x, y, scrollTo }`
+ *
+ * @example
+ * ```tsx
+ * const { y, scrollTo } = useWindowScroll({ throttleMs: 50 });
+ * ```
+ */
 export function useWindowScroll(
   options: UseWindowScrollOptions = {},
 ): UseWindowScrollReturn {

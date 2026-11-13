@@ -1,13 +1,20 @@
 import { useCallback, useRef, useSyncExternalStore } from 'react';
 
+/** Reactive snapshot of the screen's orientation. */
 export interface ScreenOrientationState {
+  /** Current orientation type (e.g. `'portrait-primary'`, `'landscape-primary'`). */
   type: OrientationType;
+  /** Current orientation angle in degrees (`0`, `90`, `180`, or `270`). */
   angle: number;
+  /** Whether the `screen.orientation` API is natively supported. */
   isSupported: boolean;
 }
 
+/** Return value of `useScreenOrientation`. */
 export interface UseScreenOrientationReturn extends ScreenOrientationState {
+  /** Locks the screen orientation to the specified type (if supported by the browser). */
   lock: (orientation: string) => Promise<void>;
+  /** Unlocks the screen orientation. */
   unlock: () => void;
 }
 
@@ -68,6 +75,17 @@ function subscribe(onStoreChange: () => void): () => void {
   };
 }
 
+/**
+ * Tracks the device screen orientation and provides `lock` and `unlock` controls.
+ *
+ * @category Sensors
+ * @returns Current orientation `type`, `angle`, support flag, and lock/unlock methods
+ *
+ * @example
+ * ```tsx
+ * const { type, angle, lock, unlock } = useScreenOrientation();
+ * ```
+ */
 export function useScreenOrientation(): UseScreenOrientationReturn {
   const cacheRef: { current: ScreenOrientationState } =
     useRef(SERVER_SNAPSHOT);

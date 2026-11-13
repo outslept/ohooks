@@ -8,8 +8,11 @@ import { useLatest } from './useLatest';
 export type ClickOutsideEvent = MouseEvent | TouchEvent | PointerEvent;
 
 export interface UseOnClickOutsideOptions {
+  /** Whether the outside click listener is active (default: `true`) */
   enabled?: boolean;
+  /** DOM events to listen for on `document` (default: `['pointerdown']`) */
   events?: ReadonlyArray<'mousedown' | 'mouseup' | 'touchstart' | 'touchend' | 'pointerdown' | 'click'>;
+  /** Listen during the capture phase (default: `true`) */
   capture?: boolean;
 }
 
@@ -17,6 +20,21 @@ const DEFAULT_EVENTS: ReadonlyArray<
   'mousedown' | 'mouseup' | 'touchstart' | 'touchend' | 'pointerdown' | 'click'
 > = ['pointerdown'];
 
+/**
+ * Invokes a handler when a pointer, mouse, or touch interaction occurs outside one or more target elements (with Shadow DOM `composedPath` support).
+ *
+ * @category DOM
+ * @param target - Single target element/ref or array of elements/refs considered "inside"
+ * @param handler - Callback invoked when an interaction occurs outside all target elements
+ * @param options - Configuration for `enabled`, listened `events`, and `capture` phase
+ *
+ * @example
+ * ```tsx
+ * useOnClickOutside(dropdownRef, () => {
+ *   setIsOpen(false);
+ * });
+ * ```
+ */
 export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
   target:
     | EventListenerTarget<T>

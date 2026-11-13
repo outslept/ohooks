@@ -10,38 +10,59 @@ import { useThrottleCallback } from './useThrottleCallback';
 import { useUnmount } from './useUnmount';
 
 export interface ScrollDirections {
+  /** Whether the element is currently scrolling left */
   left: boolean;
+  /** Whether the element is currently scrolling right */
   right: boolean;
+  /** Whether the element is currently scrolling up */
   top: boolean;
+  /** Whether the element is currently scrolling down */
   bottom: boolean;
 }
 
 export interface ScrollArrivedState {
+  /** Whether the scroll position has reached the top edge */
   top: boolean;
+  /** Whether the scroll position has reached the bottom edge */
   bottom: boolean;
+  /** Whether the scroll position has reached the left edge */
   left: boolean;
+  /** Whether the scroll position has reached the right edge */
   right: boolean;
 }
 
 export interface ScrollOffset {
+  /** Threshold in pixels from the top edge to consider `arrived.top` as `true` (default: `0`) */
   top?: number | undefined;
+  /** Threshold in pixels from the bottom edge to consider `arrived.bottom` as `true` (default: `0`) */
   bottom?: number | undefined;
+  /** Threshold in pixels from the left edge to consider `arrived.left` as `true` (default: `0`) */
   left?: number | undefined;
+  /** Threshold in pixels from the right edge to consider `arrived.right` as `true` (default: `0`) */
   right?: number | undefined;
 }
 
 export interface UseElementScrollOptions {
+  /** Throttle interval in milliseconds for scroll updates (default: `0`) */
   throttleMs?: number | undefined;
+  /** Delay in milliseconds after the last scroll event before `isScrolling` resets to `false` (default: `150`) */
   idleDelayMs?: number | undefined;
+  /** Edge arrival offset thresholds in pixels */
   offset?: ScrollOffset | undefined;
 }
 
 export interface UseElementScrollReturn {
+  /** Current horizontal scroll offset (`scrollLeft`) */
   x: number;
+  /** Current vertical scroll offset (`scrollTop`) */
   y: number;
+  /** Whether the element is actively scrolling */
   isScrolling: boolean;
+  /** Active scroll movement directions */
   directions: ScrollDirections;
+  /** Flags indicating whether the scroll position has reached any edge */
   arrived: ScrollArrivedState;
+  /** Programmatically scrolls the target element to given coordinates or `ScrollToOptions` */
   scrollTo: (xOrOptions: number | ScrollToOptions, y?: number) => void;
 }
 
@@ -59,6 +80,19 @@ const INITIAL_ARRIVED: ScrollArrivedState = {
   right: false,
 };
 
+/**
+ * Tracks a scrollable element's scroll position, active scrolling state, movement directions, and edge arrival flags.
+ *
+ * @category DOM
+ * @param target - Target scrollable DOM element or React ref
+ * @param options - Configuration for throttling, idle delay, and edge arrival offsets
+ * @returns Scroll coordinates (`x`, `y`), `isScrolling`, `directions`, `arrived` flags, and `scrollTo` helper
+ *
+ * @example
+ * ```tsx
+ * const { y, isScrolling, arrived, scrollTo } = useElementScroll(containerRef);
+ * ```
+ */
 export function useElementScroll<T extends HTMLElement = HTMLElement>(
   target: EventListenerTarget<T>,
   options: UseElementScrollOptions = {},

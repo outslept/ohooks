@@ -1,14 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
 import { useHydrated } from './useHydrated';
 
+/** Configuration options for `useSpinDelay`. */
 export interface SpinDelayOptions {
+  /** Delay in milliseconds before showing the spinner (default: `500`). */
   delay?: number;
+  /** Minimum duration in milliseconds the spinner stays visible once shown (default: `200`). */
   minDuration?: number;
+  /** Immediately show the spinner during SSR when `loading` is `true` (default: `true`). */
   ssr?: boolean;
 }
 
 type SpinState = 'IDLE' | 'DELAY' | 'DISPLAY' | 'EXPIRE';
 
+/**
+ * Prevents loading indicator flashes by delaying appearance and enforcing a minimum display duration.
+ *
+ * @category Effects
+ * @param loading - Raw loading state boolean
+ * @param options - Delay, minimum visible duration, and SSR behavior options
+ * @returns Whether the loading spinner should currently be rendered
+ *
+ * @example
+ * ```tsx
+ * const showSpinner = useSpinDelay(isFetching, { delay: 400, minDuration: 200 });
+ * ```
+ */
 export function useSpinDelay(
   loading: boolean,
   options: SpinDelayOptions = {}

@@ -6,16 +6,24 @@ import {
 import { useLatest } from './useLatest';
 
 export interface UseFullscreenOptions {
+  /** Callback fired when fullscreen mode is entered */
   onEnter?: () => void;
+  /** Callback fired when fullscreen mode is exited */
   onExit?: () => void;
+  /** Callback fired if entering or exiting fullscreen fails */
   onError?: (error: unknown) => void;
 }
 
 export interface UseFullscreenReturn {
+  /** Whether the target element (or document) is currently in fullscreen mode */
   isFullscreen: boolean;
+  /** Whether the Fullscreen API is supported in the current browser */
   isSupported: boolean;
+  /** Requests fullscreen mode for the target element */
   enter: () => Promise<void>;
+  /** Exits fullscreen mode */
   exit: () => Promise<void>;
+  /** Toggles fullscreen mode on or off */
   toggle: () => Promise<void>;
 }
 
@@ -75,6 +83,19 @@ function isTargetCurrentlyFullscreen(
   return targetElement ? activeElement === targetElement : true;
 }
 
+/**
+ * Manages fullscreen state for a target DOM element (or `document.documentElement`) with vendor prefix support.
+ *
+ * @category Browser
+ * @param target - Optional target DOM element or React ref (defaults to `document.documentElement`)
+ * @param options - Lifecycle callbacks (`onEnter`, `onExit`, `onError`)
+ * @returns Fullscreen state (`isFullscreen`, `isSupported`) and control methods (`enter`, `exit`, `toggle`)
+ *
+ * @example
+ * ```tsx
+ * const { isFullscreen, toggle } = useFullscreen(videoContainerRef);
+ * ```
+ */
 export function useFullscreen(
   target?: EventListenerTarget<HTMLElement>,
   options: UseFullscreenOptions = {}

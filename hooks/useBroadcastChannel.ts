@@ -3,15 +3,22 @@ import { useEventCallback } from './useEventCallback';
 import { useLatest } from './useLatest';
 
 export interface UseBroadcastChannelOptions<T> {
+  /** Whether the broadcast channel subscription is active (default: `true`) */
   enabled?: boolean;
+  /** Callback fired when a message is received on the channel */
   onMessage?: (event: MessageEvent<T>) => void;
+  /** Callback fired when a message cannot be deserialized */
   onMessageError?: (event: MessageEvent) => void;
 }
 
 export interface UseBroadcastChannelReturn<T> {
+  /** Whether the `BroadcastChannel` API is supported in the current environment */
   isSupported: boolean;
+  /** Most recent message data received from the channel */
   lastMessage: T | undefined;
+  /** Latest message deserialization error event, or `null` */
   error: Event | null;
+  /** Sends a message to all browsing contexts listening on the channel */
   postMessage: (message: T) => boolean;
 }
 
@@ -22,6 +29,19 @@ function isBroadcastChannelSupported(): boolean {
   );
 }
 
+/**
+ * Communicates between browser tabs, windows, or iframes of the same origin using the `BroadcastChannel` API.
+ *
+ * @category Browser
+ * @param channelName - Name of the broadcast channel to join
+ * @param options - Configuration options and message event callbacks
+ * @returns Channel support flag, latest received message, error state, and `postMessage` sender
+ *
+ * @example
+ * ```tsx
+ * const { lastMessage, postMessage } = useBroadcastChannel<string>('auth-channel');
+ * ```
+ */
 export function useBroadcastChannel<T = unknown>(
   channelName: string,
   options: UseBroadcastChannelOptions<T> = {},

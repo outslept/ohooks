@@ -5,10 +5,28 @@ import {
 } from './useEventListener';
 import { useLatest } from './useLatest';
 
+/** Configuration options for `useResizeObserver`. */
 export interface UseResizeObserverOptions extends ResizeObserverOptions {
+  /** Whether the `ResizeObserver` is active (default: `true`). */
   enabled?: boolean;
 }
 
+/**
+ * Observes size changes on a target DOM element using the `ResizeObserver` API.
+ *
+ * @category DOM
+ * @param target - Ref, DOM element, or getter to observe
+ * @param callback - Invoked with the `ResizeObserverEntry` whenever the element resizes
+ * @param options - Observer box model and enablement options
+ *
+ * @example
+ * ```tsx
+ * const boxRef = useRef<HTMLDivElement>(null);
+ * useResizeObserver(boxRef, (entry) => {
+ *   console.log(entry.contentRect.width);
+ * });
+ * ```
+ */
 export function useResizeObserver<T extends Element = HTMLElement>(
   target: EventListenerTarget<T>,
   callback: (entry: ResizeObserverEntry, observer: ResizeObserver) => void,

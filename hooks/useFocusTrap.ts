@@ -6,9 +6,13 @@ import {
 import { useLatest } from './useLatest';
 
 export interface UseFocusTrapOptions {
+  /** Whether the focus trap is currently active (default: `true`) */
   enabled?: boolean;
+  /** Element, ref, or CSS selector to focus when the trap activates */
   initialFocus?: EventListenerTarget<HTMLElement> | string;
+  /** Restore focus to the previously active element on cleanup (default: `true`) */
   restoreFocus?: boolean;
+  /** Callback fired when the `Escape` key is pressed while the trap is active */
   onEscape?: (event: KeyboardEvent) => void;
 }
 
@@ -41,6 +45,21 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
   );
 }
 
+/**
+ * Traps keyboard `Tab` / `Shift+Tab` focus within a container element and optionally restores focus on unmount.
+ *
+ * @category DOM
+ * @param target - Container DOM element or React ref to trap focus inside
+ * @param options - Configuration for initial focus, focus restoration, and `Escape` key handling
+ *
+ * @example
+ * ```tsx
+ * useFocusTrap(modalRef, {
+ *   enabled: isOpen,
+ *   onEscape: () => setIsOpen(false),
+ * });
+ * ```
+ */
 export function useFocusTrap(
   target: EventListenerTarget<HTMLElement>,
   options: UseFocusTrapOptions = {}

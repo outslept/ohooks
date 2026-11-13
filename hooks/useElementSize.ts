@@ -10,12 +10,16 @@ import {
 } from './useResizeObserver';
 
 export interface ElementSize {
+  /** Measured width of the element in pixels */
   width: number;
+  /** Measured height of the element in pixels */
   height: number;
 }
 
 export interface UseElementSizeOptions extends UseResizeObserverOptions {
+  /** Initial width used during SSR and before the first measurement (default: `0`) */
   initialWidth?: number | undefined;
+  /** Initial height used during SSR and before the first measurement (default: `0`) */
   initialHeight?: number | undefined;
 }
 
@@ -67,6 +71,19 @@ function measureElement(
   };
 }
 
+/**
+ * Tracks the width and height of a DOM element reactively using `ResizeObserver`.
+ *
+ * @category DOM
+ * @param target - Target DOM element or React ref to measure
+ * @param options - Box model option (`content-box`, `border-box`, `device-pixel-content-box`) and initial SSR dimensions
+ * @returns Object containing `width` and `height`
+ *
+ * @example
+ * ```tsx
+ * const { width, height } = useElementSize(boxRef, { box: 'border-box' });
+ * ```
+ */
 export function useElementSize<T extends Element = HTMLElement>(
   target: EventListenerTarget<T>,
   options: UseElementSizeOptions = {},

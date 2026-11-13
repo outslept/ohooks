@@ -87,6 +87,22 @@ export function useEventListener<
   options?: boolean | AddEventListenerOptions
 ): void;
 
+/**
+ * Attaches a type-safe event listener to `Window`, `Document`, `HTMLElement`, `SVGElement`, `MediaQueryList`, or custom `EventTarget` with automatic cleanup.
+ *
+ * @category DOM
+ * @param eventName - Name of the event to listen for
+ * @param handler - Callback function invoked when the event fires
+ * @param element - Target element or ref (defaults to `window`)
+ * @param options - Standard `addEventListener` options or `capture` boolean
+ *
+ * @example
+ * ```tsx
+ * useEventListener('keydown', (event) => {
+ *   if (event.key === 'Escape') close();
+ * });
+ * ```
+ */
 export function useEventListener(
   eventName: string,
   handler: (event: Event) => void,

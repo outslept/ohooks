@@ -5,15 +5,25 @@ import {
 } from './useEventListener';
 
 export interface MousePositionState {
+  /** Horizontal coordinate relative to the whole document (`pageX`) */
   x: number;
+  /** Vertical coordinate relative to the whole document (`pageY`) */
   y: number;
+  /** Horizontal coordinate relative to the viewport (`clientX`) */
   clientX: number;
+  /** Vertical coordinate relative to the viewport (`clientY`) */
   clientY: number;
+  /** Horizontal coordinate relative to the user's screen (`screenX`) */
   screenX: number;
+  /** Vertical coordinate relative to the user's screen (`screenY`) */
   screenY: number;
+  /** Horizontal coordinate relative to the target element */
   elementX: number;
+  /** Vertical coordinate relative to the target element */
   elementY: number;
+  /** Target element's horizontal document offset */
   elementPositionX: number;
+  /** Target element's vertical document offset */
   elementPositionY: number;
 }
 
@@ -30,6 +40,18 @@ const INITIAL_STATE: MousePositionState = {
   elementPositionY: 0,
 };
 
+/**
+ * Tracks mouse cursor coordinates across the document, viewport, screen, and an optional target element using `requestAnimationFrame`.
+ *
+ * @category Sensors
+ * @param target - Optional target DOM element or React ref for computing element-relative coordinates
+ * @returns Mouse position coordinates (`x`, `y`, `clientX`, `clientY`, `screenX`, `screenY`, `elementX`, `elementY`, `elementPositionX`, `elementPositionY`)
+ *
+ * @example
+ * ```tsx
+ * const { x, y, elementX, elementY } = useMouse(boxRef);
+ * ```
+ */
 export function useMouse(
   target?: EventListenerTarget<HTMLElement>
 ): MousePositionState {

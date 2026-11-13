@@ -9,35 +9,58 @@ import { useControllableState } from './useControllableState';
 import { useEventCallback } from './useEventCallback';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
+/** Keyboard navigation orientation for roving tabindex groups. */
 export type RovingOrientation = 'horizontal' | 'vertical' | 'both';
 
+/** Configuration options for `useRovingTabIndex`. */
 export interface UseRovingTabIndexOptions {
+  /** Total number of items (inferred automatically from registered refs if omitted). */
   count?: number | undefined;
+  /** Controlled active item index. */
   activeIndex?: number | undefined;
+  /** Initial active item index in uncontrolled mode (default: `0`). */
   defaultActiveIndex?: number | undefined;
+  /** Arrow key navigation orientation (default: `'horizontal'`). */
   orientation?: RovingOrientation | undefined;
+  /** Whether arrow navigation wraps around at the ends (default: `true`). */
   loop?: boolean | undefined;
+  /** Flip horizontal arrow keys for right-to-left layouts (default: `false`). */
   rtl?: boolean | undefined;
+  /** Callback fired when the active index changes. */
   onActiveIndexChange?: ((index: number) => void) | undefined;
 }
 
+/** Per-item options passed to `getItemProps`. */
 export interface RovingItemOptions<T extends HTMLElement = HTMLElement> {
+  /** Whether this specific item is disabled and skipped during navigation. */
   disabled?: boolean | undefined;
+  /** Custom `onKeyDown` handler composed with roving keyboard navigation. */
   onKeyDown?: ((event: ReactKeyboardEvent<T>) => void) | undefined;
+  /** Custom `onFocus` handler composed with active index synchronization. */
   onFocus?: ((event: ReactFocusEvent<T>) => void) | undefined;
 }
 
+/** Props returned by `getItemProps` to spread onto each focusable item. */
 export interface RovingTabIndexItemProps<T extends HTMLElement = HTMLElement> {
+  /** Ref callback that registers the item's DOM node. */
   ref: (node: T | null) => void;
+  /** `0` for the active tabbable item, `-1` for all other items. */
   tabIndex: number;
+  /** Keyboard handler managing arrow, Home, and End navigation. */
   onKeyDown: (event: ReactKeyboardEvent<T>) => void;
+  /** Focus handler that updates the active index when focused. */
   onFocus: (event: ReactFocusEvent<T>) => void;
 }
 
+/** Return value of `useRovingTabIndex`. */
 export interface UseRovingTabIndexReturn {
+  /** Currently active item index. */
   activeIndex: number;
+  /** Updates the active index without moving DOM focus. */
   setActiveIndex: (index: number) => void;
+  /** Updates the active index and moves DOM focus to the item. */
   focusItem: (index: number) => void;
+  /** Generates `ref`, `tabIndex`, `onKeyDown`, and `onFocus` props for an item at `index`. */
   getItemProps: <T extends HTMLElement = HTMLElement>(
     index: number,
     options?: RovingItemOptions<T>,
@@ -49,6 +72,25 @@ interface RegisteredItem {
   disabled: boolean;
 }
 
+/**
+ * Implements the WAI-ARIA roving `tabIndex` keyboard navigation pattern for composite widgets.
+ *
+ * @category DOM
+ * @param options - Orientation, looping, RTL, and controlled/uncontrolled index options
+ * @returns Active index state, focus helpers, and `getItemProps` prop getter
+ *
+ * @example
+ * ```tsx
+ * const { getItemProps } = useRovingTabIndex({ orientation: 'horizontal' });
+ * return (
+ *   <div role="toolbar">
+ *     {items.map((item, i) => (
+ *       <button key={item.id} {...getItemProps(i)}>{item.label}</button>
+ *     ))}
+ *   </div>
+ * );
+ * ```
+ */
 export function useRovingTabIndex(
   options: UseRovingTabIndexOptions = {},
 ): UseRovingTabIndexReturn {

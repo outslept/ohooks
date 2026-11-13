@@ -5,25 +5,39 @@ import {
 } from './useEventListener';
 import { useLatest } from './useLatest';
 
+/** Metadata for a single visible item in a virtualized list. */
 export interface VirtualItem<T> {
+  /** Index of the item in the source `items` array. */
   index: number;
+  /** The item data at `index`. */
   data: T;
+  /** Top offset in pixels from the start of the scrollable content. */
   offsetTop: number;
+  /** Computed height of the item in pixels. */
   height: number;
 }
 
+/** Configuration options for `useVirtualList`. */
 export interface UseVirtualListOptions {
+  /** Ref, element, or getter for the scrollable container element. */
   containerTarget: EventListenerTarget<HTMLElement>;
+  /** Fixed pixel height or function returning the pixel height for each item index. */
   itemHeight: number | ((index: number) => number);
+  /** Number of extra items to render above and below the visible viewport (default: `5`). */
   overscan?: number;
 }
 
+/** Virtualized items, layout props, and scroll controls returned by `useVirtualList`. */
 export interface UseVirtualListReturn<T> {
+  /** Slice of items currently within the visible viewport plus overscan. */
   virtualItems: VirtualItem<T>[];
+  /** Total pixel height of all items combined. */
   totalHeight: number;
+  /** Style props to spread onto the inner positioning wrapper element. */
   wrapperProps: {
     style: CSSProperties;
   };
+  /** Scrolls the container to bring the item at `index` into view. */
   scrollToIndex: (index: number, behavior?: ScrollBehavior) => void;
 }
 
@@ -47,6 +61,23 @@ function findStartIndex(offsets: readonly number[], scrollTop: number): number {
   return Math.max(0, low - 1);
 }
 
+/**
+ * Virtualizes a large list of fixed or variable-height items so only visible rows are rendered.
+ *
+ * @category DOM
+ * @param items - Full array of list items
+ * @param options - Scroll container target, item height (number or function), and overscan count
+ * @returns Visible `virtualItems`, `totalHeight`, `wrapperProps`, and `scrollToIndex`
+ *
+ * @example
+ * ```tsx
+ * const containerRef = useRef<HTMLDivElement>(null);
+ * const { virtualItems, wrapperProps } = useVirtualList(rows, {
+ *   containerTarget: containerRef,
+ *   itemHeight: 40,
+ * });
+ * ```
+ */
 export function useVirtualList<T>(
   items: readonly T[],
   options: UseVirtualListOptions

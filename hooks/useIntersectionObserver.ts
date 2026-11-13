@@ -6,14 +6,34 @@ import {
 import { useLatest } from './useLatest';
 
 export interface UseIntersectionObserverOptions {
+  /** Ancestor element or document used as the viewport for checking visibility (default: `null`) */
   root?: EventListenerTarget<Element | Document>;
+  /** Margin around the `root` element (default: `'0px'`) */
   rootMargin?: string;
+  /** Visibility ratio threshold(s) at which the observer callback fires (default: `0`) */
   threshold?: number | number[];
+  /** Stop observing once the target element has intersected at least once (default: `false`) */
   freezeOnceVisible?: boolean;
+  /** Whether the observer is active (default: `true`) */
   enabled?: boolean;
+  /** Callback fired whenever the intersection entry updates */
   onChange?: (entry: IntersectionObserverEntry) => void;
 }
 
+/**
+ * Observes changes in the intersection of a target DOM element with an ancestor element or the viewport.
+ *
+ * @category DOM
+ * @param target - Target DOM element or React ref to observe
+ * @param options - `IntersectionObserver` options, `freezeOnceVisible`, and `onChange` callback
+ * @returns Latest `IntersectionObserverEntry`, or `null` before the first observation
+ *
+ * @example
+ * ```tsx
+ * const entry = useIntersectionObserver(sectionRef, { threshold: 0.5 });
+ * const isVisible = Boolean(entry?.isIntersecting);
+ * ```
+ */
 export function useIntersectionObserver(
   target: EventListenerTarget<Element>,
   options: UseIntersectionObserverOptions = {}

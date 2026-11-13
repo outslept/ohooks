@@ -1,18 +1,42 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useLatest } from './useLatest';
 
+/** Configuration options for `useThrottleCallback` and `useThrottleValue`. */
 export interface ThrottleOptions {
+  /** Invoke the function on the leading edge of the wait interval (default: `true`). */
   leading?: boolean;
+  /** Invoke the function on the trailing edge of the wait interval (default: `true`). */
   trailing?: boolean;
 }
 
+/** A throttled function with `cancel`, `flush`, and `isPending` control methods. */
 export interface ThrottledFunction<T extends (...args: never[]) => unknown> {
+  /** Invokes the throttled function. */
   (...args: Parameters<T>): ReturnType<T> | undefined;
+  /** Cancels any pending trailing invocation and resets the timer. */
   cancel: () => void;
+  /** Immediately executes any pending trailing invocation. */
   flush: () => ReturnType<T> | undefined;
+  /** Returns `true` if a trailing invocation timer is currently active. */
   isPending: () => boolean;
 }
 
+/**
+ * Creates a throttled version of a callback that executes at most once every `wait` milliseconds.
+ *
+ * @category Effects
+ * @param fn - The callback function to throttle
+ * @param wait - Throttle interval in milliseconds
+ * @param options - Leading and trailing edge execution options
+ * @returns Throttled callback with `cancel`, `flush`, and `isPending` methods
+ *
+ * @example
+ * ```tsx
+ * const handleScroll = useThrottleCallback((scrollY: number) => {
+ *   saveScrollPosition(scrollY);
+ * }, 200);
+ * ```
+ */
 export function useThrottleCallback<T extends (...args: never[]) => unknown>(
   fn: T,
   wait: number,

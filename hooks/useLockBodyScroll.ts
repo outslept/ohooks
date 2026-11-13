@@ -5,7 +5,9 @@ import {
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
 export interface UseLockBodyScrollOptions {
+  /** Compensate for the hidden scrollbar width by adding `padding-right` to prevent layout shift (default: `true`) */
   reserveScrollBarGap?: boolean;
+  /** Target scrollable element to lock (default: `document.body`) */
   target?: EventListenerTarget<HTMLElement>;
 }
 
@@ -17,6 +19,18 @@ interface LockState {
 
 const lockRegistry = new WeakMap<HTMLElement, LockState>();
 
+/**
+ * Locks scrolling on `document.body` (or a target element) with scrollbar gap compensation and reference counting across multiple active locks.
+ *
+ * @category DOM
+ * @param locked - Whether scrolling should be locked (default: `true`)
+ * @param options - Configuration for scrollbar gap compensation and custom target element
+ *
+ * @example
+ * ```tsx
+ * useLockBodyScroll(isModalOpen);
+ * ```
+ */
 export function useLockBodyScroll(
   locked: boolean = true,
   options: UseLockBodyScrollOptions = {}

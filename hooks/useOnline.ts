@@ -28,6 +28,17 @@ function getServerSnapshot(): boolean {
   return true;
 }
 
+/**
+ * Tracks whether the browser is currently connected to the network (`navigator.onLine`) using `useSyncExternalStore`.
+ *
+ * @category Sensors
+ * @returns `true` when online (and during SSR), `false` when offline
+ *
+ * @example
+ * ```tsx
+ * const isOnline = useOnline();
+ * ```
+ */
 export function useOnline(): boolean {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

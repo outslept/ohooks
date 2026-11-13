@@ -1,6 +1,7 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
 export interface UseDevicePixelRatioOptions {
+  /** Fallback device pixel ratio used during SSR (default: `1`) */
   defaultValue?: number;
 }
 
@@ -48,6 +49,18 @@ function subscribe(onStoreChange: () => void): () => void {
   return cleanup;
 }
 
+/**
+ * Tracks the current `window.devicePixelRatio` reactively across screen changes and browser zoom levels.
+ *
+ * @category Sensors
+ * @param options - Configuration for SSR fallback value
+ * @returns Current device pixel ratio
+ *
+ * @example
+ * ```tsx
+ * const dpr = useDevicePixelRatio({ defaultValue: 1 });
+ * ```
+ */
 export function useDevicePixelRatio(
   options: UseDevicePixelRatioOptions = {},
 ): number {

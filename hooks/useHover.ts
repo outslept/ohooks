@@ -6,12 +6,29 @@ import {
 import { useLatest } from './useLatest';
 
 export interface UseHoverOptions {
+  /** Delay in milliseconds before `isHovered` becomes `true` after `mouseenter` (default: `0`) */
   enterDelay?: number;
+  /** Delay in milliseconds before `isHovered` becomes `false` after `mouseleave` (default: `0`) */
   leaveDelay?: number;
+  /** Callback fired when the hover state activates */
   onEnter?: (event: MouseEvent) => void;
+  /** Callback fired when the hover state deactivates */
   onLeave?: (event: MouseEvent) => void;
 }
 
+/**
+ * Tracks whether the pointer is hovering over a target DOM element, with optional enter and leave delays.
+ *
+ * @category Sensors
+ * @param target - Target DOM element or React ref
+ * @param options - Enter/leave delays and hover lifecycle callbacks
+ * @returns `true` while the target element is hovered, `false` otherwise
+ *
+ * @example
+ * ```tsx
+ * const isHovered = useHover(cardRef, { enterDelay: 100, leaveDelay: 150 });
+ * ```
+ */
 export function useHover<T extends HTMLElement = HTMLElement>(
   target: EventListenerTarget<T>,
   options: UseHoverOptions = {}

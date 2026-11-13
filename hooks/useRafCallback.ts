@@ -2,13 +2,32 @@ import { useMemo, useRef } from 'react';
 import { useLatest } from './useLatest';
 import { useUnmount } from './useUnmount';
 
+/** A callback scheduled via `requestAnimationFrame` with control methods. */
 export interface RafScheduledFunction<T extends (...args: never[]) => unknown> {
+  /** Schedules the callback to run on the next animation frame with the latest arguments. */
   (...args: Parameters<T>): void;
+  /** Cancels any pending animation frame invocation. */
   cancel: () => void;
+  /** Immediately executes a pending invocation and cancels the scheduled frame. */
   flush: () => ReturnType<T> | undefined;
+  /** Returns `true` if an animation frame invocation is currently scheduled. */
   isPending: () => boolean;
 }
 
+/**
+ * Throttles a callback so it executes at most once per `requestAnimationFrame` with the latest arguments.
+ *
+ * @category Effects
+ * @param fn - The function to schedule on animation frames
+ * @returns A wrapped function with `cancel`, `flush`, and `isPending` controls
+ *
+ * @example
+ * ```tsx
+ * const onPointerMove = useRafCallback((x: number, y: number) => {
+ *   updatePosition(x, y);
+ * });
+ * ```
+ */
 export function useRafCallback<T extends (...args: never[]) => unknown>(
   fn: T,
 ): RafScheduledFunction<T> {

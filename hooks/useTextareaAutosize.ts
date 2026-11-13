@@ -6,16 +6,37 @@ import {
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useLatest } from './useLatest';
 
+/** Configuration options for `useTextareaAutosize`. */
 export interface UseTextareaAutosizeOptions {
+  /** Minimum height of the textarea in pixels. */
   minHeight?: number;
+  /** Maximum height of the textarea in pixels before vertical scrolling is enabled. */
   maxHeight?: number;
+  /** Callback fired with the new pixel height whenever the textarea resizes. */
   onResize?: (height: number) => void;
 }
 
+/** Return value of `useTextareaAutosize`. */
 export interface UseTextareaAutosizeReturn {
+  /** Imperatively recalculates and applies the textarea height. */
   resize: () => void;
 }
 
+/**
+ * Automatically adjusts the height of a `<textarea>` element to fit its content.
+ *
+ * @category DOM
+ * @param target - Ref, element, or getter for the `<textarea>`
+ * @param value - Optional controlled text value that triggers a resize on change
+ * @param options - Minimum/maximum height constraints and `onResize` callback
+ * @returns An object containing the manual `resize` trigger function
+ *
+ * @example
+ * ```tsx
+ * const textareaRef = useRef<HTMLTextAreaElement>(null);
+ * useTextareaAutosize(textareaRef, text, { maxHeight: 300 });
+ * ```
+ */
 export function useTextareaAutosize(
   target: EventListenerTarget<HTMLTextAreaElement>,
   value?: string,

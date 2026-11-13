@@ -4,6 +4,11 @@ import {
 } from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
+export interface UseInertOptions {
+  /** Apply `inert` and `aria-hidden="true"` to all top-level sibling elements instead of the target itself (default: `false`) */
+  trapSiblings?: boolean;
+}
+
 interface InertRestoreState {
   count: number;
   hadInertAttr: boolean;
@@ -62,12 +67,23 @@ function releaseInertFromElement(element: HTMLElement): void {
   inertRegistry.delete(element);
 }
 
+/**
+ * Manages the `inert` and `aria-hidden` attributes on a target element (or its document-level siblings) with reference counting.
+ *
+ * @category DOM
+ * @param target - Target DOM element or React ref
+ * @param inert - Whether `inert` should be applied (default: `true`)
+ * @param options - Configuration for applying `inert` to sibling elements (`trapSiblings`)
+ *
+ * @example
+ * ```tsx
+ * useInert(modalRef, isOpen, { trapSiblings: true });
+ * ```
+ */
 export function useInert(
   target: EventListenerTarget<HTMLElement>,
   inert: boolean = true,
-  options: {
-    trapSiblings?: boolean;
-  } = {}
+  options: UseInertOptions = {}
 ): void {
   const { trapSiblings = false } = options;
 

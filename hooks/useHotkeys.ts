@@ -8,11 +8,17 @@ import { useLatest } from './useLatest';
 export type HotkeyCallback = (event: KeyboardEvent, combo: string) => void;
 
 export interface UseHotkeysOptions {
+  /** Whether the hotkey listener is active (default: `true`) */
   enabled?: boolean;
+  /** Call `event.preventDefault()` when a matching hotkey is pressed (default: `true`) */
   preventDefault?: boolean;
+  /** Call `event.stopPropagation()` when a matching hotkey is pressed (default: `false`) */
   stopPropagation?: boolean;
+  /** Allow hotkeys to trigger while focus is inside `<input>`, `<textarea>`, `<select>`, or `contentEditable` elements (default: `false`) */
   enableOnFormTags?: boolean;
+  /** Keyboard event type to listen for (default: `'keydown'`) */
   event?: 'keydown' | 'keyup';
+  /** Target element, document, or window to attach the listener to (default: `window`) */
   target?: EventListenerTarget<HTMLElement | Document | Window>;
 }
 
@@ -172,6 +178,21 @@ export function matchesHotkey(
   return false;
 }
 
+/**
+ * Listens for keyboard shortcut combinations (including cross-platform `mod` support) and invokes a callback when matched.
+ *
+ * @category Sensors
+ * @param keys - Hotkey combination string (comma-separated) or array of combinations (e.g., `'mod+k, ctrl+shift+p'`)
+ * @param callback - Function invoked when any of the specified key combinations is pressed
+ * @param options - Configuration for form tag filtering, `preventDefault`, event type, and target element
+ *
+ * @example
+ * ```tsx
+ * useHotkeys('mod+k', () => {
+ *   setCommandPaletteOpen(true);
+ * });
+ * ```
+ */
 export function useHotkeys(
   keys: string | readonly string[],
   callback: HotkeyCallback,

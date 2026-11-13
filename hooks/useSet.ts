@@ -1,15 +1,34 @@
 import { useCallback, useState } from 'react';
 import { useEventCallback } from './useEventCallback';
 
+/** Mutation and lookup actions returned by `useSet`. */
 export interface UseSetActions<T> {
+  /** Adds `value` to the set if not already present. */
   add: (value: T) => void;
+  /** Removes `value` from the set if present. */
   remove: (value: T) => void;
+  /** Adds `value` if absent, or removes it if present. */
   toggle: (value: T) => void;
+  /** Removes all values from the set. */
   clear: () => void;
+  /** Resets the set back to `initialValue`. */
   reset: () => void;
+  /** Returns `true` if `value` is in the set. */
   has: (value: T) => boolean;
 }
 
+/**
+ * Manages a reactive `Set` in React state with immutable update helpers.
+ *
+ * @category State
+ * @param initialValue - Optional initial iterable of values
+ * @returns A tuple of `[set, actions]`
+ *
+ * @example
+ * ```tsx
+ * const [tags, { add, remove, toggle, has }] = useSet(['react', 'typescript']);
+ * ```
+ */
 export function useSet<T>(
   initialValue?: Iterable<T>,
 ): [ReadonlySet<T>, UseSetActions<T>] {

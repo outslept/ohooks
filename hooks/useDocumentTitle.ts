@@ -3,9 +3,22 @@ import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useUnmount } from './useUnmount';
 
 export interface UseDocumentTitleOptions {
+  /** Restore the previous `document.title` when the component unmounts (default: `false`) */
   restoreOnUnmount?: boolean;
 }
 
+/**
+ * Updates `document.title` reactively and optionally restores the original title on unmount.
+ *
+ * @category DOM
+ * @param title - Document title string to set
+ * @param options - Configuration for restoring the previous title on unmount
+ *
+ * @example
+ * ```tsx
+ * useDocumentTitle(`Inbox (${unreadCount})`, { restoreOnUnmount: true });
+ * ```
+ */
 export function useDocumentTitle(
   title: string,
   options: UseDocumentTitleOptions = {},

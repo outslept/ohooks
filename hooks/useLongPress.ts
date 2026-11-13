@@ -8,25 +8,55 @@ import { useEventCallback } from './useEventCallback';
 import { useUnmount } from './useUnmount';
 
 export interface UseLongPressOptions<T extends Element = Element> {
+  /** Hold duration in milliseconds required to trigger the long press callback (default: `400`) */
   threshold?: number;
+  /** Maximum pointer movement in pixels allowed before canceling the long press (default: `10`) */
   moveThreshold?: number;
+  /** Suppress the subsequent `click` event after a long press triggers (default: `true`) */
   preventClick?: boolean;
+  /** Cancel the pending long press if the pointer leaves the element (default: `true`) */
   cancelOnLeave?: boolean;
+  /** Predicate to filter which pointer events can initiate a long press */
   filterEvents?: (event: ReactPointerEvent<T>) => boolean;
+  /** Callback fired when the pointer press starts */
   onStart?: (event: ReactPointerEvent<T>) => void;
+  /** Callback fired when the pointer is released after a completed long press */
   onFinish?: (event: ReactPointerEvent<T>) => void;
+  /** Callback fired if the press is released, moved, or canceled before `threshold` elapses */
   onCancel?: (event: ReactPointerEvent<T>) => void;
 }
 
 export interface UseLongPressHandlers<T extends Element = Element> {
+  /** Pointer down handler to spread onto the target element */
   onPointerDown: (event: ReactPointerEvent<T>) => void;
+  /** Pointer move handler to cancel the press if movement exceeds `moveThreshold` */
   onPointerMove: (event: ReactPointerEvent<T>) => void;
+  /** Pointer up handler to finish or cancel the press */
   onPointerUp: (event: ReactPointerEvent<T>) => void;
+  /** Pointer leave handler to cancel the press when leaving the element */
   onPointerLeave: (event: ReactPointerEvent<T>) => void;
+  /** Pointer cancel handler */
   onPointerCancel: (event: ReactPointerEvent<T>) => void;
+  /** Click capture handler to suppress synthetic clicks after a long press */
   onClickCapture: (event: ReactMouseEvent<T>) => void;
 }
 
+/**
+ * Detects long-press pointer gestures with movement threshold cancellation and click suppression.
+ *
+ * @category Sensors
+ * @param callback - Function invoked when the pointer is held down for `threshold` milliseconds
+ * @param options - Hold duration, movement tolerance, click suppression, and lifecycle callbacks
+ * @returns Pointer and click event handlers to spread onto a JSX element
+ *
+ * @example
+ * ```tsx
+ * const longPressProps = useLongPress(() => {
+ *   openContextMenu();
+ * }, { threshold: 500 });
+ * // <button {...longPressProps}>Hold me</button>
+ * ```
+ */
 export function useLongPress<T extends Element = Element>(
   callback: (event: ReactPointerEvent<T>) => void,
   options: UseLongPressOptions<T> = {},

@@ -2,10 +2,12 @@ import { useCallback, useSyncExternalStore } from 'react';
 import { useEventCallback } from './useEventCallback';
 
 export interface SetHashOptions {
+  /** Use `history.replaceState` instead of `history.pushState` (default: `false`) */
   replace?: boolean;
 }
 
 export interface UseHashOptions {
+  /** Fallback hash string used during SSR (default: `''`) */
   defaultHash?: string;
 }
 
@@ -34,6 +36,19 @@ function subscribe(onStoreChange: () => void): () => void {
   };
 }
 
+/**
+ * Reads and updates `window.location.hash` reactively using `useSyncExternalStore`.
+ *
+ * @category Storage
+ * @param options - Configuration for the SSR fallback hash
+ * @returns Tuple of `[hash, setHash]` where `hash` is normalized with a leading `'#'` (or `''` when empty)
+ *
+ * @example
+ * ```tsx
+ * const [hash, setHash] = useHash();
+ * // setHash('section-2', { replace: true });
+ * ```
+ */
 export function useHash(
   options: UseHashOptions = {},
 ): [string, (nextHash: string, navOptions?: SetHashOptions) => void] {

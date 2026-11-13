@@ -6,6 +6,7 @@ import {
 import { useLatest } from './useLatest';
 
 export interface UseMutationObserverOptions extends MutationObserverInit {
+  /** Whether the mutation observer is active (default: `true`) */
   enabled?: boolean;
 }
 
@@ -15,6 +16,21 @@ const DEFAULT_OPTIONS: MutationObserverInit = {
   subtree: false,
 };
 
+/**
+ * Observes DOM tree, attribute, or character data mutations on a target node using `MutationObserver`.
+ *
+ * @category DOM
+ * @param target - Target DOM node or React ref to observe
+ * @param callback - `MutationCallback` invoked when observed mutations occur
+ * @param options - Standard `MutationObserverInit` options and `enabled` flag
+ *
+ * @example
+ * ```tsx
+ * useMutationObserver(containerRef, (mutations) => {
+ *   console.log('DOM mutated:', mutations);
+ * }, { childList: true, subtree: true });
+ * ```
+ */
 export function useMutationObserver(
   target: EventListenerTarget<Node>,
   callback: MutationCallback,

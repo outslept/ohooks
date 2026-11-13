@@ -11,7 +11,9 @@ export type KeyPressFilter =
   | ((event: KeyboardEvent) => boolean);
 
 export interface UseKeyPressOptions {
+  /** Target element, document, or window to listen on (default: `window`) */
   target?: EventListenerTarget<EventTarget>;
+  /** Call `event.preventDefault()` when a matching key is pressed (default: `false`) */
   preventDefault?: boolean;
 }
 
@@ -27,6 +29,19 @@ function matchesKeyFilter(
   return list.some((hotkey) => matchesHotkey(hotkey, event));
 }
 
+/**
+ * Tracks whether a specific key, hotkey combination, or custom key predicate is currently held down.
+ *
+ * @category Sensors
+ * @param keyFilter - Key name, hotkey combo, array of keys, or predicate function
+ * @param options - Target element and `preventDefault` configuration
+ * @returns `true` while the matching key is held down, `false` otherwise
+ *
+ * @example
+ * ```tsx
+ * const isShiftPressed = useKeyPress('shift');
+ * ```
+ */
 export function useKeyPress(
   keyFilter: KeyPressFilter,
   options: UseKeyPressOptions = {},

@@ -2,18 +2,28 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLatest } from './useLatest';
 
 export interface UseFileDialogOptions {
+  /** Allow selecting multiple files (default: `true`) */
   multiple?: boolean;
+  /** Accepted file types or extensions (default: `'*'`) */
   accept?: string;
+  /** Media capture source (`'user'` or `'environment'`) for mobile devices */
   capture?: string;
+  /** Allow selecting directories via `webkitdirectory` (default: `false`) */
   directory?: boolean;
+  /** Reset previously selected files when opening the dialog (default: `false`) */
   reset?: boolean;
+  /** Callback fired when files are selected */
   onChange?: (files: FileList | null) => void;
+  /** Callback fired when the file dialog is canceled without selection */
   onCancel?: () => void;
 }
 
 export interface UseFileDialogReturn {
+  /** Currently selected `FileList`, or `null` */
   files: FileList | null;
+  /** Opens the native file picker dialog with optional per-call overrides */
   open: (localOptions?: Partial<UseFileDialogOptions>) => void;
+  /** Clears the selected `files` state and resets the underlying file input */
   reset: () => void;
 }
 
@@ -29,6 +39,18 @@ const DEFAULT_OPTIONS: Required<
   reset: false,
 };
 
+/**
+ * Opens the native file selection dialog programmatically without rendering a visible `<input type="file">` element.
+ *
+ * @category Browser
+ * @param options - File input attributes (`accept`, `multiple`, `directory`, `capture`) and callbacks
+ * @returns Selected `files`, `open` trigger, and `reset` method
+ *
+ * @example
+ * ```tsx
+ * const { files, open, reset } = useFileDialog({ accept: 'image/*', multiple: false });
+ * ```
+ */
 export function useFileDialog(
   options: UseFileDialogOptions = {}
 ): UseFileDialogReturn {
