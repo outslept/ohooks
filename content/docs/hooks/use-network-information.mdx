@@ -1,9 +1,11 @@
 ---
 title: useNetworkInformation
-description: "Tracks network connectivity status and connection quality metrics (`effectiveType`, `downlink`, `rtt`, `saveData`) via the Network Information API."
+description: Tracks network connectivity status and connection quality metrics (effectiveType, downlink, rtt, saveData) via the Network Information API.
 ---
 
 {/* Preview */}
+
+The `useNetworkInformation` hook subscribes to `online`/`offline` events and the browser's `navigator.connection` (`NetworkInformation`) API using `useSyncExternalStore`, exposing live connection speed, latency, and data-saver preferences.
 
 ## Installation
 
@@ -12,11 +14,63 @@ description: "Tracks network connectivity status and connection quality metrics 
 ## Usage
 
 ```tsx
-const { isOnline, effectiveType, saveData } = useNetworkInformation();
+import { useNetworkInformation } from "@/hooks/useNetworkInformation"
+```
+
+```tsx
+const { isOnline, effectiveType, saveData } = useNetworkInformation()
+```
+
+## Examples
+
+### Adaptive Media Quality (`saveData` and `effectiveType`)
+
+Serve lower-resolution images or disable autoplay video when the user is on a slow connection (`2g` / `slow-2g`) or has Data Saver enabled.
+
+```tsx
+const { isOnline, effectiveType, saveData } = useNetworkInformation()
+const isLowBandwidth =
+  saveData || effectiveType === "slow-2g" || effectiveType === "2g"
+
+if (!isOnline) {
+  return <p>You are currently offline.</p>
+}
+
+return (
+  <img
+    src={isLowBandwidth ? "/hero-low.jpg" : "/hero-hd.jpg"}
+    alt="Hero banner"
+  />
+)
+```
+
+### Displaying Connection Diagnostics
+
+Read `downlink` (Mbps) and `rtt` (round-trip time in ms) when `isSupported` is `true`.
+
+```tsx
+const { isSupported, effectiveType, downlink, rtt } = useNetworkInformation()
+
+return (
+  <div>
+    {isSupported ? (
+      <p>
+        Network: {effectiveType} ({downlink} Mbps, {rtt}ms RTT)
+      </p>
+    ) : (
+      <p>Network Information API not supported in this browser.</p>
+    )}
+  </div>
+)
 ```
 
 ## API Reference
 
-### `NetworkInformationState`
+### NetworkInformationState
 
-<AutoTypeTable path="./hooks/useNetworkInformation.ts" name="NetworkInformationState" />
+Network connectivity and quality metrics returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useNetworkInformation.ts"
+  name="NetworkInformationState"
+/>

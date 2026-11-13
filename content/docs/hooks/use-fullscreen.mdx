@@ -1,9 +1,11 @@
 ---
 title: useFullscreen
-description: "Manages fullscreen state for a target DOM element (or `document.documentElement`) with vendor prefix support."
+description: Manages fullscreen state for a target DOM element (or document.documentElement) with vendor prefix support.
 ---
 
 {/* Preview */}
+
+The `useFullscreen` hook enters, exits, and toggles fullscreen mode for a target DOM element (defaulting to `document.documentElement` when no target is provided), handling standard and vendor-prefixed Fullscreen APIs automatically.
 
 ## Installation
 
@@ -12,15 +14,62 @@ description: "Manages fullscreen state for a target DOM element (or `document.do
 ## Usage
 
 ```tsx
-const { isFullscreen, toggle } = useFullscreen(videoContainerRef);
+import { useFullscreen } from "@/hooks/useFullscreen"
+```
+
+```tsx
+const { isFullscreen, toggle } = useFullscreen(videoContainerRef)
+```
+
+## Examples
+
+### Fullscreen Media Player Container
+
+Pass a container `RefObject` to toggle fullscreen on a specific element rather than the entire page.
+
+```tsx
+const playerRef = useRef<HTMLDivElement>(null)
+const { isFullscreen, isSupported, toggle } = useFullscreen(playerRef, {
+  onEnter: () => console.log("Entered fullscreen"),
+  onExit: () => console.log("Exited fullscreen"),
+})
+
+return (
+  <div ref={playerRef}>
+    <video src="/clip.mp4" controls />
+    {isSupported && (
+      <button onClick={toggle}>
+        {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+      </button>
+    )}
+  </div>
+)
+```
+
+### Fullscreen Document Mode
+
+Omit the target argument (or pass `undefined`) to enter and exit fullscreen on `document.documentElement`.
+
+```tsx
+const { isFullscreen, enter, exit } = useFullscreen()
+
+return (
+  <button onClick={isFullscreen ? exit : enter}>
+    {isFullscreen ? "Exit page fullscreen" : "Enter page fullscreen"}
+  </button>
+)
 ```
 
 ## API Reference
 
-### `UseFullscreenOptions`
+### UseFullscreenOptions
+
+Lifecycle callbacks for fullscreen transitions and errors.
 
 <AutoTypeTable path="./hooks/useFullscreen.ts" name="UseFullscreenOptions" />
 
-### `UseFullscreenReturn`
+### UseFullscreenReturn
+
+Fullscreen state and control methods returned by the hook.
 
 <AutoTypeTable path="./hooks/useFullscreen.ts" name="UseFullscreenReturn" />

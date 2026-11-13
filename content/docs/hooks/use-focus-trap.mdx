@@ -1,9 +1,11 @@
 ---
 title: useFocusTrap
-description: "Traps keyboard `Tab` / `Shift+Tab` focus within a container element and optionally restores focus on unmount."
+description: Traps keyboard Tab / Shift+Tab focus within a container element and optionally restores focus on unmount.
 ---
 
 {/* Preview */}
+
+The `useFocusTrap` hook constrains keyboard `Tab` and `Shift+Tab` navigation to focusable elements inside a container, moves initial focus into the container when activated, and restores focus to the previously focused element when deactivated.
 
 ## Installation
 
@@ -12,14 +14,63 @@ description: "Traps keyboard `Tab` / `Shift+Tab` focus within a container elemen
 ## Usage
 
 ```tsx
+import { useFocusTrap } from "@/hooks/useFocusTrap"
+```
+
+```tsx
 useFocusTrap(modalRef, {
   enabled: isOpen,
   onEscape: () => setIsOpen(false),
-});
+})
+```
+
+## Examples
+
+### Accessible Modal Dialog
+
+Combine `enabled`, `initialFocus`, and `onEscape` to trap focus inside an open modal and close it when the user presses `Escape`.
+
+```tsx
+const [isOpen, setIsOpen] = useState(false)
+const dialogRef = useRef<HTMLDivElement>(null)
+
+useFocusTrap(dialogRef, {
+  enabled: isOpen,
+  initialFocus: "[data-autofocus]",
+  onEscape: () => setIsOpen(false),
+})
+
+return (
+  <>
+    <button onClick={() => setIsOpen(true)}>Open modal</button>
+    {isOpen && (
+      <div ref={dialogRef} role="dialog" aria-modal="true">
+        <input data-autofocus placeholder="Your name" />
+        <button onClick={() => setIsOpen(false)}>Close</button>
+      </div>
+    )}
+  </>
+)
+```
+
+### Custom Initial Focus Element
+
+Pass a `RefObject` or CSS selector to `initialFocus` to control which element receives focus when the trap activates.
+
+```tsx
+const containerRef = useRef<HTMLDivElement>(null)
+const cancelBtnRef = useRef<HTMLButtonElement>(null)
+
+useFocusTrap(containerRef, {
+  initialFocus: cancelBtnRef,
+  restoreFocus: true,
+})
 ```
 
 ## API Reference
 
-### `UseFocusTrapOptions`
+### UseFocusTrapOptions
+
+Configuration options for focus trapping, initial focus target, and restoration behavior.
 
 <AutoTypeTable path="./hooks/useFocusTrap.ts" name="UseFocusTrapOptions" />

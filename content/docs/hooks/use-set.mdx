@@ -1,9 +1,11 @@
 ---
 title: useSet
-description: "Manages a reactive `Set` in React state with immutable update helpers."
+description: Manages a reactive Set in React state with immutable update helpers.
 ---
 
 {/* Preview */}
+
+The `useSet` hook manages a JavaScript `Set` in React state and provides memoized helper methods (`add`, `remove`, `toggle`, `has`, `clear`, and `reset`) that clone the set on mutations so components re-render predictably.
 
 ## Installation
 
@@ -12,11 +14,64 @@ description: "Manages a reactive `Set` in React state with immutable update help
 ## Usage
 
 ```tsx
-const [tags, { add, remove, toggle, has }] = useSet(['react', 'typescript']);
+import { useSet } from "@/hooks/useSet"
+```
+
+```tsx
+const [tags, { add, remove, toggle, has }] = useSet(["react", "typescript"])
+```
+
+## Examples
+
+### Multi-Select Tag Filter
+
+Use `toggle` and `has` to build a multi-select filter bar where clicking a tag adds or removes it from the active set.
+
+```tsx
+const availableTags = ["react", "typescript", "tailwind", "nextjs"]
+const [selected, { toggle, has, clear, reset }] = useSet(["react"])
+
+return (
+  <div>
+    <div>
+      {availableTags.map((tag) => (
+        <button
+          key={tag}
+          aria-pressed={has(tag)}
+          onClick={() => toggle(tag)}
+        >
+          {tag} {has(tag) ? "✓" : ""}
+        </button>
+      ))}
+    </div>
+    <p>Active filters: {Array.from(selected).join(", ") || "None"}</p>
+    <button onClick={clear}>Clear</button>
+    <button onClick={reset}>Reset</button>
+  </div>
+)
+```
+
+### Tracking Expanded Accordion Items
+
+Store expanded item IDs in `useSet` to allow multiple accordion panels to stay open simultaneously.
+
+```tsx
+const [openIds, { add, remove, has }] = useSet<string>()
+
+return (
+  <div>
+    <button onClick={() => (has("faq-1") ? remove("faq-1") : add("faq-1"))}>
+      Toggle FAQ 1
+    </button>
+    {has("faq-1") && <p>Answer to FAQ 1</p>}
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseSetActions`
+### UseSetActions
+
+Memoized set mutation and lookup methods returned as the second tuple element.
 
 <AutoTypeTable path="./hooks/useSet.ts" name="UseSetActions" />

@@ -1,9 +1,11 @@
 ---
 title: usePrevious
-description: "Returns the value passed on the previous render."
+description: Returns the value passed on the previous render.
 ---
 
 {/* Preview */}
+
+The `usePrevious` hook returns the value from the immediately preceding render pass (`undefined` on the initial render).
 
 ## Installation
 
@@ -12,5 +14,48 @@ description: "Returns the value passed on the previous render."
 ## Usage
 
 ```tsx
-const prevCount = usePrevious(count);
+import { usePrevious } from "@/hooks/usePrevious"
+```
+
+```tsx
+const prevCount = usePrevious(count)
+```
+
+## Examples
+
+### Comparing Current and Previous Numeric Values
+
+Compare a value against its previous render value to show trend indicators.
+
+```tsx
+const [price, setPrice] = useState(100)
+const prevPrice = usePrevious(price)
+
+const trend =
+  prevPrice === undefined
+    ? "unchanged"
+    : price > prevPrice
+      ? "up"
+      : price < prevPrice
+        ? "down"
+        : "unchanged"
+
+return (
+  <div>
+    <p>
+      Price: ${price} (Previous: {prevPrice ?? "N/A"}, Trend: {trend})
+    </p>
+    <button onClick={() => setPrice((p) => p + 5)}>+$5</button>
+    <button onClick={() => setPrice((p) => p - 5)}>-$5</button>
+  </div>
+)
+```
+
+### Logging Prop Transitions
+
+Inspect `prevStatus` alongside `status` to detect when a prop transitions between states.
+
+```tsx
+const prevStatus = usePrevious(status)
+const justCompleted = prevStatus === "running" && status === "completed"
 ```

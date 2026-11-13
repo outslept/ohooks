@@ -1,9 +1,11 @@
 ---
 title: useDocumentTitle
-description: "Updates `document.title` reactively and optionally restores the original title on unmount."
+description: Updates document.title reactively and optionally restores the original title on unmount.
 ---
 
 {/* Preview */}
+
+The `useDocumentTitle` hook synchronizes `document.title` with a string value and can restore the previous title when the component unmounts.
 
 ## Installation
 
@@ -12,11 +14,46 @@ description: "Updates `document.title` reactively and optionally restores the or
 ## Usage
 
 ```tsx
-useDocumentTitle(`Inbox (${unreadCount})`, { restoreOnUnmount: true });
+import { useDocumentTitle } from "@/hooks/useDocumentTitle"
+```
+
+```tsx
+useDocumentTitle(`Inbox (${unreadCount})`, { restoreOnUnmount: true })
+```
+
+## Examples
+
+### Dynamic Notification Badge in Title
+
+Include live state in the title string to reflect unread counts or background task status in the browser tab.
+
+```tsx
+const [unread, setUnread] = useState(3)
+
+useDocumentTitle(unread > 0 ? `(${unread}) Messages` : "Messages")
+
+return (
+  <button onClick={() => setUnread(0)}>Mark all as read</button>
+)
+```
+
+### Restoring the Previous Title on Unmount
+
+Enable `restoreOnUnmount: true` inside modals, drawers, or temporary views so closing them restores the parent page's title.
+
+```tsx
+useDocumentTitle("Editing Profile — Settings", {
+  restoreOnUnmount: true,
+})
 ```
 
 ## API Reference
 
-### `UseDocumentTitleOptions`
+### UseDocumentTitleOptions
 
-<AutoTypeTable path="./hooks/useDocumentTitle.ts" name="UseDocumentTitleOptions" />
+Configuration options for `useDocumentTitle`.
+
+<AutoTypeTable
+  path="./hooks/useDocumentTitle.ts"
+  name="UseDocumentTitleOptions"
+/>

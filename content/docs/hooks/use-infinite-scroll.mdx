@@ -1,9 +1,11 @@
 ---
 title: useInfiniteScroll
-description: "Triggers an asynchronous `onLoadMore` callback when a sentinel element scrolls into view using `IntersectionObserver`."
+description: Triggers an asynchronous onLoadMore callback when a sentinel element scrolls into view using IntersectionObserver.
 ---
 
 {/* Preview */}
+
+The `useInfiniteScroll` hook observes a sentinel element with `IntersectionObserver`, invokes `onLoadMore` when it enters the viewport (with configurable `distance` pre-fetching), and prevents duplicate concurrent calls while a page is loading.
 
 ## Installation
 
@@ -12,17 +14,82 @@ description: "Triggers an asynchronous `onLoadMore` callback when a sentinel ele
 ## Usage
 
 ```tsx
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll"
+```
+
+```tsx
 const { isLoading } = useInfiniteScroll(sentinelRef, fetchNextPage, {
   hasMore: hasNextPage,
-});
+})
+```
+
+## Examples
+
+### Paginated Feed with a Bottom Sentinel
+
+Place an empty sentinel element at the bottom of your list and pass its ref to `useInfiniteScroll`.
+
+```tsx
+const sentinelRef = useRef<HTMLDivElement>(null)
+const [items, setItems] = useState<string[]>(["Item 1", "Item 2"])
+const [hasMore, setHasMore] = useState(true)
+
+const { isLoading, error } = useInfiniteScroll(
+  sentinelRef,
+  async () => {
+    const nextBatch = await fetchMoreItems(items.length)
+    setItems((prev) => [...prev, ...nextBatch])
+    if (nextBatch.length === 0) setHasMore(false)
+  },
+  { hasMore, distance: "200px" }
+)
+
+return (
+  <div>
+    <ul>
+      {items.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+    <div ref={sentinelRef} />
+    {isLoading && <p>Loading more...</p>}
+    {error && <p role="alert">Failed to load more items.</p>}
+  </div>
+)
+```
+
+### Reverse Infinite Scroll for Chat History
+
+Set `direction: "top"` and provide a scrollable container `root` ref to load older messages when the user scrolls near the top.
+
+```tsx
+const chatContainerRef = useRef<HTMLDivElement>(null)
+const topSentinelRef = useRef<HTMLDivElement>(null)
+
+const { isLoading } = useInfiniteScroll(topSentinelRef, loadOlderMessages, {
+  root: chatContainerRef,
+  direction: "top",
+  distance: 120,
+  hasMore: hasOlderMessages,
+})
 ```
 
 ## API Reference
 
-### `UseInfiniteScrollOptions`
+### UseInfiniteScrollOptions
 
-<AutoTypeTable path="./hooks/useInfiniteScroll.ts" name="UseInfiniteScrollOptions" />
+Configuration options for intersection root, pre-fetch distance, and pagination state.
 
-### `UseInfiniteScrollReturn`
+<AutoTypeTable
+  path="./hooks/useInfiniteScroll.ts"
+  name="UseInfiniteScrollOptions"
+/>
 
-<AutoTypeTable path="./hooks/useInfiniteScroll.ts" name="UseInfiniteScrollReturn" />
+### UseInfiniteScrollReturn
+
+Loading status and error state returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useInfiniteScroll.ts"
+  name="UseInfiniteScrollReturn"
+/>

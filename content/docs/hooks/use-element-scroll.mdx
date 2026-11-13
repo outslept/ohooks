@@ -1,9 +1,11 @@
 ---
 title: useElementScroll
-description: "Tracks a scrollable element's scroll position, active scrolling state, movement directions, and edge arrival flags."
+description: Tracks a scrollable element's scroll position, active scrolling state, movement directions, and edge arrival flags.
 ---
 
 {/* Preview */}
+
+The `useElementScroll` hook monitors a scrollable element's `x` and `y` scroll offsets, active scrolling state, movement directions (`left`, `right`, `top`, `bottom`), and edge arrival flags (`arrived`), while providing a programmatic `scrollTo` helper.
 
 ## Installation
 
@@ -12,27 +14,94 @@ description: "Tracks a scrollable element's scroll position, active scrolling st
 ## Usage
 
 ```tsx
-const { y, isScrolling, arrived, scrollTo } = useElementScroll(containerRef);
+import { useElementScroll } from "@/hooks/useElementScroll"
+```
+
+```tsx
+const { y, isScrolling, arrived, scrollTo } = useElementScroll(containerRef)
+```
+
+## Examples
+
+### Infinite Scroll Container
+
+Check `arrived.bottom` together with an `offset.bottom` threshold to load more items when the user nears the bottom of a list.
+
+```tsx
+const listRef = useRef<HTMLDivElement>(null)
+const { arrived } = useElementScroll(listRef, {
+  offset: { bottom: 40 },
+})
+
+useEffect(() => {
+  if (arrived.bottom) {
+    loadNextPage()
+  }
+}, [arrived.bottom])
+
+return (
+  <div ref={listRef} style={{ height: 320, overflowY: "auto" }}>
+    {/* list items */}
+  </div>
+)
+```
+
+### Scroll-to-Top Button inside a Container
+
+Use `y` to show a button after scrolling down and `scrollTo` to smoothly return to the top.
+
+```tsx
+const containerRef = useRef<HTMLDivElement>(null)
+const { y, scrollTo } = useElementScroll(containerRef, {
+  behavior: "smooth",
+})
+
+return (
+  <div>
+    <div ref={containerRef} style={{ height: 240, overflowY: "auto" }}>
+      {/* scrollable content */}
+    </div>
+    {y > 100 && (
+      <button onClick={() => scrollTo({ y: 0 })}>Back to top</button>
+    )}
+  </div>
+)
 ```
 
 ## API Reference
 
-### `ScrollDirections`
+### UseElementScrollOptions
+
+Configuration options for scroll tracking, offsets, and scroll behavior.
+
+<AutoTypeTable
+  path="./hooks/useElementScroll.ts"
+  name="UseElementScrollOptions"
+/>
+
+### UseElementScrollReturn
+
+Scroll coordinates, direction flags, arrival state, and control helpers returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useElementScroll.ts"
+  name="UseElementScrollReturn"
+/>
+
+### ScrollDirections
+
+Flags indicating the direction of the most recent scroll movement.
 
 <AutoTypeTable path="./hooks/useElementScroll.ts" name="ScrollDirections" />
 
-### `ScrollArrivedState`
+### ScrollArrivedState
+
+Flags indicating whether the scroll container has reached any of its edges.
 
 <AutoTypeTable path="./hooks/useElementScroll.ts" name="ScrollArrivedState" />
 
-### `ScrollOffset`
+### ScrollOffset
+
+Pixel thresholds from each edge used when computing `arrived` flags.
 
 <AutoTypeTable path="./hooks/useElementScroll.ts" name="ScrollOffset" />
-
-### `UseElementScrollOptions`
-
-<AutoTypeTable path="./hooks/useElementScroll.ts" name="UseElementScrollOptions" />
-
-### `UseElementScrollReturn`
-
-<AutoTypeTable path="./hooks/useElementScroll.ts" name="UseElementScrollReturn" />

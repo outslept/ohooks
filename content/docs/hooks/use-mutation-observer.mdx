@@ -1,9 +1,11 @@
 ---
 title: useMutationObserver
-description: "Observes DOM tree, attribute, or character data mutations on a target node using `MutationObserver`."
+description: Observes DOM tree, attribute, or character data mutations on a target node using MutationObserver.
 ---
 
 {/* Preview */}
+
+The `useMutationObserver` hook attaches a `MutationObserver` to a target DOM node and invokes a callback whenever matching attribute, child list, or character data mutations occur.
 
 ## Installation
 
@@ -12,13 +14,71 @@ description: "Observes DOM tree, attribute, or character data mutations on a tar
 ## Usage
 
 ```tsx
-useMutationObserver(containerRef, (mutations) => {
-  console.log('DOM mutated:', mutations);
-}, { childList: true, subtree: true });
+import { useMutationObserver } from "@/hooks/useMutationObserver"
+```
+
+```tsx
+useMutationObserver(
+  containerRef,
+  (mutations) => {
+    console.log("DOM mutated:", mutations)
+  },
+  { childList: true, subtree: true }
+)
+```
+
+## Examples
+
+### Watching `data-*` or `aria-*` Attribute Changes
+
+Configure `attributes: true` and `attributeFilter` to react only when specific attributes change on a target element.
+
+```tsx
+const panelRef = useRef<HTMLDivElement>(null)
+const [stateAttr, setStateAttr] = useState("closed")
+
+useMutationObserver(
+  panelRef,
+  () => {
+    setStateAttr(panelRef.current?.getAttribute("data-state") ?? "closed")
+  },
+  {
+    attributes: true,
+    attributeFilter: ["data-state"],
+  }
+)
+
+return (
+  <div ref={panelRef} data-state="open">
+    Observed state: {stateAttr}
+  </div>
+)
+```
+
+### Pausing Observation with `enabled`
+
+Set `enabled: false` in the options object to temporarily disconnect the `MutationObserver`.
+
+```tsx
+const listRef = useRef<HTMLUListElement>(null)
+const [isObserving, setIsObserving] = useState(true)
+
+useMutationObserver(
+  listRef,
+  (records) => {
+    console.logAddedNodes(records.length)
+  },
+  { childList: true, enabled: isObserving }
+)
 ```
 
 ## API Reference
 
-### `UseMutationObserverOptions`
+### UseMutationObserverOptions
 
-<AutoTypeTable path="./hooks/useMutationObserver.ts" name="UseMutationObserverOptions" />
+Configuration options extending standard `MutationObserverInit` with an `enabled` flag.
+
+<AutoTypeTable
+  path="./hooks/useMutationObserver.ts"
+  name="UseMutationObserverOptions"
+/>

@@ -1,9 +1,11 @@
 ---
 title: useMergeRefs
-description: "Combines multiple React refs (callback refs, `RefObject`s, or `null`/`undefined`) into a single stable callback ref with React 19 cleanup support."
+description: Combines multiple React refs (callback refs, RefObjects, or null/undefined) into a single stable callback ref with React 19 cleanup support.
 ---
 
 {/* Preview */}
+
+The `useMergeRefs` hook merges any number of `RefObject`s and callback refs into a single memoized callback ref, forwarding React 19 ref cleanup functions when the element unmounts.
 
 ## Installation
 
@@ -12,6 +14,44 @@ description: "Combines multiple React refs (callback refs, `RefObject`s, or `nul
 ## Usage
 
 ```tsx
-const mergedRef = useMergeRefs(localRef, forwardedRef);
-// <div ref={mergedRef} />
+import { useMergeRefs } from "@/hooks/useMergeRefs"
+```
+
+```tsx
+const mergedRef = useMergeRefs(localRef, forwardedRef)
+```
+
+## Examples
+
+### Combining a Local Ref with a Forwarded Prop Ref
+
+Merge an internal `useRef` with a consumer-supplied `ref` prop so both references point to the same underlying DOM node.
+
+```tsx
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  ref?: React.Ref<HTMLButtonElement>
+}
+
+export function CustomButton({ ref, children, ...props }: ButtonProps) {
+  const internalRef = useRef<HTMLButtonElement>(null)
+  const mergedRef = useMergeRefs(internalRef, ref)
+
+  return (
+    <button ref={mergedRef} {...props}>
+      {children}
+    </button>
+  )
+}
+```
+
+### Combining Multiple Hook Refs
+
+Attach multiple ref-based hooks (such as `useMeasure` and `useFocus`) to the same element.
+
+```tsx
+const focusRef = useRef<HTMLDivElement>(null)
+const [measureRef, { width }] = useMeasure<HTMLDivElement>()
+const combinedRef = useMergeRefs(focusRef, measureRef)
+
+return <div ref={combinedRef}>Measured width: {width}px</div>
 ```

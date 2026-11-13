@@ -1,9 +1,11 @@
 ---
 title: useTextareaAutosize
-description: "Automatically adjusts the height of a `<textarea>` element to fit its content."
+description: Automatically adjusts the height of a <textarea> element to fit its content.
 ---
 
 {/* Preview */}
+
+The `useTextareaAutosize` hook dynamically resizes a `<textarea>` element's height to match its `scrollHeight` whenever `value` changes or the element resizes, respecting `minHeight` and `maxHeight` bounds and switching `overflowY` between `'hidden'` and `'auto'` automatically.
 
 ## Installation
 
@@ -12,16 +14,76 @@ description: "Automatically adjusts the height of a `<textarea>` element to fit 
 ## Usage
 
 ```tsx
-const textareaRef = useRef<HTMLTextAreaElement>(null);
-useTextareaAutosize(textareaRef, text, { maxHeight: 300 });
+import { useTextareaAutosize } from "@/hooks/useTextareaAutosize"
+```
+
+```tsx
+const textareaRef = useRef<HTMLTextAreaElement>(null)
+useTextareaAutosize(textareaRef, text, { maxHeight: 300 })
+```
+
+## Examples
+
+### Auto-Growing Chat Composer with Maximum Height
+
+Cap growth with `maxHeight` so the textarea expands up to a limit and then scrolls internally.
+
+```tsx
+const [message, setMessage] = useState("")
+const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+useTextareaAutosize(textareaRef, message, {
+  minHeight: 40,
+  maxHeight: 160,
+})
+
+return (
+  <textarea
+    ref={textareaRef}
+    value={message}
+    onChange={(e) => setMessage(e.target.value)}
+    placeholder="Write a message..."
+    rows={1}
+  />
+)
+```
+
+### Triggering a Manual Resize Calculation
+
+Call the returned `resize()` function after programmatic font size or layout changes, or listen to height changes via `onResize`.
+
+```tsx
+const [note, setNote] = useState("")
+const ref = useRef<HTMLTextAreaElement>(null)
+
+const { resize } = useTextareaAutosize(ref, note, {
+  onResize: (height) => console.log("New height:", height),
+})
+
+return (
+  <div>
+    <textarea ref={ref} value={note} onChange={(e) => setNote(e.target.value)} />
+    <button onClick={resize}>Recalculate height</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseTextareaAutosizeOptions`
+### UseTextareaAutosizeOptions
 
-<AutoTypeTable path="./hooks/useTextareaAutosize.ts" name="UseTextareaAutosizeOptions" />
+Configuration options for minimum/maximum height bounds and resize callbacks.
 
-### `UseTextareaAutosizeReturn`
+<AutoTypeTable
+  path="./hooks/useTextareaAutosize.ts"
+  name="UseTextareaAutosizeOptions"
+/>
 
-<AutoTypeTable path="./hooks/useTextareaAutosize.ts" name="UseTextareaAutosizeReturn" />
+### UseTextareaAutosizeReturn
+
+Control methods returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useTextareaAutosize.ts"
+  name="UseTextareaAutosizeReturn"
+/>

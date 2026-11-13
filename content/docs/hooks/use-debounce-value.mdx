@@ -1,9 +1,11 @@
 ---
 title: useDebounceValue
-description: "Debounces a reactive value and provides a debounced setter with `.cancel()`, `.flush()`, and `.isPending()` controls."
+description: Debounces a reactive value and provides a debounced setter with .cancel(), .flush(), and .isPending() controls.
 ---
 
 {/* Preview */}
+
+The `useDebounceValue` hook delays updates to a reactive value until `delay` milliseconds have passed without further changes, returning a tuple of the debounced value and the underlying debounced setter function.
 
 ## Installation
 
@@ -12,5 +14,68 @@ description: "Debounces a reactive value and provides a debounced setter with `.
 ## Usage
 
 ```tsx
-const [debouncedQuery, setDebouncedQuery] = useDebounceValue(searchQuery, 300);
+import { useDebounceValue } from "@/hooks/useDebounceValue"
 ```
+
+```tsx
+const [debouncedQuery, setDebouncedQuery] = useDebounceValue(searchQuery, 300)
+```
+
+## Examples
+
+### Filtering a Search Input
+
+Pass a rapidly changing input state to `useDebounceValue` so expensive filtering or network requests only run after the user pauses typing.
+
+```tsx
+const [query, setQuery] = useState("")
+const [debouncedQuery] = useDebounceValue(query, 300)
+
+useEffect(() => {
+  if (debouncedQuery) {
+    fetchSearchResults(debouncedQuery)
+  }
+}, [debouncedQuery])
+
+return (
+  <input
+    value={query}
+    onChange={(e) => setQuery(e.target.value)}
+    placeholder="Search..."
+  />
+)
+```
+
+### Flushing or Cancelling via the Setter
+
+Use the second tuple item to manually update, flush, or cancel pending value transitions.
+
+```tsx
+const [text, setText] = useState("")
+const [debouncedText, updateDebouncedText] = useDebounceValue(text, 500, {
+  maxWait: 2000,
+})
+
+return (
+  <div>
+    <input value={text} onChange={(e) => setText(e.target.value)} />
+    <button onClick={() => updateDebouncedText.flush()}>Apply now</button>
+    <button onClick={() => updateDebouncedText.cancel()}>Cancel</button>
+    <p>Debounced value: {debouncedText}</p>
+  </div>
+)
+```
+
+## API Reference
+
+### DebounceOptions
+
+Configuration options for controlling debounce timing and execution edges.
+
+<AutoTypeTable path="./hooks/useDebounceCallback.ts" name="DebounceOptions" />
+
+### DebouncedFunction
+
+Debounced setter returned as the second tuple element.
+
+<AutoTypeTable path="./hooks/useDebounceCallback.ts" name="DebouncedFunction" />

@@ -1,9 +1,11 @@
 ---
 title: useHistoryState
-description: "Manages state with undo/redo history tracking and configurable history capacity."
+description: Manages state with undo/redo history tracking and configurable history capacity.
 ---
 
 {/* Preview */}
+
+The `useHistoryState` hook manages a state value alongside bounded `past` and `future` stacks, providing `undo`, `redo`, and `clear` helpers for reversible user actions.
 
 ## Installation
 
@@ -12,11 +14,69 @@ description: "Manages state with undo/redo history tracking and configurable his
 ## Usage
 
 ```tsx
-const { state, set, undo, redo, canUndo, canRedo } = useHistoryState('');
+import { useHistoryState } from "@/hooks/useHistoryState"
+```
+
+```tsx
+const { state, set, undo, redo, canUndo, canRedo } = useHistoryState("")
+```
+
+## Examples
+
+### Text Editor with Undo and Redo
+
+Use `canUndo` and `canRedo` to enable or disable toolbar buttons as the user edits state.
+
+```tsx
+const { state, set, undo, redo, clear, canUndo, canRedo } =
+  useHistoryState("Initial note")
+
+return (
+  <div>
+    <textarea value={state} onChange={(e) => set(e.target.value)} />
+    <div>
+      <button onClick={undo} disabled={!canUndo}>
+        Undo
+      </button>
+      <button onClick={redo} disabled={!canRedo}>
+        Redo
+      </button>
+      <button onClick={clear}>Reset history</button>
+    </div>
+  </div>
+)
+```
+
+### Limiting History Capacity
+
+Pass a `capacity` argument to cap the maximum number of undo snapshots retained in memory.
+
+```tsx
+const { state, set, past, future } = useHistoryState(
+  { x: 0, y: 0 },
+  20
+)
+
+return (
+  <div>
+    <p>
+      Position: ({state.x}, {state.y}) — {past.length} undo / {future.length}{" "}
+      redo steps
+    </p>
+    <button onClick={() => set((prev) => ({ x: prev.x + 10, y: prev.y }))}>
+      Move right
+    </button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseHistoryStateReturn`
+### UseHistoryStateReturn
 
-<AutoTypeTable path="./hooks/useHistoryState.ts" name="UseHistoryStateReturn" />
+Current state, history stacks, and undo/redo controls returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useHistoryState.ts"
+  name="UseHistoryStateReturn"
+/>

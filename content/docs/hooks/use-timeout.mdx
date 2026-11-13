@@ -1,9 +1,11 @@
 ---
 title: useTimeout
-description: "Declarative `setTimeout` hook that invokes a callback after `delay` milliseconds."
+description: Declarative setTimeout hook that invokes a callback after delay milliseconds.
 ---
 
 {/* Preview */}
+
+The `useTimeout` hook schedules a callback to run after `delay` milliseconds (pausing when `delay` is `null`), always invoking the latest callback reference and exposing `reset` and `clear` controls.
 
 ## Installation
 
@@ -12,7 +14,70 @@ description: "Declarative `setTimeout` hook that invokes a callback after `delay
 ## Usage
 
 ```tsx
-useTimeout(() => {
-  setVisible(false);
-}, 3000);
+import { useTimeout } from "@/hooks/useTimeout"
 ```
+
+```tsx
+useTimeout(() => {
+  setVisible(false)
+}, 3000)
+```
+
+## Examples
+
+### Auto-Dismissing a Toast Banner
+
+Hide a notification banner automatically after 4 seconds, or let the user cancel or restart the timer manually.
+
+```tsx
+const [visible, setVisible] = useState(true)
+
+const { isPending, clear, reset } = useTimeout(
+  () => {
+    setVisible(false)
+  },
+  visible ? 4000 : null
+)
+
+return (
+  <div>
+    {visible && (
+      <div role="status">
+        <p>Saved changes! (Auto-closing: {isPending ? "Yes" : "No"})</p>
+        <button onClick={clear}>Keep open</button>
+      </div>
+    )}
+    <button
+      onClick={() => {
+        setVisible(true)
+        reset()
+      }}
+    >
+      Show toast again
+    </button>
+  </div>
+)
+```
+
+### Conditional Delayed Execution
+
+Pass `null` as the `delay` until a condition is met to defer scheduling the timeout.
+
+```tsx
+const [shouldRedirect, setShouldRedirect] = useState(false)
+
+useTimeout(
+  () => {
+    window.location.href = "/dashboard"
+  },
+  shouldRedirect ? 2000 : null
+)
+```
+
+## API Reference
+
+### UseTimeoutReturn
+
+Timer status and `clear` / `reset` controls returned by the hook.
+
+<AutoTypeTable path="./hooks/useTimeout.ts" name="UseTimeoutReturn" />

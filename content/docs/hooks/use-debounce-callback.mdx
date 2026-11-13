@@ -1,9 +1,11 @@
 ---
 title: useDebounceCallback
-description: "Creates a debounced version of a callback function with `leading`, `trailing`, `maxWait`, `cancel`, and `flush` support."
+description: Creates a debounced version of a callback function with leading, trailing, maxWait, cancel, and flush support.
 ---
 
 {/* Preview */}
+
+The `useDebounceCallback` hook returns a stable, debounced version of a callback that delays invocation until `delay` milliseconds have elapsed since the last call, and exposes `.cancel()`, `.flush()`, and `.isPending()` control methods.
 
 ## Installation
 
@@ -12,17 +14,68 @@ description: "Creates a debounced version of a callback function with `leading`,
 ## Usage
 
 ```tsx
+import { useDebounceCallback } from "@/hooks/useDebounceCallback"
+```
+
+```tsx
 const handleSearch = useDebounceCallback((query: string) => {
-  fetchResults(query);
-}, 300);
+  fetchResults(query)
+}, 300)
+```
+
+## Examples
+
+### Leading Edge and `maxWait`
+
+Configure `leading: true` to invoke immediately on the first call, or set `maxWait` to guarantee execution at regular intervals during continuous input.
+
+```tsx
+const saveDraft = useDebounceCallback(
+  (content: string) => {
+    api.saveDraft(content)
+  },
+  1000,
+  { leading: false, trailing: true, maxWait: 5000 }
+)
+
+return (
+  <textarea
+    onChange={(e) => saveDraft(e.target.value)}
+    placeholder="Type your draft..."
+  />
+)
+```
+
+### Flushing and Cancelling Pending Calls
+
+Call `.flush()` to immediately execute a pending invocation (for example, on form submit or blur) or `.cancel()` to discard it.
+
+```tsx
+const debouncedSave = useDebounceCallback((value: string) => {
+  api.save(value)
+}, 500)
+
+return (
+  <div>
+    <input
+      onChange={(e) => debouncedSave(e.target.value)}
+      onBlur={() => debouncedSave.flush()}
+    />
+    <button onClick={() => debouncedSave.cancel()}>Cancel pending save</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `DebounceOptions`
+### DebounceOptions
+
+Configuration options for controlling debounce timing and execution edges.
 
 <AutoTypeTable path="./hooks/useDebounceCallback.ts" name="DebounceOptions" />
 
-### `DebouncedFunction`
+### DebouncedFunction
+
+Debounced function returned by the hook, augmented with control methods.
 
 <AutoTypeTable path="./hooks/useDebounceCallback.ts" name="DebouncedFunction" />

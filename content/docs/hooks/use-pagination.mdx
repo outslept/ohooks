@@ -1,9 +1,11 @@
 ---
 title: usePagination
-description: "Computes pagination state, page ranges with ellipsis markers, data slice indices, and navigation helpers."
+description: Computes pagination state, page ranges with ellipsis markers, data slice indices, and navigation helpers.
 ---
 
 {/* Preview */}
+
+The `usePagination` hook calculates total pages, `[startIndex, endIndex)` array slice bounds, and a UI-ready `items` array containing page numbers and `'ellipsis'` markers, while supporting both controlled and uncontrolled current page state.
 
 ## Installation
 
@@ -12,18 +14,86 @@ description: "Computes pagination state, page ranges with ellipsis markers, data
 ## Usage
 
 ```tsx
+import { usePagination } from "@/hooks/usePagination"
+```
+
+```tsx
 const { page, items, nextPage, prevPage, setPage } = usePagination({
   totalItems: 250,
   pageSize: 20,
-});
+})
+```
+
+## Examples
+
+### Rendering a Pagination Bar with Ellipsis
+
+Map over `items` to render numbered page buttons alongside `'ellipsis'` separators.
+
+```tsx
+const {
+  page,
+  items,
+   canPrevPage,
+  canNextPage,
+  prevPage,
+  nextPage,
+  setPage,
+} = usePagination({
+  totalItems: 200,
+  pageSize: 10,
+  siblingCount: 1,
+  boundaryCount: 1,
+})
+
+return (
+  <nav aria-label="Pagination">
+    <button onClick={prevPage} disabled={!canPrevPage}>
+      Previous
+    </button>
+    {items.map((item, idx) =>
+      item === "ellipsis" ? (
+        <span key={`ellipsis-${idx}`}>…</span>
+      ) : (
+        <button
+          key={item}
+          aria-current={item === page ? "page" : undefined}
+          onClick={() => setPage(item)}
+        >
+          {item}
+        </button>
+      )
+    )}
+    <button onClick={nextPage} disabled={!canNextPage}>
+      Next
+    </button>
+  </nav>
+)
+```
+
+### Slicing Client-Side Data
+
+Use `startIndex` and `endIndex` directly with `Array.prototype.slice` to paginate an in-memory array.
+
+```tsx
+const { startIndex, endIndex, nextPage, prevPage } = usePagination({
+  totalItems: allUsers.length,
+  pageSize: 5,
+})
+
+const visibleUsers = allUsers.slice(startIndex, endIndex)
 ```
 
 ## API Reference
 
-### `UsePaginationOptions`
+### UsePaginationOptions
+
+Configuration options for item counts, page size, and sibling/boundary ranges.
 
 <AutoTypeTable path="./hooks/usePagination.ts" name="UsePaginationOptions" />
 
-### `UsePaginationReturn`
+### UsePaginationReturn
+
+Computed pagination state, slice indices, and navigation methods returned by the hook.
 
 <AutoTypeTable path="./hooks/usePagination.ts" name="UsePaginationReturn" />

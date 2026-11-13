@@ -1,9 +1,11 @@
 ---
 title: useLongPress
-description: "Detects long-press pointer gestures with movement threshold cancellation and click suppression."
+description: Detects long-press pointer gestures with movement threshold cancellation and click suppression.
 ---
 
 {/* Preview */}
+
+The `useLongPress` hook returns pointer and click event handlers that invoke a callback when the user presses and holds an element for `threshold` milliseconds, cancelling automatically if the pointer moves beyond `moveThreshold` and suppressing the subsequent synthetic `click` event.
 
 ## Installation
 
@@ -12,18 +14,76 @@ description: "Detects long-press pointer gestures with movement threshold cancel
 ## Usage
 
 ```tsx
-const longPressProps = useLongPress(() => {
-  openContextMenu();
-}, { threshold: 500 });
-// <button {...longPressProps}>Hold me</button>
+import { useLongPress } from "@/hooks/useLongPress"
+```
+
+```tsx
+const longPressProps = useLongPress(
+  () => {
+    openContextMenu()
+  },
+  { threshold: 500 }
+)
+```
+
+## Examples
+
+### Long Press vs. Normal Click
+
+Spread the returned handlers onto a button that also has a normal `onClick`—if a long press completes, the click event is suppressed automatically.
+
+```tsx
+const longPressProps = useLongPress(
+  () => {
+    enterSelectionMode()
+  },
+  { threshold: 600 }
+)
+
+return (
+  <button {...longPressProps} onClick={() => openItem()}>
+    Tap to open, hold to select
+  </button>
+)
+```
+
+### Lifecycle Callbacks (`onStart`, `onFinish`, `onCancel`)
+
+Track press progress and distinguish completed long presses from cancelled ones using `onStart`, `onFinish`, and `onCancel`.
+
+```tsx
+const [pressing, setPressing] = useState(false)
+
+const handlers = useLongPress(
+  () => {
+    deleteItem()
+  },
+  {
+    threshold: 800,
+    moveThreshold: 10,
+    onStart: () => setPressing(true),
+    onFinish: () => setPressing(false),
+    onCancel: () => setPressing(false),
+  }
+)
+
+return (
+  <button {...handlers}>
+    {pressing ? "Keep holding to delete..." : "Hold to delete"}
+  </button>
+)
 ```
 
 ## API Reference
 
-### `UseLongPressOptions`
+### UseLongPressOptions
+
+Configuration options and lifecycle callbacks for the long-press gesture.
 
 <AutoTypeTable path="./hooks/useLongPress.ts" name="UseLongPressOptions" />
 
-### `UseLongPressHandlers`
+### UseLongPressHandlers
+
+DOM event handlers returned by the hook to spread onto the target element.
 
 <AutoTypeTable path="./hooks/useLongPress.ts" name="UseLongPressHandlers" />

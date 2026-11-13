@@ -1,9 +1,11 @@
 ---
 title: useUnmountedRef
-description: "Returns a read-only ref whose `current` value is `true` after the component has unmounted."
+description: Returns a read-only ref whose current value is true after the component has unmounted.
 ---
 
 {/* Preview */}
+
+The `useUnmountedRef` hook returns a `Readonly<RefObject<boolean>>` whose `.current` property is `false` while the component is mounted and `true` after it unmounts.
 
 ## Installation
 
@@ -12,5 +14,47 @@ description: "Returns a read-only ref whose `current` value is `true` after the 
 ## Usage
 
 ```tsx
-const unmountedRef = useUnmountedRef();
+import { useUnmountedRef } from "@/hooks/useUnmountedRef"
+```
+
+```tsx
+const unmountedRef = useUnmountedRef()
+```
+
+## Examples
+
+### Guarding Async Callbacks After Unmount
+
+Check `unmountedRef.current` after an `await` boundary before calling state setters or side effects.
+
+```tsx
+const unmountedRef = useUnmountedRef()
+const [status, setStatus] = useState("idle")
+
+const handleUpload = async () => {
+  setStatus("uploading")
+  await uploadFile()
+  if (unmountedRef.current) return
+  setStatus("done")
+}
+
+return <button onClick={handleUpload}>Status: {status}</button>
+```
+
+### Stopping Polling Loops When Unmounted
+
+Break out of a recursive polling loop as soon as `unmountedRef.current` becomes `true`.
+
+```tsx
+const unmountedRef = useUnmountedRef()
+
+useEffect(() => {
+  async function poll() {
+    while (!unmountedRef.current) {
+      await fetchHealthCheck()
+      await new Promise((r) => setTimeout(r, 5000))
+    }
+  }
+  poll()
+}, [unmountedRef])
 ```

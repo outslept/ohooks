@@ -1,9 +1,11 @@
 ---
 title: useHash
-description: "Reads and updates `window.location.hash` reactively using `useSyncExternalStore`."
+description: Reads and updates window.location.hash reactively using useSyncExternalStore.
 ---
 
 {/* Preview */}
+
+The `useHash` hook reads `window.location.hash` (without the leading `#` character) and updates it reactively across the app via `useSyncExternalStore`.
 
 ## Installation
 
@@ -12,16 +14,59 @@ description: "Reads and updates `window.location.hash` reactively using `useSync
 ## Usage
 
 ```tsx
-const [hash, setHash] = useHash();
-// setHash('section-2', { replace: true });
+import { useHash } from "@/hooks/useHash"
+```
+
+```tsx
+const [hash, setHash] = useHash()
+```
+
+## Examples
+
+### Hash-Based Tab Navigation
+
+Sync the active tab with the URL hash so users can bookmark or share links to specific sections.
+
+```tsx
+const [hash, setHash] = useHash({ defaultValue: "overview" })
+const activeTab = hash || "overview"
+
+return (
+  <div>
+    <button onClick={() => setHash("overview")}>Overview</button>
+    <button onClick={() => setHash("activity")}>Activity</button>
+    <p>Current section: {activeTab}</p>
+  </div>
+)
+```
+
+### Replacing History Entries Instead of Pushing
+
+Pass `{ replace: true }` as the second argument to `setHash` to update the URL hash via `history.replaceState` without creating a new browser history entry.
+
+```tsx
+const [hash, setHash] = useHash()
+
+return (
+  <div>
+    <button onClick={() => setHash("step-2", { replace: true })}>
+      Go to Step 2 (replace)
+    </button>
+    <button onClick={() => setHash("", { replace: true })}>Clear hash</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `SetHashOptions`
+### UseHashOptions
 
-<AutoTypeTable path="./hooks/useHash.ts" name="SetHashOptions" />
-
-### `UseHashOptions`
+Configuration options for initial SSR fallback value.
 
 <AutoTypeTable path="./hooks/useHash.ts" name="UseHashOptions" />
+
+### SetHashOptions
+
+Options for controlling history navigation when updating the hash.
+
+<AutoTypeTable path="./hooks/useHash.ts" name="SetHashOptions" />

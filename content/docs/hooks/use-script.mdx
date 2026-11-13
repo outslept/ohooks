@@ -1,9 +1,11 @@
 ---
 title: useScript
-description: "Dynamically loads an external `<script>` tag, deduplicating across components and tracking its status."
+description: Dynamically loads an external <script> tag, deduplicating across components and tracking its status.
 ---
 
 {/* Preview */}
+
+The `useScript` hook injects an external `<script>` tag into `document.body` (or attaches to an existing tag with the same `src`), deduplicates concurrent requests across multiple mounted components, and returns the current loading status (`'idle'`, `'loading'`, `'ready'`, or `'error'`).
 
 ## Installation
 
@@ -12,11 +14,56 @@ description: "Dynamically loads an external `<script>` tag, deduplicating across
 ## Usage
 
 ```tsx
-const status = useScript('https://js.stripe.com/v3/');
+import { useScript } from "@/hooks/useScript"
+```
+
+```tsx
+const status = useScript("https://js.stripe.com/v3/")
+```
+
+## Examples
+
+### Rendering a Widget Once the Script is `'ready'`
+
+Check `status === "ready"` before initializing or rendering components that depend on the global script.
+
+```tsx
+const status = useScript("https://checkout.stripe.com/checkout.js")
+
+if (status === "loading") return <p>Loading payment SDK...</p>
+if (status === "error") return <p role="alert">Failed to load payment SDK.</p>
+
+return <button disabled={status !== "ready"}>Pay now</button>
+```
+
+### Conditional Loading and Cleanup on Unmount
+
+Pass `null` (or `shouldPreventLoad: true`) to defer loading until needed, and `removeOnUnmount: true` to remove the `<script>` tag when the last consumer unmounts.
+
+```tsx
+const [enabled, setEnabled] = useState(false)
+
+const status = useScript(
+  enabled ? "https://example.com/analytics.js" : null,
+  {
+    id: "custom-analytics",
+    removeOnUnmount: true,
+    attrs: { "data-site-id": "my-site" },
+  }
+)
+
+return (
+  <div>
+    <button onClick={() => setEnabled(true)}>Enable analytics</button>
+    <p>Script status: {status}</p>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseScriptOptions`
+### UseScriptOptions
+
+Configuration options for script attributes, conditional loading, and unmount cleanup.
 
 <AutoTypeTable path="./hooks/useScript.ts" name="UseScriptOptions" />

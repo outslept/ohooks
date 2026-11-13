@@ -1,9 +1,11 @@
 ---
 title: useSpinDelay
-description: "Prevents loading indicator flashes by delaying appearance and enforcing a minimum display duration."
+description: Prevents loading indicator flashes by delaying appearance and enforcing a minimum display duration.
 ---
 
 {/* Preview */}
+
+The `useSpinDelay` hook smooths loading states by waiting `delay` milliseconds before returning `true` (so fast requests under the threshold never show a spinner) and keeping the spinner visible for at least `minDuration` milliseconds once shown to avoid jarring flickers.
 
 ## Installation
 
@@ -12,11 +14,51 @@ description: "Prevents loading indicator flashes by delaying appearance and enfo
 ## Usage
 
 ```tsx
-const showSpinner = useSpinDelay(isFetching, { delay: 400, minDuration: 200 });
+import { useSpinDelay } from "@/hooks/useSpinDelay"
+```
+
+```tsx
+const showSpinner = useSpinDelay(isFetching, { delay: 400, minDuration: 200 })
+```
+
+## Examples
+
+### Preventing Spinner Flash on Fast Network Requests
+
+Wrap your `isLoading` boolean with `useSpinDelay` before rendering a skeleton or spinner.
+
+```tsx
+const [isLoading, setIsLoading] = useState(false)
+const showSpinner = useSpinDelay(isLoading, {
+  delay: 300,
+  minDuration: 400,
+})
+
+return (
+  <div>
+    <button onClick={() => setIsLoading((prev) => !prev)}>
+      Toggle loading
+    </button>
+    {showSpinner ? <p>Loading data...</p> : <p>Content ready</p>}
+  </div>
+)
+```
+
+### Customizing Thresholds for Instant Feedback vs. Background Sync
+
+Use a shorter `delay` and longer `minDuration` for primary page transitions so the loading skeleton feels intentional once triggered.
+
+```tsx
+const showOverlay = useSpinDelay(isSaving, {
+  delay: 150,
+  minDuration: 500,
+})
 ```
 
 ## API Reference
 
-### `SpinDelayOptions`
+### SpinDelayOptions
+
+Timing thresholds for delaying and sustaining the loading state.
 
 <AutoTypeTable path="./hooks/useSpinDelay.ts" name="SpinDelayOptions" />

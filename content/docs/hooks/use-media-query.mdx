@@ -1,9 +1,11 @@
 ---
 title: useMediaQuery
-description: "Evaluates a CSS media query string and subscribes to changes reactively using `useSyncExternalStore`."
+description: Evaluates a CSS media query string and subscribes to changes reactively using useSyncExternalStore.
 ---
 
 {/* Preview */}
+
+The `useMediaQuery` hook subscribes to `window.matchMedia(query)` using `useSyncExternalStore` and returns a boolean indicating whether the CSS media query currently matches.
 
 ## Installation
 
@@ -12,11 +14,45 @@ description: "Evaluates a CSS media query string and subscribes to changes react
 ## Usage
 
 ```tsx
-const isDesktop = useMediaQuery('(min-width: 1024px)');
+import { useMediaQuery } from "@/hooks/useMediaQuery"
+```
+
+```tsx
+const isDesktop = useMediaQuery("(min-width: 1024px)")
+```
+
+## Examples
+
+### Responsive Breakpoints and User Preferences
+
+Combine viewport queries with accessibility media queries such as `prefers-reduced-motion`.
+
+```tsx
+const isMobile = useMediaQuery("(max-width: 767px)")
+const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
+
+return (
+  <div>
+    <p>Layout: {isMobile ? "Mobile" : "Desktop"}</p>
+    <p>Animations: {prefersReducedMotion ? "Reduced" : "Full"}</p>
+  </div>
+)
+```
+
+### Providing an SSR Default Value
+
+Pass `defaultValue` so server-rendered HTML uses a predictable fallback before hydrating on the client.
+
+```tsx
+const isLargeScreen = useMediaQuery("(min-width: 1280px)", {
+  defaultValue: true,
+})
 ```
 
 ## API Reference
 
-### `UseMediaQueryOptions`
+### UseMediaQueryOptions
+
+Configuration options for `useMediaQuery`.
 
 <AutoTypeTable path="./hooks/useMediaQuery.ts" name="UseMediaQueryOptions" />

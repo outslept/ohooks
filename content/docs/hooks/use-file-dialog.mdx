@@ -1,9 +1,11 @@
 ---
 title: useFileDialog
-description: "Opens the native file selection dialog programmatically without rendering a visible `<input type=\"file\">` element."
+description: Opens the native file selection dialog programmatically without rendering a visible <input type="file"> element.
 ---
 
 {/* Preview */}
+
+The `useFileDialog` hook creates and manages an off-DOM file input so you can trigger the native file picker from any button or action and read the selected `FileList` reactively.
 
 ## Installation
 
@@ -12,15 +14,71 @@ description: "Opens the native file selection dialog programmatically without re
 ## Usage
 
 ```tsx
-const { files, open, reset } = useFileDialog({ accept: 'image/*', multiple: false });
+import { useFileDialog } from "@/hooks/useFileDialog"
+```
+
+```tsx
+const { files, open, reset } = useFileDialog({
+  accept: "image/*",
+  multiple: false,
+})
+```
+
+## Examples
+
+### Selecting and Clearing Files
+
+Call `open()` from any click handler to launch the native file dialog and `reset()` to clear the selection.
+
+```tsx
+const { files, open, reset } = useFileDialog({
+  accept: ".json,.csv",
+  multiple: true,
+  onChange: (selected) => {
+    console.log("Selected files:", selected?.length ?? 0)
+  },
+})
+
+return (
+  <div>
+    <button onClick={() => open()}>Choose files</button>
+    {files && (
+      <>
+        <p>{files.length} file(s) chosen</p>
+        <button onClick={reset}>Clear</button>
+      </>
+    )}
+  </div>
+)
+```
+
+### Overriding Options Per Invocation
+
+Pass per-call options directly to `open()` to reuse the same hook instance for different file types.
+
+```tsx
+const { open } = useFileDialog()
+
+return (
+  <div>
+    <button onClick={() => open({ accept: "image/*" })}>Upload image</button>
+    <button onClick={() => open({ accept: "application/pdf" })}>
+      Upload PDF
+    </button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseFileDialogOptions`
+### UseFileDialogOptions
+
+Configuration options for the file picker.
 
 <AutoTypeTable path="./hooks/useFileDialog.ts" name="UseFileDialogOptions" />
 
-### `UseFileDialogReturn`
+### UseFileDialogReturn
+
+Selected files and control functions returned by the hook.
 
 <AutoTypeTable path="./hooks/useFileDialog.ts" name="UseFileDialogReturn" />

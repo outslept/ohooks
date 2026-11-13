@@ -1,9 +1,11 @@
 ---
 title: useOnClickOutside
-description: "Invokes a handler when a pointer, mouse, or touch interaction occurs outside one or more target elements (with Shadow DOM `composedPath` support)."
+description: Invokes a handler when a pointer, mouse, or touch interaction occurs outside one or more target elements (with Shadow DOM composedPath support).
 ---
 
 {/* Preview */}
+
+The `useOnClickOutside` hook detects clicks, taps, or pointer presses outside a target element (or an array of elements) using `event.composedPath()` for accurate Shadow DOM and portal handling.
 
 ## Installation
 
@@ -12,13 +14,66 @@ description: "Invokes a handler when a pointer, mouse, or touch interaction occu
 ## Usage
 
 ```tsx
+import { useOnClickOutside } from "@/hooks/useOnClickOutside"
+```
+
+```tsx
 useOnClickOutside(dropdownRef, () => {
-  setIsOpen(false);
-});
+  setIsOpen(false)
+})
+```
+
+## Examples
+
+### Closing a Popover with a Separate Trigger Button
+
+Pass an array of refs so clicking either the popover content or its trigger button does not count as an outside click.
+
+```tsx
+const [isOpen, setIsOpen] = useState(false)
+const triggerRef = useRef<HTMLButtonElement>(null)
+const menuRef = useRef<HTMLDivElement>(null)
+
+useOnClickOutside([triggerRef, menuRef], () => {
+  setIsOpen(false)
+})
+
+return (
+  <div>
+    <button ref={triggerRef} onClick={() => setIsOpen((o) => !o)}>
+      Toggle menu
+    </button>
+    {isOpen && <div ref={menuRef}>Menu content</div>}
+  </div>
+)
+```
+
+### Customizing the Event Type and Enabling Conditionally
+
+Use `eventType` to listen on `mouseup` or `click` instead of `pointerdown`, and disable the listener when the overlay is closed.
+
+```tsx
+const modalRef = useRef<HTMLDivElement>(null)
+
+useOnClickOutside(
+  modalRef,
+  () => {
+    closeModal()
+  },
+  {
+    enabled: isModalOpen,
+    eventType: "mousedown",
+  }
+)
 ```
 
 ## API Reference
 
-### `UseOnClickOutsideOptions`
+### UseOnClickOutsideOptions
 
-<AutoTypeTable path="./hooks/useOnClickOutside.ts" name="UseOnClickOutsideOptions" />
+Configuration options for the outside interaction listener.
+
+<AutoTypeTable
+  path="./hooks/useOnClickOutside.ts"
+  name="UseOnClickOutsideOptions"
+/>

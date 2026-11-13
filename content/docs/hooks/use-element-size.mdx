@@ -1,9 +1,11 @@
 ---
 title: useElementSize
-description: "Tracks the width and height of a DOM element reactively using `ResizeObserver`."
+description: Tracks the width and height of a DOM element reactively using ResizeObserver.
 ---
 
 {/* Preview */}
+
+The `useElementSize` hook observes a target DOM element with `ResizeObserver` and returns its live `{ width, height }` dimensions.
 
 ## Installation
 
@@ -12,15 +14,63 @@ description: "Tracks the width and height of a DOM element reactively using `Res
 ## Usage
 
 ```tsx
-const { width, height } = useElementSize(boxRef, { box: 'border-box' });
+import { useElementSize } from "@/hooks/useElementSize"
+```
+
+```tsx
+const { width, height } = useElementSize(boxRef, { box: "border-box" })
+```
+
+## Examples
+
+### Responsive Component Layout
+
+Adapt a component's layout based on its own container width rather than the global viewport size.
+
+```tsx
+const cardRef = useRef<HTMLDivElement>(null)
+const { width, height } = useElementSize(cardRef)
+
+return (
+  <div ref={cardRef} style={{ width: "100%" }}>
+    <p>
+      Container size: {Math.round(width)}px × {Math.round(height)}px
+    </p>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: width > 480 ? "1fr 1fr" : "1fr",
+      }}
+    >
+      <div>Column A</div>
+      <div>Column B</div>
+    </div>
+  </div>
+)
+```
+
+### Selecting the Box Model and Initial Size
+
+Specify `box: "border-box"` to include padding and borders, and `initialSize` to provide fallback dimensions before the element mounts.
+
+```tsx
+const [ref, element] = useElementRef<HTMLDivElement>()
+const { width, height } = useElementSize(element, {
+  box: "border-box",
+  initialSize: { width: 320, height: 180 },
+})
 ```
 
 ## API Reference
 
-### `ElementSize`
+### UseElementSizeOptions
 
-<AutoTypeTable path="./hooks/useElementSize.ts" name="ElementSize" />
-
-### `UseElementSizeOptions`
+Configuration options for `ResizeObserver` box model and initial dimensions.
 
 <AutoTypeTable path="./hooks/useElementSize.ts" name="UseElementSizeOptions" />
+
+### ElementSize
+
+Dimensions object returned by the hook.
+
+<AutoTypeTable path="./hooks/useElementSize.ts" name="ElementSize" />

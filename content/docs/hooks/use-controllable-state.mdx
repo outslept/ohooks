@@ -1,9 +1,11 @@
 ---
 title: useControllableState
-description: "Manages state that can be either controlled externally or uncontrolled with an internal fallback."
+description: Manages state that can be either controlled externally or uncontrolled with an internal fallback.
 ---
 
 {/* Preview */}
+
+The `useControllableState` hook powers components that support both controlled (`value` + `onChange`) and uncontrolled (`defaultValue`) usage patterns, automatically warning in development if a component switches between modes.
 
 ## Installation
 
@@ -12,15 +14,78 @@ description: "Manages state that can be either controlled externally or uncontro
 ## Usage
 
 ```tsx
+import { useControllableState } from "@/hooks/useControllableState"
+```
+
+```tsx
 const [open, setOpen, isControlled] = useControllableState({
   value: props.open,
   defaultValue: false,
   onChange: props.onOpenChange,
-});
+})
+```
+
+## Examples
+
+### Building a Dual-Mode Switch Component
+
+Accept optional `checked`, `defaultChecked`, and `onCheckedChange` props and delegate state management to `useControllableState`.
+
+```tsx
+interface SwitchProps {
+  checked?: boolean
+  defaultChecked?: boolean
+  onCheckedChange?: (checked: boolean) => void
+}
+
+export function Switch({
+  checked,
+  defaultChecked = false,
+  onCheckedChange,
+}: SwitchProps) {
+  const [isChecked, setIsChecked] = useControllableState({
+    value: checked,
+    defaultValue: defaultChecked,
+    onChange: onCheckedChange,
+  })
+
+  return (
+    <button
+      role="switch"
+      aria-checked={isChecked}
+      onClick={() => setIsChecked((prev) => !prev)}
+    >
+      {isChecked ? "On" : "Off"}
+    </button>
+  )
+}
+```
+
+### Functional Updates
+
+Like `useState`, the setter accepts an updater function that receives the current resolved value regardless of whether the state is controlled or uncontrolled.
+
+```tsx
+const [count, setCount] = useControllableState({
+  value: props.count,
+  defaultValue: 0,
+  onChange: props.onCountChange,
+})
+
+return (
+  <button onClick={() => setCount((prev) => prev + 1)}>
+    Count: {count}
+  </button>
+)
 ```
 
 ## API Reference
 
-### `UseControllableStateOptions`
+### UseControllableStateOptions
 
-<AutoTypeTable path="./hooks/useControllableState.ts" name="UseControllableStateOptions" />
+Configuration options for resolving controlled and uncontrolled state.
+
+<AutoTypeTable
+  path="./hooks/useControllableState.ts"
+  name="UseControllableStateOptions"
+/>

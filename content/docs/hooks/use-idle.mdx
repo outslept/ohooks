@@ -1,9 +1,11 @@
 ---
 title: useIdle
-description: "Tracks whether the user has been inactive for a given duration by listening to window interaction events."
+description: Tracks whether the user has been inactive for a given duration by listening to window interaction events.
 ---
 
 {/* Preview */}
+
+The `useIdle` hook monitors user activity across mouse, pointer, touch, keyboard, wheel, and visibility events and returns `true` when no interaction has occurred for `timeout` milliseconds.
 
 ## Installation
 
@@ -12,11 +14,45 @@ description: "Tracks whether the user has been inactive for a given duration by 
 ## Usage
 
 ```tsx
-const isIdle = useIdle(30_000);
+import { useIdle } from "@/hooks/useIdle"
+```
+
+```tsx
+const isIdle = useIdle(30_000)
+```
+
+## Examples
+
+### Auto-Locking a Session After Inactivity
+
+Detect when the user has been inactive for 60 seconds and show a lock screen or warning banner.
+
+```tsx
+const isIdle = useIdle(60_000)
+
+return (
+  <div>
+    <p>Status: {isIdle ? "Away" : "Active"}</p>
+    {isIdle && <div role="alert">Session paused due to inactivity.</div>}
+  </div>
+)
+```
+
+### Custom Activity Events and Initial State
+
+Customize the list of DOM events that reset the timer or start in the idle state using `initialState`.
+
+```tsx
+const isIdle = useIdle(10_000, {
+  initialState: false,
+  events: ["keydown", "pointerdown"],
+})
 ```
 
 ## API Reference
 
-### `UseIdleOptions`
+### UseIdleOptions
+
+Configuration options for initial idle state and monitored DOM events.
 
 <AutoTypeTable path="./hooks/useIdle.ts" name="UseIdleOptions" />

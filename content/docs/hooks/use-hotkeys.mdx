@@ -1,9 +1,11 @@
 ---
 title: useHotkeys
-description: "Listens for keyboard shortcut combinations (including cross-platform `mod` support) and invokes a callback when matched."
+description: Listens for keyboard shortcut combinations (including cross-platform mod support) and invokes a callback when matched.
 ---
 
 {/* Preview */}
+
+The `useHotkeys` hook binds one or more keyboard shortcut combinations (such as `'mod+k'`, `'shift+?'`, or `['ctrl+s', 'meta+s']`) to a callback, ignoring editable form fields by default.
 
 ## Installation
 
@@ -12,13 +14,61 @@ description: "Listens for keyboard shortcut combinations (including cross-platfo
 ## Usage
 
 ```tsx
-useHotkeys('mod+k', () => {
-  setCommandPaletteOpen(true);
-});
+import { useHotkeys } from "@/hooks/useHotkeys"
+```
+
+```tsx
+useHotkeys("mod+k", () => {
+  setCommandPaletteOpen(true)
+})
+```
+
+## Examples
+
+### Preventing Default Browser Shortcuts (`mod+s`)
+
+Set `preventDefault: true` and `enableOnFormTags: true` to intercept `Cmd+S` / `Ctrl+S` even while the user is typing inside an `<input>` or `<textarea>`.
+
+```tsx
+useHotkeys(
+  "mod+s",
+  () => {
+    saveDocument()
+  },
+  {
+    preventDefault: true,
+    enableOnFormTags: true,
+  }
+)
+```
+
+### Scoping Shortcuts to a Container Element
+
+Pass a `target` ref in the options object so the shortcut only triggers when focus is inside that container.
+
+```tsx
+const editorRef = useRef<HTMLDivElement>(null)
+
+useHotkeys(
+  ["mod+z", "mod+shift+z"],
+  (event) => {
+    if (event.shiftKey) redo()
+    else undo()
+  },
+  { target: editorRef, preventDefault: true }
+)
+
+return (
+  <div ref={editorRef} tabIndex={0}>
+    Focusable editor area
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseHotkeysOptions`
+### UseHotkeysOptions
+
+Configuration options for hotkey matching, event type, and form element behavior.
 
 <AutoTypeTable path="./hooks/useHotkeys.ts" name="UseHotkeysOptions" />

@@ -1,9 +1,11 @@
 ---
 title: useThrottleValue
-description: "Throttles state updates to a value so it changes at most once per `wait` milliseconds."
+description: Throttles state updates to a value so it changes at most once per wait milliseconds.
 ---
 
 {/* Preview */}
+
+The `useThrottleValue` hook throttles updates to a reactive value so it changes at most once every `wait` milliseconds, returning a `[throttledValue, controls]` tuple.
 
 ## Installation
 
@@ -12,5 +14,69 @@ description: "Throttles state updates to a value so it changes at most once per 
 ## Usage
 
 ```tsx
-const [throttledFilter] = useThrottleValue(filterText, 250);
+import { useThrottleValue } from "@/hooks/useThrottleValue"
 ```
+
+```tsx
+const [throttledFilter] = useThrottleValue(filterText, 250)
+```
+
+## Examples
+
+### Throttling Live Slider Previews
+
+Keep a range slider responsive while throttling expensive chart or preview re-renders to once every `150ms`.
+
+```tsx
+const [zoom, setZoom] = useState(100)
+const [throttledZoom] = useThrottleValue(zoom, 150)
+
+return (
+  <div>
+    <input
+      type="range"
+      min={50}
+      max={200}
+      value={zoom}
+      onChange={(e) => setZoom(Number(e.target.value))}
+    />
+    <p>
+      Live: {zoom}% | Throttled preview: {throttledZoom}%
+    </p>
+  </div>
+)
+```
+
+### Controlling Trailing Updates via Setter Controls
+
+Use the second tuple item to flush or cancel a pending trailing value update.
+
+```tsx
+const [query, setQuery] = useState("")
+const [throttledQuery, throttleControls] = useThrottleValue(query, 400, {
+  leading: true,
+  trailing: true,
+})
+
+return (
+  <div>
+    <input value={query} onChange={(e) => setQuery(e.target.value)} />
+    <button onClick={() => throttleControls.flush()}>Flush now</button>
+    <p>Throttled: {throttledQuery}</p>
+  </div>
+)
+```
+
+## API Reference
+
+### ThrottleOptions
+
+Configuration options for leading and trailing execution edges.
+
+<AutoTypeTable path="./hooks/useThrottleCallback.ts" name="ThrottleOptions" />
+
+### ThrottledFunction
+
+Throttled setter returned as the second tuple element.
+
+<AutoTypeTable path="./hooks/useThrottleCallback.ts" name="ThrottledFunction" />

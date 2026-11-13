@@ -1,9 +1,11 @@
 ---
 title: useLockBodyScroll
-description: "Locks scrolling on `document.body` (or a target element) with scrollbar gap compensation and reference counting across multiple active locks."
+description: Locks scrolling on document.body (or a target element) with scrollbar gap compensation and reference counting across multiple active locks.
 ---
 
 {/* Preview */}
+
+The `useLockBodyScroll` hook prevents background scrolling by setting `overflow: hidden` on `document.body` (or a custom target element), compensates for the disappearing scrollbar width via `padding-right` to prevent layout shift, and reference-counts concurrent locks so nested modals unlock safely.
 
 ## Installation
 
@@ -12,11 +14,68 @@ description: "Locks scrolling on `document.body` (or a target element) with scro
 ## Usage
 
 ```tsx
-useLockBodyScroll(isModalOpen);
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll"
+```
+
+```tsx
+useLockBodyScroll(isModalOpen)
+```
+
+## Examples
+
+### Locking Scroll When a Drawer or Modal Opens
+
+Pass a boolean `locked` flag so body scrolling is disabled only while the overlay is open.
+
+```tsx
+const [isOpen, setIsOpen] = useState(false)
+useLockBodyScroll(isOpen)
+
+return (
+  <>
+    <button onClick={() => setIsOpen(true)}>Open drawer</button>
+    {isOpen && (
+      <div role="dialog">
+        <p>Background scroll is locked.</p>
+        <button onClick={() => setIsOpen(false)}>Close</button>
+      </div>
+    )}
+  </>
+)
+```
+
+### Locking a Custom Scrollable Container
+
+Pass a `target` element ref and optionally disable `reserveScrollBarGap` to lock a specific container element instead of `document.body`.
+
+```tsx
+const panelRef = useRef<HTMLDivElement>(null)
+const [locked, setLocked] = useState(false)
+
+useLockBodyScroll(locked, {
+  target: panelRef,
+  reserveScrollBarGap: false,
+})
+
+return (
+  <div>
+    <button onClick={() => setLocked((prev) => !prev)}>
+      {locked ? "Unlock panel" : "Lock panel"}
+    </button>
+    <div ref={panelRef} style={{ height: 200, overflowY: "auto" }}>
+      {/* scrollable content */}
+    </div>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseLockBodyScrollOptions`
+### UseLockBodyScrollOptions
 
-<AutoTypeTable path="./hooks/useLockBodyScroll.ts" name="UseLockBodyScrollOptions" />
+Configuration options for target element and scrollbar gap reservation.
+
+<AutoTypeTable
+  path="./hooks/useLockBodyScroll.ts"
+  name="UseLockBodyScrollOptions"
+/>

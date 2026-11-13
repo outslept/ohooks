@@ -1,9 +1,11 @@
 ---
 title: useEventCallback
-description: "Returns a referentially stable callback that always invokes the latest version of `fn`."
+description: Returns a referentially stable callback that always invokes the latest version of fn.
 ---
 
 {/* Preview */}
+
+The `useEventCallback` hook wraps a function in a stable callback reference whose identity never changes across renders while always reading the latest props and state when invoked.
 
 ## Installation
 
@@ -12,7 +14,48 @@ description: "Returns a referentially stable callback that always invokes the la
 ## Usage
 
 ```tsx
+import { useEventCallback } from "@/hooks/useEventCallback"
+```
+
+```tsx
 const handleSubmit = useEventCallback((data: FormData) => {
-  send(data, latestProp);
-});
+  send(data, latestProp)
+})
+```
+
+## Examples
+
+### Passing Stable Callbacks to Memoized Children
+
+Pass the returned function to `React.memo` child components so they do not re-render when parent state changes.
+
+```tsx
+const [draft, setDraft] = useState("")
+
+const handleSave = useEventCallback(() => {
+  api.save(draft)
+})
+
+return (
+  <div>
+    <input value={draft} onChange={(e) => setDraft(e.target.value)} />
+    <MemoizedToolbar onSave={handleSave} />
+  </div>
+)
+```
+
+### Avoiding Effect Re-Subscriptions
+
+Call an event callback inside `useEffect` without adding rapidly changing dependencies that would tear down and re-create a subscription.
+
+```tsx
+const onMessageReceived = useEventCallback((payload: string) => {
+  notifyUser(payload, currentChannelName)
+})
+
+useEffect(() => {
+  const socket = connectSocket()
+  socket.on("message", onMessageReceived)
+  return () => socket.disconnect()
+}, [onMessageReceived])
 ```

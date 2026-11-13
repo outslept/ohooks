@@ -1,9 +1,11 @@
 ---
 title: useUrlSearchParams
-description: "Reads and updates `window.location.search` as reactive `URLSearchParams` synchronized with browser history."
+description: Reads and updates window.location.search as reactive URLSearchParams synchronized with browser history.
 ---
 
 {/* Preview */}
+
+The `useUrlSearchParams` hook reads `window.location.search` via `useSyncExternalStore` and returns a `[searchParams, setSearchParams]` tuple that updates the URL using `history.pushState` or `history.replaceState` while notifying all subscribed components.
 
 ## Installation
 
@@ -12,12 +14,71 @@ description: "Reads and updates `window.location.search` as reactive `URLSearchP
 ## Usage
 
 ```tsx
-const [searchParams, setSearchParams] = useUrlSearchParams();
-const query = searchParams.get('q') ?? '';
+import { useUrlSearchParams } from "@/hooks/useUrlSearchParams"
+```
+
+```tsx
+const [searchParams, setSearchParams] = useUrlSearchParams()
+const query = searchParams.get("q") ?? ""
+```
+
+## Examples
+
+### Updating Query Parameters with an Object or Functional Updater
+
+Pass a plain object (where `null` or `undefined` removes a parameter) or an updater function that mutates a cloned `URLSearchParams` instance.
+
+```tsx
+const [searchParams, setSearchParams] = useUrlSearchParams()
+const sort = searchParams.get("sort") ?? "newest"
+
+return (
+  <div>
+    <p>Current sort: {sort}</p>
+    <button
+      onClick={() =>
+        setSearchParams((prev) => {
+          prev.set("sort", "popular")
+          return prev
+        })
+      }
+    >
+      Sort by popular
+    </button>
+    <button onClick={() => setSearchParams({ sort: null })}>
+      Clear sort
+    </button>
+  </div>
+)
+```
+
+### Pushing vs. Replacing History Entries
+
+By default, updates use `replaceState` so rapid filter changes do not clutter browser history; pass `{ history: "push" }` when you want the Back button to undo the change.
+
+```tsx
+const [searchParams, setSearchParams] = useUrlSearchParams({
+  history: "replace",
+})
+
+return (
+  <button
+    onClick={() =>
+      setSearchParams({ tab: "billing" }, { history: "push" })
+    }
+  >
+    Open Billing tab
+  </button>
+)
 ```
 
 ## API Reference
 
-### `UseUrlSearchParamsOptions`
+### UseUrlSearchParamsOptions
 
-<AutoTypeTable path="./hooks/useUrlSearchParams.ts" name="UseUrlSearchParamsOptions" />
+Configuration options for browser history mode and initial SSR search params.
+
+<AutoTypeTable
+  path="./hooks/useUrlSearchParams.ts"
+  name="UseUrlSearchParamsOptions"
+/>

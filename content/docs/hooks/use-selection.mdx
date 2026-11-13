@@ -1,9 +1,11 @@
 ---
 title: useSelection
-description: "Manages single or multi-item selection state with range selection and bulk toggle helpers."
+description: Manages single or multi-item selection state with range selection and bulk toggle helpers.
 ---
 
 {/* Preview */}
+
+The `useSelection` hook manages item selection for data tables, lists, and galleries, supporting key extraction (`getKey`), bulk selection (`selectAll`, `clearSelection`, `toggleAll`), `Shift+Click` range selection (`selectRange`), and computed `isAllSelected` / `isPartiallySelected` flags for indeterminate header checkboxes.
 
 ## Installation
 
@@ -12,17 +14,98 @@ description: "Manages single or multi-item selection state with range selection 
 ## Usage
 
 ```tsx
+import { useSelection } from "@/hooks/useSelection"
+```
+
+```tsx
 const { isSelected, toggle, toggleAll, isAllSelected } = useSelection(users, {
   getKey: (u) => u.id,
-});
+})
+```
+
+## Examples
+
+### Data Table with Indeterminate Header Checkbox
+
+Use `isAllSelected`, `isPartiallySelected`, and `toggleAll` to wire up a master checkbox alongside row checkboxes.
+
+```tsx
+const users = [
+  { id: "1", name: "Alice" },
+  { id: "2", name: "Bob" },
+  { id: "3", name: "Charlie" },
+]
+
+const {
+  isSelected,
+  toggle,
+  toggleAll,
+  isAllSelected,
+  isPartiallySelected,
+  selectedItems,
+} = useSelection(users, {
+  getKey: (user) => user.id,
+})
+
+return (
+  <div>
+    <label>
+      <input
+        type="checkbox"
+        checked={isAllSelected}
+        ref={(el) => {
+          if (el) el.indeterminate = isPartiallySelected
+        }}
+        onChange={toggleAll}
+      />
+      Select all ({selectedItems.length} selected)
+    </label>
+    <ul>
+      {users.map((user) => (
+        <li key={user.id}>
+          <label>
+            <input
+              type="checkbox"
+              checked={isSelected(user.id)}
+              onChange={() => toggle(user.id)}
+            />
+            {user.name}
+          </label>
+        </li>
+      ))}
+    </ul>
+  </div>
+)
+```
+
+### `Shift+Click` Range Selection
+
+Call `selectRange(key)` when the user holds the `Shift` key to select every item between the last interacted item and the clicked item.
+
+```tsx
+const { isSelected, toggle, selectRange } = useSelection(items, {
+  getKey: (item) => item.id,
+})
+
+const handleRowClick = (id: string, event: React.MouseEvent) => {
+  if (event.shiftKey) {
+    selectRange(id)
+  } else {
+    toggle(id)
+  }
+}
 ```
 
 ## API Reference
 
-### `UseSelectionOptions`
+### UseSelectionOptions
+
+Configuration options for key extraction, single/multiple mode, and controlled/uncontrolled selection keys.
 
 <AutoTypeTable path="./hooks/useSelection.ts" name="UseSelectionOptions" />
 
-### `UseSelectionReturn`
+### UseSelectionReturn
+
+Selection state, flags, and helper methods returned by the hook.
 
 <AutoTypeTable path="./hooks/useSelection.ts" name="UseSelectionReturn" />

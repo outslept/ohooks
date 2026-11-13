@@ -1,9 +1,11 @@
 ---
 title: useBeforeUnload
-description: "Prompts the user with a confirmation dialog before leaving or reloading the page."
+description: Prompts the user with a confirmation dialog before leaving or reloading the page.
 ---
 
 {/* Preview */}
+
+The `useBeforeUnload` hook attaches a `beforeunload` listener to `window` to warn users about unsaved changes before they close the tab, reload, or navigate away.
 
 ## Installation
 
@@ -12,5 +14,52 @@ description: "Prompts the user with a confirmation dialog before leaving or relo
 ## Usage
 
 ```tsx
-useBeforeUnload(isDirty, 'You have unsaved changes. Are you sure you want to leave?');
+import { useBeforeUnload } from "@/hooks/useBeforeUnload"
 ```
+
+```tsx
+useBeforeUnload(
+  isDirty,
+  "You have unsaved changes. Are you sure you want to leave?"
+)
+```
+
+## Examples
+
+### Unsaved Form Changes
+
+Pass a boolean flag so the browser only prompts the user when the form has unsaved edits.
+
+```tsx
+const [value, setValue] = useState("")
+const isDirty = value.trim().length > 0
+
+useBeforeUnload(isDirty)
+
+return (
+  <textarea
+    value={value}
+    onChange={(e) => setValue(e.target.value)}
+    placeholder="Write a draft..."
+  />
+)
+```
+
+### Predicate Function
+
+Pass a predicate function as the first argument to evaluate the condition lazily when the `beforeunload` event fires.
+
+```tsx
+const draftRef = useRef("")
+
+useBeforeUnload(() => draftRef.current.length > 0)
+```
+
+## API Reference
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `enabled` | `boolean \| (() => boolean)` | `true` | Whether the confirmation prompt is active, or a predicate evaluated when `beforeunload` fires. |
+| `message` | `string` | `undefined` | Optional legacy message assigned to `event.returnValue`. |

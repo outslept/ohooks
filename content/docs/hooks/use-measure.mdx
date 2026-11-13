@@ -1,9 +1,11 @@
 ---
 title: useMeasure
-description: "Measures the dimensions and box insets of a DOM element via a callback ref and `ResizeObserver`."
+description: Measures the dimensions and box insets of a DOM element via a callback ref and ResizeObserver.
 ---
 
 {/* Preview */}
+
+The `useMeasure` hook returns a `[ref, rect]` tuple that observes a DOM element with `ResizeObserver` and provides its `width`, `height`, and box insets (`top`, `left`, `right`, `bottom`, `x`, `y`), automatically re-subscribing when conditionally rendered elements mount or unmount.
 
 ## Installation
 
@@ -12,15 +14,53 @@ description: "Measures the dimensions and box insets of a DOM element via a call
 ## Usage
 
 ```tsx
-const [ref, { width, height }] = useMeasure<HTMLDivElement>();
+import { useMeasure } from "@/hooks/useMeasure"
+```
+
+```tsx
+const [ref, { width, height }] = useMeasure<HTMLDivElement>()
+```
+
+## Examples
+
+### Measuring a Dynamically Sized Container
+
+Attach the callback `ref` directly to any element to read its live dimensions as it resizes.
+
+```tsx
+const [ref, { width, height }] = useMeasure<HTMLDivElement>()
+
+return (
+  <div ref={ref} style={{ resize: "both", overflow: "auto", padding: 16 }}>
+    Dimensions: {Math.round(width)}px × {Math.round(height)}px
+  </div>
+)
+```
+
+### Measuring Border-Box Dimensions
+
+Pass `{ box: "border-box" }` to measure the element including its padding and borders.
+
+```tsx
+const [ref, rect] = useMeasure<HTMLDivElement>({ box: "border-box" })
+
+return (
+  <div ref={ref} style={{ padding: 24, border: "2px solid black" }}>
+    Border-box width: {Math.round(rect.width)}px
+  </div>
+)
 ```
 
 ## API Reference
 
-### `MeasureRect`
+### UseMeasureOptions
 
-<AutoTypeTable path="./hooks/useMeasure.ts" name="MeasureRect" />
-
-### `UseMeasureOptions`
+Configuration options for the observed CSS box model.
 
 <AutoTypeTable path="./hooks/useMeasure.ts" name="UseMeasureOptions" />
+
+### MeasureRect
+
+Measured dimensions and box coordinates returned as the second tuple element.
+
+<AutoTypeTable path="./hooks/useMeasure.ts" name="MeasureRect" />

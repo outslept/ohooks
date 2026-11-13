@@ -1,9 +1,11 @@
 ---
 title: useSessionStorage
-description: "Persists reactive state in `window.sessionStorage` with automatic serialization and synchronization."
+description: Persists reactive state in window.sessionStorage with automatic serialization and synchronization.
 ---
 
 {/* Preview */}
+
+The `useSessionStorage` hook synchronizes React state with `window.sessionStorage` using `useSyncExternalStore`, keeping all components sharing the same key in sync within the current browser tab.
 
 ## Installation
 
@@ -12,5 +14,58 @@ description: "Persists reactive state in `window.sessionStorage` with automatic 
 ## Usage
 
 ```tsx
-const [draft, setDraft, clearDraft] = useSessionStorage('form-draft', '');
+import { useSessionStorage } from "@/hooks/useSessionStorage"
 ```
+
+```tsx
+const [draft, setDraft, clearDraft] = useSessionStorage("form-draft", "")
+```
+
+## Examples
+
+### Persisting Multi-Step Wizard State Across Reloads
+
+Store wizard form data in `sessionStorage` so page refreshes preserve progress without leaking state to other browser tabs.
+
+```tsx
+const [stepData, setStepData, clearStepData] = useSessionStorage(
+  "checkout-wizard",
+  { step: 1, coupon: "" }
+)
+
+return (
+  <div>
+    <p>Current step: {stepData.step}</p>
+    <button
+      onClick={() =>
+        setStepData((prev) => ({ ...prev, step: prev.step + 1 }))
+      }
+    >
+      Next step
+    </button>
+    <button onClick={clearStepData}>Reset wizard</button>
+  </div>
+)
+```
+
+### Custom Serialization Options
+
+Pass `serializer` and `deserializer` functions when storing custom data structures in `sessionStorage`.
+
+```tsx
+const [visitedIds, setVisitedIds] = useSessionStorage<number[]>(
+  "visited-ids",
+  [],
+  {
+    onError: (error) => console.warn("SessionStorage error:", error),
+  }
+)
+```
+
+## API Reference
+
+### StorageOptions
+
+Configuration options for custom serialization and error handling.
+
+<AutoTypeTable path="./hooks/useLocalStorage.ts" name="StorageOptions" />

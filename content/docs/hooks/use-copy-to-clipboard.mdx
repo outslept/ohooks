@@ -1,9 +1,11 @@
 ---
 title: useCopyToClipboard
-description: "Copies text to the system clipboard and tracks the copied state with an optional auto-reset timer."
+description: Copies text to the system clipboard and tracks the copied state with an optional auto-reset timer.
 ---
 
 {/* Preview */}
+
+The `useCopyToClipboard` hook writes text to the system clipboard via the Clipboard API (with a legacy `execCommand('copy')` fallback), tracks the last copied string, and optionally resets `isCopied` after a timeout.
 
 ## Installation
 
@@ -12,15 +14,68 @@ description: "Copies text to the system clipboard and tracks the copied state wi
 ## Usage
 
 ```tsx
-const { isCopied, copy } = useCopyToClipboard({ resetInterval: 2000 });
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard"
+```
+
+```tsx
+const { isCopied, copy } = useCopyToClipboard({ resetInterval: 2000 })
+```
+
+## Examples
+
+### Copy Button with Temporary Feedback
+
+Set `resetInterval` so `isCopied` automatically reverts to `false` after a few seconds.
+
+```tsx
+const { isCopied, copy } = useCopyToClipboard({ resetInterval: 2000 })
+
+return (
+  <button onClick={() => copy("npm install react")}>
+    {isCopied ? "Copied!" : "Copy command"}
+  </button>
+)
+```
+
+### Handling Errors and Inspecting the Copied Value
+
+Read `error` and `copiedText` or await the boolean promise returned by `copy` to trigger custom notifications.
+
+```tsx
+const { copiedText, error, copy, reset } = useCopyToClipboard()
+
+return (
+  <div>
+    <button onClick={() => copy("https://example.com/invite")}>
+      Copy invite link
+    </button>
+    {copiedText && (
+      <p>
+        Copied: <code>{copiedText}</code>{" "}
+        <button onClick={reset}>Clear</button>
+      </p>
+    )}
+    {error && <p role="alert">Failed to copy: {error.message}</p>}
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseCopyToClipboardOptions`
+### UseCopyToClipboardOptions
 
-<AutoTypeTable path="./hooks/useCopyToClipboard.ts" name="UseCopyToClipboardOptions" />
+Configuration options for the clipboard hook.
 
-### `UseCopyToClipboardReturn`
+<AutoTypeTable
+  path="./hooks/useCopyToClipboard.ts"
+  name="UseCopyToClipboardOptions"
+/>
 
-<AutoTypeTable path="./hooks/useCopyToClipboard.ts" name="UseCopyToClipboardReturn" />
+### UseCopyToClipboardReturn
+
+Clipboard state and helper methods returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useCopyToClipboard.ts"
+  name="UseCopyToClipboardReturn"
+/>

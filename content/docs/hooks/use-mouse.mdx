@@ -1,9 +1,11 @@
 ---
 title: useMouse
-description: "Tracks mouse cursor coordinates across the document, viewport, screen, and an optional target element using `requestAnimationFrame`."
+description: Tracks mouse cursor coordinates across the document, viewport, screen, and an optional target element using requestAnimationFrame.
 ---
 
 {/* Preview */}
+
+The `useMouse` hook listens to `mousemove` and `dragover` events (throttled via `requestAnimationFrame`) and reports cursor coordinates relative to the document (`x`, `y`), viewport (`clientX`, `clientY`), screen (`screenX`, `screenY`), and an optional target element (`elementX`, `elementY`).
 
 ## Installation
 
@@ -12,11 +14,54 @@ description: "Tracks mouse cursor coordinates across the document, viewport, scr
 ## Usage
 
 ```tsx
-const { x, y, elementX, elementY } = useMouse(boxRef);
+import { useMouse } from "@/hooks/useMouse"
+```
+
+```tsx
+const { x, y, elementX, elementY } = useMouse(boxRef)
+```
+
+## Examples
+
+### Spotlight Effect Relative to an Element
+
+Pass a target element ref to compute `elementX` and `elementY` relative to that element's top-left corner.
+
+```tsx
+const cardRef = useRef<HTMLDivElement>(null)
+const { elementX, elementY } = useMouse(cardRef)
+
+return (
+  <div
+    ref={cardRef}
+    style={{
+      position: "relative",
+      background: `radial-gradient(200px at ${elementX}px ${elementY}px, rgba(59,130,246,0.15), transparent)`,
+    }}
+  >
+    Move cursor inside card ({Math.round(elementX)}, {Math.round(elementY)})
+  </div>
+)
+```
+
+### Global Viewport Cursor Tracking
+
+Call `useMouse()` without arguments to track global document and viewport coordinates.
+
+```tsx
+const { clientX, clientY } = useMouse()
+
+return (
+  <p>
+    Viewport cursor: {clientX}, {clientY}
+  </p>
+)
 ```
 
 ## API Reference
 
-### `MousePositionState`
+### MousePositionState
+
+Cursor and element coordinate values returned by the hook.
 
 <AutoTypeTable path="./hooks/useMouse.ts" name="MousePositionState" />

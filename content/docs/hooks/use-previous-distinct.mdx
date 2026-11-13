@@ -1,9 +1,11 @@
 ---
 title: usePreviousDistinct
-description: "Returns the most recent distinct value prior to the current value."
+description: Returns the most recent distinct value prior to the current value.
 ---
 
 {/* Preview */}
+
+The `usePreviousDistinct` hook tracks and returns the last value that was not equal to the current value (using `Object.is` by default or a custom comparator), ignoring re-renders where the value stayed the same.
 
 ## Installation
 
@@ -12,5 +14,50 @@ description: "Returns the most recent distinct value prior to the current value.
 ## Usage
 
 ```tsx
-const prevDistinctId = usePreviousDistinct(selectedId);
+import { usePreviousDistinct } from "@/hooks/usePreviousDistinct"
+```
+
+```tsx
+const prevDistinctId = usePreviousDistinct(selectedId)
+```
+
+## Examples
+
+### Preserving the Previous Selection Across Unrelated Re-Renders
+
+Unlike `usePrevious`, `usePreviousDistinct` keeps returning the last distinct value even when unrelated state changes cause extra renders.
+
+```tsx
+const [tab, setTab] = useState("home")
+const [, forceRender] = useState(0)
+const prevTab = usePreviousDistinct(tab)
+
+return (
+  <div>
+    <p>
+      Current: {tab} | Previous distinct: {prevTab ?? "None"}
+    </p>
+    <button onClick={() => setTab("profile")}>Profile</button>
+    <button onClick={() => setTab("settings")}>Settings</button>
+    <button onClick={() => forceRender((n) => n + 1)}>
+      Unrelated re-render
+    </button>
+  </div>
+)
+```
+
+### Custom Equality Comparator for Objects
+
+Pass a `compare` function as the second argument to compare objects by a specific key or deep equality.
+
+```tsx
+interface User {
+  id: string
+  name: string
+}
+
+const prevUser = usePreviousDistinct<User>(
+  currentUser,
+  (prev, next) => prev.id === next.id
+)
 ```

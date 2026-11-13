@@ -1,9 +1,11 @@
 ---
 title: useFirstMountState
-description: "Returns `true` during the initial render of a component and `false` on all subsequent renders."
+description: Returns true during the initial render of a component and false on all subsequent renders.
 ---
 
 {/* Preview */}
+
+The `useFirstMountState` hook returns a boolean indicating whether the component is currently executing its very first render pass.
 
 ## Installation
 
@@ -12,5 +14,37 @@ description: "Returns `true` during the initial render of a component and `false
 ## Usage
 
 ```tsx
-const isFirstMount = useFirstMountState();
+import { useFirstMountState } from "@/hooks/useFirstMountState"
+```
+
+```tsx
+const isFirstMount = useFirstMountState()
+```
+
+## Examples
+
+### Skipping Entrance Animations on Initial Render
+
+Check `isFirstMount` to render the initial UI without transition classes and enable animations only on subsequent state changes.
+
+```tsx
+const isFirstMount = useFirstMountState()
+const [activeTab, setActiveTab] = useState("overview")
+
+return (
+  <div className={isFirstMount ? "" : "animate-fade-in"}>
+    <p>Current tab: {activeTab}</p>
+    <button onClick={() => setActiveTab("settings")}>Settings</button>
+  </div>
+)
+```
+
+### Distinguishing Mount from Updates
+
+Combine `isFirstMount` with state or props to log or react differently after the first render.
+
+```tsx
+const isFirstMount = useFirstMountState()
+
+return <span>{isFirstMount ? "Initial render" : "Updated render"}</span>
 ```

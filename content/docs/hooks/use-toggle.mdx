@@ -1,9 +1,11 @@
 ---
 title: useToggle
-description: "Manages a boolean state with a `toggle` function that also accepts an explicit boolean or DOM event."
+description: Manages a boolean state with a toggle function that also accepts an explicit boolean or DOM event.
 ---
 
 {/* Preview */}
+
+The `useToggle` hook manages a boolean state and returns a `[value, toggle, setValue]` tuple where `toggle` flips the boolean when called with no arguments (or a React/DOM event) and sets an explicit boolean when passed `true` or `false`.
 
 ## Installation
 
@@ -12,11 +14,52 @@ description: "Manages a boolean state with a `toggle` function that also accepts
 ## Usage
 
 ```tsx
-const [isOpen, toggleOpen, setOpen] = useToggle(false);
+import { useToggle } from "@/hooks/useToggle"
+```
+
+```tsx
+const [isOpen, toggleOpen, setOpen] = useToggle(false)
+```
+
+## Examples
+
+### Passing `toggle` Directly to `onClick`
+
+Because `toggle` ignores non-boolean arguments like `MouseEvent`, you can pass it directly to `onClick` handlers without wrapping it in an arrow function.
+
+```tsx
+const [isExpanded, toggleExpanded] = useToggle(false)
+
+return (
+  <div>
+    <button onClick={toggleExpanded}>
+      {isExpanded ? "Hide details" : "Show details"}
+    </button>
+    {isExpanded && <p>Extra details content.</p>}
+  </div>
+)
+```
+
+### Forcing an Explicit Boolean Value
+
+Pass `true` or `false` to `toggle(nextValue)` (or use `setValue`) when you need to force a specific state.
+
+```tsx
+const [isEditing, toggleEditing] = useToggle(false)
+
+return (
+  <div>
+    <button onClick={() => toggleEditing(true)}>Start editing</button>
+    <button onClick={() => toggleEditing(false)}>Cancel</button>
+    <button onClick={toggleEditing}>Toggle ({String(isEditing)})</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `ToggleFn`
+### ToggleFn
+
+Signature of the `toggle` function returned as the second tuple element.
 
 <AutoTypeTable path="./hooks/useToggle.ts" name="ToggleFn" />

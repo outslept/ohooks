@@ -1,9 +1,11 @@
 ---
 title: useLocalStorage
-description: "Persists and synchronizes state with `window.localStorage` across components and browser tabs."
+description: Persists and synchronizes state with window.localStorage across components and browser tabs.
 ---
 
 {/* Preview */}
+
+The `useLocalStorage` hook synchronizes React state with `window.localStorage` using `useSyncExternalStore`, automatically updating all subscribed components in the current tab as well as across other open tabs via the `storage` event.
 
 ## Installation
 
@@ -12,11 +14,63 @@ description: "Persists and synchronizes state with `window.localStorage` across 
 ## Usage
 
 ```tsx
-const [theme, setTheme, removeTheme] = useLocalStorage('theme', 'light');
+import { useLocalStorage } from "@/hooks/useLocalStorage"
+```
+
+```tsx
+const [theme, setTheme, removeTheme] = useLocalStorage("theme", "light")
+```
+
+## Examples
+
+### Persisting Complex Objects
+
+Objects and arrays are serialized with `JSON.stringify` and parsed with `JSON.parse` by default, and the setter supports functional updates just like `useState`.
+
+```tsx
+interface UserSettings {
+  sidebarCollapsed: boolean
+  pageSize: number
+}
+
+const [settings, setSettings, resetSettings] = useLocalStorage<UserSettings>(
+  "user-settings",
+  { sidebarCollapsed: false, pageSize: 20 }
+)
+
+return (
+  <div>
+    <button
+      onClick={() =>
+        setSettings((prev) => ({
+          ...prev,
+          sidebarCollapsed: !prev.sidebarCollapsed,
+        }))
+      }
+    >
+      Toggle sidebar ({settings.sidebarCollapsed ? "Collapsed" : "Expanded"})
+    </button>
+    <button onClick={resetSettings}>Reset to defaults</button>
+  </div>
+)
+```
+
+### Custom Serializer and Error Handling
+
+Provide custom `serializer`, `deserializer`, and `onError` callbacks when storing non-JSON types such as `Date` or `Set`.
+
+```tsx
+const [tags, setTags] = useLocalStorage<Set<string>>("saved-tags", new Set(), {
+  serializer: (set) => JSON.stringify(Array.from(set)),
+  deserializer: (raw) => new Set(JSON.parse(raw)),
+  onError: (err) => console.error("Storage error:", err),
+})
 ```
 
 ## API Reference
 
-### `StorageOptions`
+### StorageOptions
+
+Configuration options for custom serialization, cross-tab sync, and error handling.
 
 <AutoTypeTable path="./hooks/useLocalStorage.ts" name="StorageOptions" />

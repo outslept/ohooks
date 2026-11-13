@@ -1,9 +1,11 @@
 ---
 title: useIntersectionObserver
-description: "Observes changes in the intersection of a target DOM element with an ancestor element or the viewport."
+description: Observes changes in the intersection of a target DOM element with an ancestor element or the viewport.
 ---
 
 {/* Preview */}
+
+The `useIntersectionObserver` hook wraps the browser `IntersectionObserver` API to track when a target element enters or leaves the viewport (or a custom scroll container) and returns the latest `IntersectionObserverEntry`.
 
 ## Installation
 
@@ -12,12 +14,68 @@ description: "Observes changes in the intersection of a target DOM element with 
 ## Usage
 
 ```tsx
-const entry = useIntersectionObserver(sectionRef, { threshold: 0.5 });
-const isVisible = Boolean(entry?.isIntersecting);
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver"
+```
+
+```tsx
+const entry = useIntersectionObserver(sectionRef, { threshold: 0.5 })
+const isVisible = Boolean(entry?.isIntersecting)
+```
+
+## Examples
+
+### One-Time Reveal Animation (`freezeOnceVisible`)
+
+Enable `freezeOnceVisible: true` to disconnect the observer as soon as the element becomes visible for the first time.
+
+```tsx
+const cardRef = useRef<HTMLDivElement>(null)
+const entry = useIntersectionObserver(cardRef, {
+  threshold: 0.25,
+  freezeOnceVisible: true,
+})
+
+const isVisible = Boolean(entry?.isIntersecting)
+
+return (
+  <div
+    ref={cardRef}
+    style={{
+      opacity: isVisible ? 1 : 0,
+      transition: "opacity 400ms ease",
+    }}
+  >
+    Revealed once scrolled into view
+  </div>
+)
+```
+
+### Reacting via `onChange` Callback
+
+Use the `onChange` option to trigger side effects (such as analytics impression tracking) without needing an extra `useEffect`.
+
+```tsx
+const bannerRef = useRef<HTMLDivElement>(null)
+
+useIntersectionObserver(bannerRef, {
+  threshold: 0.8,
+  onChange: (entry) => {
+    if (entry.isIntersecting) {
+      trackBannerImpression()
+    }
+  },
+})
+
+return <div ref={bannerRef}>Promotional banner</div>
 ```
 
 ## API Reference
 
-### `UseIntersectionObserverOptions`
+### UseIntersectionObserverOptions
 
-<AutoTypeTable path="./hooks/useIntersectionObserver.ts" name="UseIntersectionObserverOptions" />
+Configuration options for `IntersectionObserver` thresholds, root container, and lifecycle callbacks.
+
+<AutoTypeTable
+  path="./hooks/useIntersectionObserver.ts"
+  name="UseIntersectionObserverOptions"
+/>

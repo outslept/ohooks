@@ -1,9 +1,11 @@
 ---
 title: useCounter
-description: "Manages a numeric counter state with optional min/max clamping and helper methods."
+description: Manages a numeric counter state with optional min/max clamping and helper methods.
 ---
 
 {/* Preview */}
+
+The `useCounter` hook manages a numeric state with optional `min` and `max` boundaries and exposes memoized helpers (`inc`, `dec`, `set`, and `reset`) to update the value.
 
 ## Installation
 
@@ -12,15 +14,63 @@ description: "Manages a numeric counter state with optional min/max clamping and
 ## Usage
 
 ```tsx
-const { count, inc, dec, reset } = useCounter(0, { min: 0, max: 10 });
+import { useCounter } from "@/hooks/useCounter"
+```
+
+```tsx
+const { count, inc, dec, reset } = useCounter(0, { min: 0, max: 10 })
+```
+
+## Examples
+
+### Bounded Quantity Picker
+
+Pass `min` and `max` options to clamp the counter so it never exceeds the allowed range.
+
+```tsx
+const { count, inc, dec, reset } = useCounter(1, { min: 1, max: 5 })
+
+return (
+  <div>
+    <button onClick={() => dec()} disabled={count <= 1}>
+      -
+    </button>
+    <span>{count}</span>
+    <button onClick={() => inc()} disabled={count >= 5}>
+      +
+    </button>
+    <button onClick={reset}>Reset</button>
+  </div>
+)
+```
+
+### Custom Step Sizes and Direct Assignment
+
+Pass a custom delta to `inc` or `dec`, or call `set` with a number or updater function.
+
+```tsx
+const { count, inc, dec, set } = useCounter(0, { min: 0, max: 100 })
+
+return (
+  <div>
+    <p>Score: {count}</p>
+    <button onClick={() => dec(10)}>-10</button>
+    <button onClick={() => inc(10)}>+10</button>
+    <button onClick={() => set(50)}>Set to 50</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseCounterOptions`
+### UseCounterOptions
+
+Optional boundary constraints for the counter.
 
 <AutoTypeTable path="./hooks/useCounter.ts" name="UseCounterOptions" />
 
-### `UseCounterReturn`
+### UseCounterReturn
+
+Counter value and helper methods returned by the hook.
 
 <AutoTypeTable path="./hooks/useCounter.ts" name="UseCounterReturn" />

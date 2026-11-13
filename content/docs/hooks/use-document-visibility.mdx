@@ -1,9 +1,11 @@
 ---
 title: useDocumentVisibility
-description: "Tracks the current `document.visibilityState` (`'visible'` or `'hidden'`) using `useSyncExternalStore`."
+description: Tracks the current document.visibilityState ('visible' | 'hidden') using useSyncExternalStore.
 ---
 
 {/* Preview */}
+
+The `useDocumentVisibility` hook subscribes to the `visibilitychange` event via `useSyncExternalStore` and returns the current `DocumentVisibilityState` (`'visible'` or `'hidden'`).
 
 ## Installation
 
@@ -12,6 +14,43 @@ description: "Tracks the current `document.visibilityState` (`'visible'` or `'hi
 ## Usage
 
 ```tsx
-const visibility = useDocumentVisibility();
-const isHidden = visibility === 'hidden';
+import { useDocumentVisibility } from "@/hooks/useDocumentVisibility"
+```
+
+```tsx
+const visibility = useDocumentVisibility()
+const isHidden = visibility === "hidden"
+```
+
+## Examples
+
+### Pausing Media or Polling When Tab is Hidden
+
+Check whether `visibility === "hidden"` to pause video playback, animations, or background polling while the user is away from the tab.
+
+```tsx
+const visibility = useDocumentVisibility()
+const videoRef = useRef<HTMLVideoElement>(null)
+
+useEffect(() => {
+  if (visibility === "hidden") {
+    videoRef.current?.pause()
+  }
+}, [visibility])
+
+return <video ref={videoRef} src="/demo.mp4" controls />
+```
+
+### Refreshing Data When Returning to the Tab
+
+Run an effect when `visibility` transitions back to `"visible"` to fetch fresh data.
+
+```tsx
+const visibility = useDocumentVisibility()
+
+useEffect(() => {
+  if (visibility === "visible") {
+    refetchNotifications()
+  }
+}, [visibility])
 ```

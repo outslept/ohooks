@@ -1,9 +1,11 @@
 ---
 title: useScreenOrientation
-description: "Tracks the device screen orientation and provides `lock` and `unlock` controls."
+description: Tracks the device screen orientation and provides lock and unlock controls.
 ---
 
 {/* Preview */}
+
+The `useScreenOrientation` hook subscribes to `screen.orientation` changes via `useSyncExternalStore` and exposes the current orientation `type` (`'portrait-primary'`, `'landscape-primary'`, etc.), rotation `angle`, and `lock` / `unlock` helper methods.
 
 ## Installation
 
@@ -12,15 +14,63 @@ description: "Tracks the device screen orientation and provides `lock` and `unlo
 ## Usage
 
 ```tsx
-const { type, angle, lock, unlock } = useScreenOrientation();
+import { useScreenOrientation } from "@/hooks/useScreenOrientation"
+```
+
+```tsx
+const { type, angle, lock, unlock } = useScreenOrientation()
+```
+
+## Examples
+
+### Displaying Current Orientation and Angle
+
+Read `type` and `angle` to adapt layouts or prompt users to rotate their device.
+
+```tsx
+const { type, angle, isSupported } = useScreenOrientation()
+
+return (
+  <div>
+    <p>Orientation: {type}</p>
+    <p>Angle: {angle}°</p>
+    <p>API supported: {isSupported ? "Yes" : "No"}</p>
+  </div>
+)
+```
+
+### Locking Orientation to Landscape
+
+Call `lock("landscape")` (typically while in fullscreen mode on mobile browsers) and `unlock()` to release the lock.
+
+```tsx
+const { type, lock, unlock } = useScreenOrientation()
+
+return (
+  <div>
+    <p>Current: {type}</p>
+    <button onClick={() => lock("landscape")}>Lock landscape</button>
+    <button onClick={() => unlock()}>Unlock orientation</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `ScreenOrientationState`
+### ScreenOrientationState
 
-<AutoTypeTable path="./hooks/useScreenOrientation.ts" name="ScreenOrientationState" />
+Reactive screen orientation state properties.
 
-### `UseScreenOrientationReturn`
+<AutoTypeTable
+  path="./hooks/useScreenOrientation.ts"
+  name="ScreenOrientationState"
+/>
 
-<AutoTypeTable path="./hooks/useScreenOrientation.ts" name="UseScreenOrientationReturn" />
+### UseScreenOrientationReturn
+
+Screen orientation state and lock/unlock methods returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useScreenOrientation.ts"
+  name="UseScreenOrientationReturn"
+/>

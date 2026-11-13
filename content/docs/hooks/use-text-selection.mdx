@@ -1,9 +1,11 @@
 ---
 title: useTextSelection
-description: "Tracks the user's current text selection, bounding rectangle, and ranges within the document or a target container."
+description: Tracks the user's current text selection, bounding rectangle, and ranges within the document or a target container.
 ---
 
 {/* Preview */}
+
+The `useTextSelection` hook listens to `selectionchange`, `mouseup`, `keyup`, `scroll`, and `resize` events to return the currently selected text string, `Range` objects, and bounding `DOMRect`—optionally scoped to a specific container element.
 
 ## Installation
 
@@ -12,11 +14,61 @@ description: "Tracks the user's current text selection, bounding rectangle, and 
 ## Usage
 
 ```tsx
-const { text, rect } = useTextSelection();
+import { useTextSelection } from "@/hooks/useTextSelection"
+```
+
+```tsx
+const { text, rect } = useTextSelection()
+```
+
+## Examples
+
+### Floating Popover Toolbar Over Selected Text
+
+Scope selection tracking to an article container and position a floating action bar using `rect`.
+
+```tsx
+const articleRef = useRef<HTMLElement>(null)
+const { text, rect } = useTextSelection(articleRef)
+
+return (
+  <article ref={articleRef}>
+    <p>Select any part of this paragraph to reveal the floating toolbar.</p>
+    {text && rect && (
+      <div
+        style={{
+          position: "fixed",
+          top: rect.top - 40,
+          left: rect.left,
+        }}
+      >
+        <button onClick={() => navigator.clipboard.writeText(text)}>
+          Copy "{text.slice(0, 20)}"
+        </button>
+      </div>
+    )}
+  </article>
+)
+```
+
+### Inspecting Selection Ranges
+
+Access `ranges` and `selection` when you need to inspect or manipulate the underlying DOM `Range` objects.
+
+```tsx
+const { text, ranges } = useTextSelection()
+
+return (
+  <p>
+    Selected characters: {text.length} ({ranges.length} range(s))
+  </p>
+)
 ```
 
 ## API Reference
 
-### `TextSelectionState`
+### TextSelectionState
+
+Selected text, ranges, and bounding rectangle returned by the hook.
 
 <AutoTypeTable path="./hooks/useTextSelection.ts" name="TextSelectionState" />

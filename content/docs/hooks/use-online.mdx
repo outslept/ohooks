@@ -1,9 +1,11 @@
 ---
 title: useOnline
-description: "Tracks whether the browser is currently connected to the network (`navigator.onLine`) using `useSyncExternalStore`."
+description: Tracks whether the browser is currently connected to the network (navigator.onLine) using useSyncExternalStore.
 ---
 
 {/* Preview */}
+
+The `useOnline` hook subscribes to window `online` and `offline` events via `useSyncExternalStore` and returns a boolean reflecting `navigator.onLine` (defaulting to `true` during SSR).
 
 ## Installation
 
@@ -12,5 +14,43 @@ description: "Tracks whether the browser is currently connected to the network (
 ## Usage
 
 ```tsx
-const isOnline = useOnline();
+import { useOnline } from "@/hooks/useOnline"
+```
+
+```tsx
+const isOnline = useOnline()
+```
+
+## Examples
+
+### Offline Banner Notification
+
+Display a status banner whenever the user loses network connectivity.
+
+```tsx
+const isOnline = useOnline()
+
+if (!isOnline) {
+  return (
+    <div role="status">
+      You are offline. Changes will be saved locally until you reconnect.
+    </div>
+  )
+}
+
+return null
+```
+
+### Disabling Network Actions While Offline
+
+Prevent form submission buttons from firing while the browser is disconnected.
+
+```tsx
+const isOnline = useOnline()
+
+return (
+  <button type="submit" disabled={!isOnline}>
+    {isOnline ? "Publish post" : "Waiting for connection..."}
+  </button>
+)
 ```

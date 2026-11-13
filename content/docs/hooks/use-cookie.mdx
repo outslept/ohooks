@@ -1,9 +1,11 @@
 ---
 title: useCookie
-description: "Reads, writes, and deletes a browser cookie reactively using `useSyncExternalStore`."
+description: Reads, writes, and deletes a browser cookie reactively using useSyncExternalStore.
 ---
 
 {/* Preview */}
+
+The `useCookie` hook reads, updates, and removes a browser cookie reactively across all components and tabs using `useSyncExternalStore` and the Cookie Store API when available.
 
 ## Installation
 
@@ -12,18 +14,76 @@ description: "Reads, writes, and deletes a browser cookie reactively using `useS
 ## Usage
 
 ```tsx
-const [token, setToken, deleteToken] = useCookie('auth_token', {
-  path: '/',
-  sameSite: 'lax',
-});
+import { useCookie } from "@/hooks/useCookie"
+```
+
+```tsx
+const [token, setToken, deleteToken] = useCookie("auth_token", {
+  path: "/",
+  sameSite: "lax",
+})
+```
+
+## Examples
+
+### Persisting a Theme Preference
+
+Provide a `defaultValue` so the hook returns a fallback when the cookie has not been set yet or during server rendering.
+
+```tsx
+const [theme, setTheme, resetTheme] = useCookie("theme", {
+  defaultValue: "system",
+  path: "/",
+  maxAge: 60 * 60 * 24 * 365,
+})
+
+return (
+  <div>
+    <p>Current theme: {theme}</p>
+    <button onClick={() => setTheme("dark")}>Dark</button>
+    <button onClick={() => setTheme("light")}>Light</button>
+    <button onClick={() => resetTheme()}>Reset</button>
+  </div>
+)
+```
+
+### Overriding Attributes Per Write
+
+Pass cookie attributes as the second argument to `setCookie` to override the default attributes for a specific update.
+
+```tsx
+const [session, setSession, clearSession] = useCookie("session_id", {
+  path: "/",
+  sameSite: "strict",
+  secure: true,
+})
+
+return (
+  <div>
+    <button
+      onClick={() =>
+        setSession("abc-123", {
+          maxAge: 3600,
+        })
+      }
+    >
+      Start 1-hour session
+    </button>
+    <button onClick={() => clearSession()}>End session</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `CookieAttributes`
+### CookieAttributes
+
+Attributes used when writing or deleting the cookie (`path`, `domain`, `maxAge`, `expires`, `secure`, and `sameSite`).
 
 <AutoTypeTable path="./hooks/useCookie.ts" name="CookieAttributes" />
 
-### `UseCookieOptions`
+### UseCookieOptions
+
+Configuration options for the cookie hook, extending `CookieAttributes` with a fallback `defaultValue`.
 
 <AutoTypeTable path="./hooks/useCookie.ts" name="UseCookieOptions" />

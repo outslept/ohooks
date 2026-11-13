@@ -1,9 +1,11 @@
 ---
 title: useHydrated
-description: "Returns `false` during server-side rendering and initial hydration, and `true` once hydrated on the client."
+description: Returns false during server-side rendering and initial hydration, and true once hydrated on the client.
 ---
 
 {/* Preview */}
+
+The `useHydrated` hook uses `useSyncExternalStore` to return `false` during server rendering and the initial hydration pass, and `true` once the component is hydrated in the browser—avoiding hydration mismatches without triggering cascading `useEffect` state updates.
 
 ## Installation
 
@@ -12,6 +14,40 @@ description: "Returns `false` during server-side rendering and initial hydration
 ## Usage
 
 ```tsx
-const isHydrated = useHydrated();
-if (!isHydrated) return <Skeleton />;
+import { useHydrated } from "@/hooks/useHydrated"
+```
+
+```tsx
+const isHydrated = useHydrated()
+if (!isHydrated) return <Skeleton />
+```
+
+## Examples
+
+### Rendering Client-Only Browser Values Safely
+
+Wait until `isHydrated` is `true` before rendering values that depend on `window`, `localStorage`, or the user's local timezone.
+
+```tsx
+const isHydrated = useHydrated()
+
+return (
+  <time>
+    {isHydrated ? new Date().toLocaleTimeString() : "Loading time..."}
+  </time>
+)
+```
+
+### Guarding Third-Party Client Widgets
+
+Defer mounting browser-only widgets (such as maps or charts) until hydration completes.
+
+```tsx
+const isHydrated = useHydrated()
+
+if (!isHydrated) {
+  return <div style={{ height: 300 }}>Loading chart...</div>
+}
+
+return <ClientOnlyChart />
 ```

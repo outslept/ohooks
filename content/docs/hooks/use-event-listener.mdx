@@ -1,9 +1,11 @@
 ---
 title: useEventListener
-description: "Attaches a type-safe event listener to `Window`, `Document`, `HTMLElement`, `SVGElement`, `MediaQueryList`, or custom `EventTarget` with automatic cleanup."
+description: Attaches a type-safe event listener to Window, Document, HTMLElement, SVGElement, MediaQueryList, or custom EventTarget with automatic cleanup.
 ---
 
 {/* Preview */}
+
+The `useEventListener` hook attaches a strongly typed event listener to `window` (by default), `document`, a DOM element ref, a `MediaQueryList`, or any `EventTarget`, and cleans it up automatically on unmount.
 
 ## Installation
 
@@ -12,7 +14,46 @@ description: "Attaches a type-safe event listener to `Window`, `Document`, `HTML
 ## Usage
 
 ```tsx
-useEventListener('keydown', (event) => {
-  if (event.key === 'Escape') close();
-});
+import { useEventListener } from "@/hooks/useEventListener"
+```
+
+```tsx
+useEventListener("keydown", (event) => {
+  if (event.key === "Escape") close()
+})
+```
+
+## Examples
+
+### Listening to a Specific DOM Element
+
+Pass a `RefObject` as the third argument to scope the event listener to that element with full event type inference.
+
+```tsx
+const buttonRef = useRef<HTMLButtonElement>(null)
+
+useEventListener(
+  "click",
+  (event) => {
+    console.log("Clicked at:", event.clientX, event.clientY)
+  },
+  buttonRef
+)
+
+return <button ref={buttonRef}>Click me</button>
+```
+
+### Passive Scroll Listener with Options
+
+Pass standard `AddEventListenerOptions` (`passive`, `capture`, `once`, or `signal`) as the fourth argument.
+
+```tsx
+useEventListener(
+  "scroll",
+  () => {
+    updateScrollProgress(window.scrollY)
+  },
+  undefined,
+  { passive: true }
+)
 ```

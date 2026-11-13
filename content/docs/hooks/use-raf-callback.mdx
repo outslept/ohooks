@@ -1,9 +1,11 @@
 ---
 title: useRafCallback
-description: "Throttles a callback so it executes at most once per `requestAnimationFrame` with the latest arguments."
+description: Throttles a callback so it executes at most once per requestAnimationFrame with the latest arguments.
 ---
 
 {/* Preview */}
+
+The `useRafCallback` hook wraps a function so repeated calls within the same frame coalesce into a single `requestAnimationFrame` callback invoked with the most recent arguments, and automatically cancels any pending frame on unmount.
 
 ## Installation
 
@@ -12,13 +14,59 @@ description: "Throttles a callback so it executes at most once per `requestAnima
 ## Usage
 
 ```tsx
+import { useRafCallback } from "@/hooks/useRafCallback"
+```
+
+```tsx
 const onPointerMove = useRafCallback((x: number, y: number) => {
-  updatePosition(x, y);
-});
+  updatePosition(x, y)
+})
+```
+
+## Examples
+
+### High-Frequency Pointer Tracking
+
+Throttle `onPointerMove` updates to the display refresh rate so DOM updates stay synchronized with browser repaints.
+
+```tsx
+const [coords, setCoords] = useState({ x: 0, y: 0 })
+
+const handlePointerMove = useRafCallback((x: number, y: number) => {
+  setCoords({ x, y })
+})
+
+return (
+  <div
+    onPointerMove={(e) => handlePointerMove(e.clientX, e.clientY)}
+    style={{ height: 200 }}
+  >
+    Cursor: {Math.round(coords.x)}, {Math.round(coords.y)}
+  </div>
+)
+```
+
+### Cancelling a Pending Frame
+
+Call `.cancel()` to abort a scheduled animation frame or `.isPending()` to check whether a frame is currently queued.
+
+```tsx
+const scheduleSync = useRafCallback(() => {
+  syncCanvas()
+})
+
+return (
+  <div>
+    <button onClick={() => scheduleSync()}>Schedule sync</button>
+    <button onClick={() => scheduleSync.cancel()}>Cancel pending frame</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `RafScheduledFunction`
+### RafScheduledFunction
+
+Frame-throttled function returned by the hook, including `.cancel()` and `.isPending()` methods.
 
 <AutoTypeTable path="./hooks/useRafCallback.ts" name="RafScheduledFunction" />

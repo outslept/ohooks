@@ -1,9 +1,11 @@
 ---
 title: useRovingTabIndex
-description: "Implements the WAI-ARIA roving `tabIndex` keyboard navigation pattern for composite widgets."
+description: Implements the WAI-ARIA roving tabIndex keyboard navigation pattern for composite widgets.
 ---
 
 {/* Preview */}
+
+The `useRovingTabIndex` hook implements the WAI-ARIA roving `tabIndex` pattern for toolbars, tablists, menus, and radio groups, managing arrow-key navigation, `Home`/`End` shortcuts, looping, disabled item skipping, and DOM focus synchronization.
 
 ## Installation
 
@@ -12,30 +14,114 @@ description: "Implements the WAI-ARIA roving `tabIndex` keyboard navigation patt
 ## Usage
 
 ```tsx
-const { getItemProps } = useRovingTabIndex({ orientation: 'horizontal' });
+import { useRovingTabIndex } from "@/hooks/useRovingTabIndex"
+```
+
+```tsx
+const { getItemProps } = useRovingTabIndex({ orientation: "horizontal" })
+
 return (
   <div role="toolbar">
     {items.map((item, i) => (
-      <button key={item.id} {...getItemProps(i)}>{item.label}</button>
+      <button key={item.id} {...getItemProps(i)}>
+        {item.label}
+      </button>
     ))}
   </div>
-);
+)
+```
+
+## Examples
+
+### Horizontal Toolbar with Disabled Items
+
+Pass `{ disabled: true }` to `getItemProps` so arrow keys automatically skip disabled buttons while navigating.
+
+```tsx
+const { activeIndex, getItemProps } = useRovingTabIndex({
+  orientation: "horizontal",
+  loop: true,
+})
+
+const actions = [
+  { label: "Cut", disabled: false },
+  { label: "Copy", disabled: false },
+  { label: "Paste", disabled: true },
+  { label: "Delete", disabled: false },
+]
+
+return (
+  <div role="toolbar" aria-label="Text actions">
+    {actions.map((action, index) => (
+      <button
+        key={action.label}
+        disabled={action.disabled}
+        {...getItemProps(index, { disabled: action.disabled })}
+      >
+        {action.label} {activeIndex === index ? "(Focused)" : ""}
+      </button>
+    ))}
+  </div>
+)
+```
+
+### Vertical Menu List
+
+Set `orientation: "vertical"` to navigate items using `ArrowUp` and `ArrowDown`.
+
+```tsx
+const { getItemProps, focusItem } = useRovingTabIndex({
+  orientation: "vertical",
+  defaultIndex: 0,
+})
+
+return (
+  <div>
+    <button onClick={() => focusItem(2)}>Jump to item 3</button>
+    <ul role="menu">
+      {["Profile", "Billing", "Team", "Log out"].map((label, index) => (
+        <li key={label} role="none">
+          <button role="menuitem" {...getItemProps(index)}>
+            {label}
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseRovingTabIndexOptions`
+### UseRovingTabIndexOptions
 
-<AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="UseRovingTabIndexOptions" />
+Configuration options for orientation, looping, and controlled/uncontrolled active index.
 
-### `RovingItemOptions`
+<AutoTypeTable
+  path="./hooks/useRovingTabIndex.ts"
+  name="UseRovingTabIndexOptions"
+/>
+
+### RovingItemOptions
+
+Per-item options passed to `getItemProps(index, options)`.
 
 <AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="RovingItemOptions" />
 
-### `RovingTabIndexItemProps`
+### RovingTabIndexItemProps
 
-<AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="RovingTabIndexItemProps" />
+Props returned by `getItemProps` to spread onto each focusable item element.
 
-### `UseRovingTabIndexReturn`
+<AutoTypeTable
+  path="./hooks/useRovingTabIndex.ts"
+  name="RovingTabIndexItemProps"
+/>
 
-<AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="UseRovingTabIndexReturn" />
+### UseRovingTabIndexReturn
+
+Active index state and helper methods returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useRovingTabIndex.ts"
+  name="UseRovingTabIndexReturn"
+/>

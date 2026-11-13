@@ -1,9 +1,11 @@
 ---
 title: useAsyncTask
-description: "Manages the manual execution, cancellation, and state of an asynchronous task with `AbortSignal` support."
+description: Manages the manual execution, cancellation, and state of an asynchronous task with AbortSignal support.
 ---
 
 {/* Preview */}
+
+The `useAsyncTask` hook runs an asynchronous task on demand, tracks its pending state and result, and passes an `AbortSignal` to the task so in-flight work can be cancelled.
 
 ## Installation
 
@@ -12,24 +14,70 @@ description: "Manages the manual execution, cancellation, and state of an asynch
 ## Usage
 
 ```tsx
+import { useAsyncTask } from "@/hooks/useAsyncTask"
+```
+
+```tsx
 const { run, abort, isPending, data } = useAsyncTask(
   async ({ signal }, id: string) => {
-    const res = await fetch(`/api/users/${id}`, { signal });
-    return res.json();
-  },
-);
+    const res = await fetch(`/api/users/${id}`, { signal })
+    return res.json()
+  }
+)
+```
+
+## Examples
+
+### Passing Arguments
+
+Arguments passed to `run` are forwarded to the task after the context object.
+
+```tsx
+const { run, isPending } = useAsyncTask(
+  async ({ signal }, query: string, page: number) => {
+    const res = await fetch(`/api/search?q=${query}&page=${page}`, { signal })
+    return res.json()
+  }
+)
+
+<button onClick={() => run("react", 1)} disabled={isPending}>
+  Search
+</button>
+```
+
+### Cancellation
+
+Call `abort` to cancel the in-flight task. The `signal` passed to the task is aborted, so `fetch` and other signal-aware APIs stop immediately.
+
+```tsx
+const { run, abort, isPending } = useAsyncTask(async ({ signal }) => {
+  const res = await fetch("/api/report", { signal })
+  return res.blob()
+})
+
+return isPending ? (
+  <button onClick={abort}>Cancel</button>
+) : (
+  <button onClick={() => run()}>Generate report</button>
+)
 ```
 
 ## API Reference
 
-### `AsyncTaskContext`
+### AsyncTaskContext
+
+Context object passed as the first argument to the task.
 
 <AutoTypeTable path="./hooks/useAsyncTask.ts" name="AsyncTaskContext" />
 
-### `UseAsyncTaskOptions`
+### UseAsyncTaskOptions
+
+Configuration options for the task.
 
 <AutoTypeTable path="./hooks/useAsyncTask.ts" name="UseAsyncTaskOptions" />
 
-### `UseAsyncTaskReturn`
+### UseAsyncTaskReturn
+
+Task state and controls returned by the hook.
 
 <AutoTypeTable path="./hooks/useAsyncTask.ts" name="UseAsyncTaskReturn" />

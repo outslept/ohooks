@@ -1,9 +1,11 @@
 ---
 title: useDropZone
-description: "Handles file drag-and-drop interactions with MIME/extension filtering via a target ref or `getRootProps`."
+description: Handles file drag-and-drop interactions with MIME/extension filtering via a target ref or getRootProps.
 ---
 
 {/* Preview */}
+
+The `useDropZone` hook manages drag-and-drop file uploads, tracks nested drag-enter depth so `isOver` does not flicker over child elements, and filters dropped files by MIME type or file extension.
 
 ## Installation
 
@@ -12,22 +14,82 @@ description: "Handles file drag-and-drop interactions with MIME/extension filter
 ## Usage
 
 ```tsx
+import { useDropZone } from "@/hooks/useDropZone"
+```
+
+```tsx
 const { isOver, files, getRootProps } = useDropZone({
-  accept: 'image/*',
+  accept: "image/*",
   onDrop: (accepted) => console.log(accepted),
-});
+})
+```
+
+## Examples
+
+### Drop Zone with `getRootProps`
+
+Spread `getRootProps()` onto your container element when you do not already have a separate `RefObject`.
+
+```tsx
+const { isOver, files, getRootProps } = useDropZone({
+  accept: ["image/*", ".pdf"],
+  multiple: true,
+  onDrop: (accepted, rejected) => {
+    console.log("Accepted:", accepted, "Rejected:", rejected)
+  },
+})
+
+return (
+  <div
+    {...getRootProps()}
+    style={{
+      border: isOver ? "2px solid blue" : "2px dashed gray",
+      padding: 24,
+    }}
+  >
+    <p>{isOver ? "Release to drop files" : "Drag images or PDFs here"}</p>
+    {files && <p>{files.length} file(s) selected</p>}
+  </div>
+)
+```
+
+### Attaching to an Existing `RefObject`
+
+Pass `target` in the options object to attach drag listeners directly to an existing element ref.
+
+```tsx
+const dropRef = useRef<HTMLDivElement>(null)
+
+const { isOver, clearFiles } = useDropZone({
+  target: dropRef,
+  accept: ".csv",
+  multiple: false,
+})
+
+return (
+  <div ref={dropRef}>
+    <p>{isOver ? "Drop CSV file" : "Drop a single CSV file here"}</p>
+    <button onClick={clearFiles}>Reset</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseDropZoneOptions`
+### UseDropZoneOptions
+
+Configuration options and event callbacks for the drop zone.
 
 <AutoTypeTable path="./hooks/useDropZone.ts" name="UseDropZoneOptions" />
 
-### `DropZoneRootProps`
+### DropZoneRootProps
+
+Drag event handlers returned by `getRootProps()`.
 
 <AutoTypeTable path="./hooks/useDropZone.ts" name="DropZoneRootProps" />
 
-### `UseDropZoneReturn`
+### UseDropZoneReturn
+
+State and helper functions returned by the hook.
 
 <AutoTypeTable path="./hooks/useDropZone.ts" name="UseDropZoneReturn" />

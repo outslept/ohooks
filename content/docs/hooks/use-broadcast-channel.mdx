@@ -1,9 +1,11 @@
 ---
 title: useBroadcastChannel
-description: "Communicates between browser tabs, windows, or iframes of the same origin using the `BroadcastChannel` API."
+description: Communicates between browser tabs, windows, or iframes of the same origin using the BroadcastChannel API.
 ---
 
 {/* Preview */}
+
+The `useBroadcastChannel` hook connects to a named `BroadcastChannel` so tabs, windows, and iframes sharing the same origin can broadcast and receive typed messages in real time.
 
 ## Installation
 
@@ -12,15 +14,74 @@ description: "Communicates between browser tabs, windows, or iframes of the same
 ## Usage
 
 ```tsx
-const { lastMessage, postMessage } = useBroadcastChannel<string>('auth-channel');
+import { useBroadcastChannel } from "@/hooks/useBroadcastChannel"
+```
+
+```tsx
+const { lastMessage, postMessage } = useBroadcastChannel<string>("auth-channel")
+```
+
+## Examples
+
+### Syncing Auth State Across Tabs
+
+Use the `onMessage` callback to react immediately when another tab broadcasts an event such as signing out.
+
+```tsx
+type AuthMessage = { type: "LOGOUT" } | { type: "LOGIN"; userId: string }
+
+const { postMessage } = useBroadcastChannel<AuthMessage>("auth-channel", {
+  onMessage: (event) => {
+    if (event.data.type === "LOGOUT") {
+      window.location.href = "/login"
+    }
+  },
+})
+
+return (
+  <button onClick={() => postMessage({ type: "LOGOUT" })}>
+    Sign out everywhere
+  </button>
+)
+```
+
+### Closing the Channel
+
+Call `close` to disconnect the tab from the channel when it no longer needs to receive updates.
+
+```tsx
+const { lastMessage, postMessage, close, isClosed } =
+  useBroadcastChannel<string>("notifications")
+
+return (
+  <div>
+    <p>Latest: {lastMessage ?? "None"}</p>
+    <button onClick={() => postMessage("Ping")} disabled={isClosed}>
+      Send ping
+    </button>
+    <button onClick={close} disabled={isClosed}>
+      Disconnect
+    </button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseBroadcastChannelOptions`
+### UseBroadcastChannelOptions
 
-<AutoTypeTable path="./hooks/useBroadcastChannel.ts" name="UseBroadcastChannelOptions" />
+Callback options for handling incoming messages and deserialization errors.
 
-### `UseBroadcastChannelReturn`
+<AutoTypeTable
+  path="./hooks/useBroadcastChannel.ts"
+  name="UseBroadcastChannelOptions"
+/>
 
-<AutoTypeTable path="./hooks/useBroadcastChannel.ts" name="UseBroadcastChannelReturn" />
+### UseBroadcastChannelReturn
+
+State and methods returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useBroadcastChannel.ts"
+  name="UseBroadcastChannelReturn"
+/>

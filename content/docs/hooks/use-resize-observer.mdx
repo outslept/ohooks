@@ -1,9 +1,11 @@
 ---
 title: useResizeObserver
-description: "Observes size changes on a target DOM element using the `ResizeObserver` API."
+description: Observes size changes on a target DOM element using the ResizeObserver API.
 ---
 
 {/* Preview */}
+
+The `useResizeObserver` hook observes a target DOM element via `ResizeObserver`, returns the latest `ResizeObserverEntry` (or invokes a custom `onResize` callback without triggering state updates), and cleans up automatically on unmount.
 
 ## Installation
 
@@ -12,14 +14,61 @@ description: "Observes size changes on a target DOM element using the `ResizeObs
 ## Usage
 
 ```tsx
-const boxRef = useRef<HTMLDivElement>(null);
+import { useResizeObserver } from "@/hooks/useResizeObserver"
+```
+
+```tsx
+const boxRef = useRef<HTMLDivElement>(null)
 useResizeObserver(boxRef, (entry) => {
-  console.log(entry.contentRect.width);
-});
+  console.log(entry.contentRect.width)
+})
+```
+
+## Examples
+
+### Reading the Returned `ResizeObserverEntry`
+
+Omit the callback argument (or pass an options object as the second argument) to read the reactive `ResizeObserverEntry` directly from the return value.
+
+```tsx
+const panelRef = useRef<HTMLDivElement>(null)
+const entry = useResizeObserver(panelRef, { box: "content-box" })
+
+const width = entry?.contentRect.width ?? 0
+const height = entry?.contentRect.height ?? 0
+
+return (
+  <div ref={panelRef}>
+    Size: {Math.round(width)}px × {Math.round(height)}px
+  </div>
+)
+```
+
+### Callback-Only Mode for Imperative Updates
+
+Pass a callback function as the second argument to handle resize events imperatively (such as resizing a chart or canvas) without re-rendering the component on every pixel change.
+
+```tsx
+const canvasContainerRef = useRef<HTMLDivElement>(null)
+
+useResizeObserver(
+  canvasContainerRef,
+  (entry) => {
+    resizeChartInstance(entry.contentRect.width, entry.contentRect.height)
+  },
+  { box: "border-box" }
+)
+
+return <div ref={canvasContainerRef} />
 ```
 
 ## API Reference
 
-### `UseResizeObserverOptions`
+### UseResizeObserverOptions
 
-<AutoTypeTable path="./hooks/useResizeObserver.ts" name="UseResizeObserverOptions" />
+Configuration options for observed box model and observer activation.
+
+<AutoTypeTable
+  path="./hooks/useResizeObserver.ts"
+  name="UseResizeObserverOptions"
+/>

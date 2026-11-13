@@ -1,9 +1,11 @@
 ---
 title: useWindowScroll
-description: "Tracks the window scroll position (`x`, `y`) and provides a `scrollTo` helper."
+description: Tracks the window scroll position (x, y) and provides a scrollTo helper.
 ---
 
 {/* Preview */}
+
+The `useWindowScroll` hook tracks `window.scrollX` and `window.scrollY` with passive event listeners (optional `throttleMs`), and provides a programmatic `scrollTo` helper.
 
 ## Installation
 
@@ -12,19 +14,70 @@ description: "Tracks the window scroll position (`x`, `y`) and provides a `scrol
 ## Usage
 
 ```tsx
-const { y, scrollTo } = useWindowScroll({ throttleMs: 50 });
+import { useWindowScroll } from "@/hooks/useWindowScroll"
+```
+
+```tsx
+const { y, scrollTo } = useWindowScroll({ throttleMs: 50 })
+```
+
+## Examples
+
+### Floating "Back to Top" Button
+
+Show a button once the user scrolls past `300px` vertically and smoothly scroll back to the top on click.
+
+```tsx
+const { y, scrollTo } = useWindowScroll()
+
+return (
+  <div>
+    <p>Scrolled: {Math.round(y)}px</p>
+    {y > 300 && (
+      <button onClick={() => scrollTo({ top: 0, behavior: "smooth" })}>
+        Back to top
+      </button>
+    )}
+  </div>
+)
+```
+
+### Throttling Scroll Updates
+
+Set `throttleMs` to reduce the frequency of state updates during fast scrolling.
+
+```tsx
+const { x, y } = useWindowScroll({
+  throttleMs: 100,
+  initialPosition: { x: 0, y: 0 },
+})
 ```
 
 ## API Reference
 
-### `WindowScrollPosition`
+### UseWindowScrollOptions
 
-<AutoTypeTable path="./hooks/useWindowScroll.ts" name="WindowScrollPosition" />
+Configuration options for scroll throttling and SSR fallback coordinates.
 
-### `UseWindowScrollOptions`
+<AutoTypeTable
+  path="./hooks/useWindowScroll.ts"
+  name="UseWindowScrollOptions"
+/>
 
-<AutoTypeTable path="./hooks/useWindowScroll.ts" name="UseWindowScrollOptions" />
+### WindowScrollPosition
 
-### `UseWindowScrollReturn`
+Horizontal (`x`) and vertical (`y`) scroll coordinates.
 
-<AutoTypeTable path="./hooks/useWindowScroll.ts" name="UseWindowScrollReturn" />
+<AutoTypeTable
+  path="./hooks/useWindowScroll.ts"
+  name="WindowScrollPosition"
+/>
+
+### UseWindowScrollReturn
+
+Scroll coordinates and `scrollTo` helper returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useWindowScroll.ts"
+  name="UseWindowScrollReturn"
+/>

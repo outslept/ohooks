@@ -1,9 +1,11 @@
 ---
 title: useLatest
-description: "Returns a ref object whose `.current` property is synchronously updated to the latest value after every render."
+description: Returns a ref object whose .current property is synchronously updated to the latest value after every render.
 ---
 
 {/* Preview */}
+
+The `useLatest` hook stores any value in a `RefObject` and keeps `.current` synchronized via `useIsomorphicLayoutEffect` so asynchronous callbacks, timers, and subscriptions can read the freshest value without stale closures.
 
 ## Installation
 
@@ -12,5 +14,45 @@ description: "Returns a ref object whose `.current` property is synchronously up
 ## Usage
 
 ```tsx
-const latestCallbackRef = useLatest(onEvent);
+import { useLatest } from "@/hooks/useLatest"
+```
+
+```tsx
+const latestCallbackRef = useLatest(onEvent)
+```
+
+## Examples
+
+### Reading Fresh State Inside a Long-Lived Timer
+
+Read `countRef.current` inside an interval or timeout so you do not need to recreate the timer every time `count` changes.
+
+```tsx
+const [count, setCount] = useState(0)
+const countRef = useLatest(count)
+
+useEffect(() => {
+  const id = setInterval(() => {
+    console.log("Latest count:", countRef.current)
+  }, 2000)
+  return () => clearInterval(id)
+}, [countRef])
+
+return (
+  <button onClick={() => setCount((c) => c + 1)}>Increment ({count})</button>
+)
+```
+
+### Wrapping Event Handlers for External Subscriptions
+
+Store a prop callback in `useLatest` so an external library or WebSocket listener only subscribes once.
+
+```tsx
+const onMessageRef = useLatest(onMessage)
+
+useEffect(() => {
+  const handler = (event: MessageEvent) => onMessageRef.current(event.data)
+  window.addEventListener("message", handler)
+  return () => window.removeEventListener("message", handler)
+}, [onMessageRef])
 ```

@@ -1,9 +1,11 @@
 ---
 title: useVisualViewport
-description: "Tracks the browser's `VisualViewport` dimensions, offsets, and pinch-zoom scale (useful for virtual keyboards)."
+description: Tracks the browser's VisualViewport dimensions, offsets, and pinch-zoom scale (useful for virtual keyboards).
 ---
 
 {/* Preview */}
+
+The `useVisualViewport` hook subscribes to `window.visualViewport` resize and scroll events via `useSyncExternalStore`, tracking the visible viewport's `width`, `height`, `offsetLeft`, `offsetTop`, `pageLeft`, `pageTop`, and pinch-zoom `scale`.
 
 ## Installation
 
@@ -12,11 +14,59 @@ description: "Tracks the browser's `VisualViewport` dimensions, offsets, and pin
 ## Usage
 
 ```tsx
-const { width, height, scale } = useVisualViewport();
+import { useVisualViewport } from "@/hooks/useVisualViewport"
+```
+
+```tsx
+const { width, height, scale } = useVisualViewport()
+```
+
+## Examples
+
+### Adjusting Bottom Bar Above Mobile On-Screen Keyboards
+
+Compare `window.innerHeight` with `visualViewport.height` to detect when a mobile virtual keyboard shrinks the visible area.
+
+```tsx
+const { height, offsetTop } = useVisualViewport()
+
+return (
+  <div
+    style={{
+      position: "fixed",
+      left: 0,
+      right: 0,
+      top: offsetTop + height - 56,
+      height: 56,
+    }}
+  >
+    Sticky toolbar above virtual keyboard
+  </div>
+)
+```
+
+### Monitoring Pinch-Zoom Scale
+
+Read `scale` to hide or adjust fixed overlays when the user pinch-zooms the page.
+
+```tsx
+const { width, height, scale } = useVisualViewport()
+
+return (
+  <p>
+    Visual viewport: {Math.round(width)}×{Math.round(height)}px (Zoom:{" "}
+    {scale.toFixed(2)}x)
+  </p>
+)
 ```
 
 ## API Reference
 
-### `VisualViewportState`
+### VisualViewportState
 
-<AutoTypeTable path="./hooks/useVisualViewport.ts" name="VisualViewportState" />
+Visual viewport dimensions, offsets, and zoom scale returned by the hook.
+
+<AutoTypeTable
+  path="./hooks/useVisualViewport.ts"
+  name="VisualViewportState"
+/>

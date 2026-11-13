@@ -1,9 +1,11 @@
 ---
 title: useList
-description: "Manages an array state with immutable helper methods for pushing, inserting, updating, removing, filtering, and sorting items."
+description: Manages an array state with immutable helper methods for pushing, inserting, updating, removing, filtering, and sorting items.
 ---
 
 {/* Preview */}
+
+The `useList` hook manages an array state and returns a tuple of `[list, actions]` with memoized helpers (`push`, `insertAt`, `updateAt`, `removeAt`, `filter`, `sort`, `clear`, and `reset`) that perform immutable updates.
 
 ## Installation
 
@@ -12,11 +14,73 @@ description: "Manages an array state with immutable helper methods for pushing, 
 ## Usage
 
 ```tsx
-const [items, { push, removeAt, clear }] = useList<string>(['a', 'b']);
+import { useList } from "@/hooks/useList"
+```
+
+```tsx
+const [items, { push, removeAt, clear }] = useList<string>(["a", "b"])
+```
+
+## Examples
+
+### Todo List CRUD Operations
+
+Use `push`, `updateAt`, `removeAt`, and `clear` to manipulate list items without writing manual array spread boilerplate.
+
+```tsx
+const [todos, { push, updateAt, removeAt, clear }] = useList([
+  { text: "Write docs", done: false },
+  { text: "Ship release", done: false },
+])
+
+return (
+  <div>
+    <ul>
+      {todos.map((todo, index) => (
+        <li key={index}>
+          <label>
+            <input
+              type="checkbox"
+              checked={todo.done}
+              onChange={() =>
+                updateAt(index, { ...todo, done: !todo.done })
+              }
+            />
+            {todo.text}
+          </label>
+          <button onClick={() => removeAt(index)}>Delete</button>
+        </li>
+      ))}
+    </ul>
+    <button onClick={() => push({ text: "New task", done: false })}>
+      Add task
+    </button>
+    <button onClick={clear}>Clear all</button>
+  </div>
+)
+```
+
+### Sorting, Filtering, and Resetting
+
+Use `filter`, `sort`, and `reset` to transform the list or revert it back to `initialValue`.
+
+```tsx
+const [numbers, { filter, sort, reset }] = useList([5, 2, 8, 1, 9])
+
+return (
+  <div>
+    <p>{numbers.join(", ")}</p>
+    <button onClick={() => sort((a, b) => a - b)}>Sort ascending</button>
+    <button onClick={() => filter((n) => n >= 5)}>Keep ≥ 5</button>
+    <button onClick={reset}>Reset</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseListActions`
+### UseListActions
+
+Memoized array mutation helpers returned as the second tuple element.
 
 <AutoTypeTable path="./hooks/useList.ts" name="UseListActions" />

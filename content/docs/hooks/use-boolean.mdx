@@ -1,9 +1,11 @@
 ---
 title: useBoolean
-description: "Manages a boolean state with helper functions to set, reset, and toggle the value."
+description: Manages a boolean state with helper functions to set, reset, and toggle the value.
 ---
 
 {/* Preview */}
+
+The `useBoolean` hook manages a boolean state and provides memoized helper callbacks (`setTrue`, `setFalse`, `toggle`, and `setValue`) for common state transitions.
 
 ## Installation
 
@@ -12,11 +14,54 @@ description: "Manages a boolean state with helper functions to set, reset, and t
 ## Usage
 
 ```tsx
-const { value, setTrue, setFalse, toggle } = useBoolean(false);
+import { useBoolean } from "@/hooks/useBoolean"
+```
+
+```tsx
+const { value, setTrue, setFalse, toggle } = useBoolean(false)
+```
+
+## Examples
+
+### Controlling a Dialog
+
+Use `setTrue` and `setFalse` directly as event handlers without creating inline arrow functions.
+
+```tsx
+const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false)
+
+return (
+  <>
+    <button onClick={open}>Open dialog</button>
+    {isOpen && (
+      <div role="dialog">
+        <p>Dialog content</p>
+        <button onClick={close}>Close</button>
+      </div>
+    )}
+  </>
+)
+```
+
+### Toggling State
+
+Use `toggle` to flip the current boolean value, or `setValue` when you need to pass an explicit boolean.
+
+```tsx
+const { value: isMuted, toggle, setValue } = useBoolean(false)
+
+return (
+  <div>
+    <button onClick={toggle}>{isMuted ? "Unmute" : "Mute"}</button>
+    <button onClick={() => setValue(false)}>Reset sound</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseBooleanReturn`
+### UseBooleanReturn
+
+State and helper functions returned by the hook.
 
 <AutoTypeTable path="./hooks/useBoolean.ts" name="UseBooleanReturn" />

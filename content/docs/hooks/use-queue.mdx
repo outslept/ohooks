@@ -1,9 +1,11 @@
 ---
 title: useQueue
-description: "Manages a reactive FIFO (first-in, first-out) queue in React state."
+description: Manages a reactive FIFO (first-in, first-out) queue in React state.
 ---
 
 {/* Preview */}
+
+The `useQueue` hook manages a reactive first-in, first-out (FIFO) queue in React state, exposing `enqueue`, `dequeue`, `peek`, `clear`, `reset`, and live `first`, `last`, and `size` properties.
 
 ## Installation
 
@@ -12,11 +14,60 @@ description: "Manages a reactive FIFO (first-in, first-out) queue in React state
 ## Usage
 
 ```tsx
-const { queue, enqueue, dequeue, first } = useQueue<string>(['task-1']);
+import { useQueue } from "@/hooks/useQueue"
+```
+
+```tsx
+const { queue, enqueue, dequeue, first } = useQueue<string>(["task-1"])
+```
+
+## Examples
+
+### Notification Toast Queue
+
+Add incoming messages to the back of the queue with `enqueue` and dismiss the oldest message from the front with `dequeue`.
+
+```tsx
+const { first, size, enqueue, dequeue, clear } = useQueue<string>()
+
+return (
+  <div>
+    <button onClick={() => enqueue(`Notification #${Date.now()}`)}>
+      Queue notification
+    </button>
+    {first && (
+      <div role="status">
+        <p>
+          {first} ({size} in queue)
+        </p>
+        <button onClick={() => dequeue()}>Dismiss</button>
+        <button onClick={clear}>Clear all</button>
+      </div>
+    )}
+  </div>
+)
+```
+
+### Batch Enqueueing Items
+
+Pass multiple items to `enqueue` at once to append a batch to the end of the queue.
+
+```tsx
+const { queue, enqueue, reset } = useQueue<number>([1, 2])
+
+return (
+  <div>
+    <p>Queue: {queue.join(" → ")}</p>
+    <button onClick={() => enqueue(3, 4, 5)}>Enqueue 3, 4, 5</button>
+    <button onClick={reset}>Reset</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseQueueReturn`
+### UseQueueReturn
+
+Queue state, boundary getters, and FIFO mutation helpers returned by the hook.
 
 <AutoTypeTable path="./hooks/useQueue.ts" name="UseQueueReturn" />

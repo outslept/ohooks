@@ -1,9 +1,11 @@
 ---
 title: useWindowSize
-description: "Tracks the browser window's `innerWidth` and `innerHeight` on resize."
+description: Tracks the browser window's innerWidth and innerHeight on resize.
 ---
 
 {/* Preview */}
+
+The `useWindowSize` hook listens to window `resize` and `orientationchange` events (plus optional `visualViewport` resize events) and returns the current `{ width, height }` dimensions.
 
 ## Installation
 
@@ -12,15 +14,52 @@ description: "Tracks the browser window's `innerWidth` and `innerHeight` on resi
 ## Usage
 
 ```tsx
-const { width, height } = useWindowSize({ throttleMs: 100 });
+import { useWindowSize } from "@/hooks/useWindowSize"
+```
+
+```tsx
+const { width, height } = useWindowSize({ throttleMs: 100 })
+```
+
+## Examples
+
+### Responsive Canvas or Chart Sizing
+
+Pass `width` and `height` to components that require explicit pixel dimensions.
+
+```tsx
+const { width, height } = useWindowSize()
+
+return (
+  <div>
+    Viewport: {width}px × {height}px
+  </div>
+)
+```
+
+### Throttled Updates and SSR Initial Dimensions
+
+Configure `throttleMs` to limit re-renders while dragging the window border, and `initialWidth` / `initialHeight` for deterministic SSR rendering.
+
+```tsx
+const { width, height } = useWindowSize({
+  initialWidth: 1280,
+  initialHeight: 720,
+  throttleMs: 150,
+  includeVisualViewport: true,
+})
 ```
 
 ## API Reference
 
-### `WindowSize`
+### UseWindowSizeOptions
 
-<AutoTypeTable path="./hooks/useWindowSize.ts" name="WindowSize" />
-
-### `UseWindowSizeOptions`
+Configuration options for initial SSR dimensions, resize throttling, and `visualViewport` listening.
 
 <AutoTypeTable path="./hooks/useWindowSize.ts" name="UseWindowSizeOptions" />
+
+### WindowSize
+
+Window width and height dimensions returned by the hook.
+
+<AutoTypeTable path="./hooks/useWindowSize.ts" name="WindowSize" />

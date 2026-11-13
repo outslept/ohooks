@@ -1,9 +1,11 @@
 ---
 title: useUpdateEffect
-description: "Runs a `useEffect` callback only on dependency updates, skipping the initial mount."
+description: Runs a useEffect callback only on dependency updates, skipping the initial mount.
 ---
 
 {/* Preview */}
+
+The `useUpdateEffect` hook has the exact same signature as `useEffect`, but skips running the effect on initial mount and executes it only when dependencies change on subsequent renders.
 
 ## Installation
 
@@ -12,7 +14,37 @@ description: "Runs a `useEffect` callback only on dependency updates, skipping t
 ## Usage
 
 ```tsx
+import { useUpdateEffect } from "@/hooks/useUpdateEffect"
+```
+
+```tsx
 useUpdateEffect(() => {
-  saveDraft(content);
-}, [content]);
+  saveDraft(content)
+}, [content])
+```
+
+## Examples
+
+### Auto-Saving Only After User Edits
+
+Skip the initial render so loading pre-populated data does not immediately trigger a network save request.
+
+```tsx
+const [title, setTitle] = useState(initialTitle)
+
+useUpdateEffect(() => {
+  api.updateTitle(title)
+}, [title])
+
+return <input value={title} onChange={(e) => setTitle(e.target.value)} />
+```
+
+### Resetting Pagination When Filters Change
+
+Reset the page number back to `1` whenever `category` changes, without resetting an initial page param on mount.
+
+```tsx
+useUpdateEffect(() => {
+  setPage(1)
+}, [category])
 ```

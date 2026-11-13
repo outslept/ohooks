@@ -1,9 +1,11 @@
 ---
 title: useInert
-description: "Manages the `inert` and `aria-hidden` attributes on a target element (or its document-level siblings) with reference counting."
+description: Manages the inert and aria-hidden attributes on a target element (or its document-level siblings) with reference counting.
 ---
 
 {/* Preview */}
+
+The `useInert` hook applies the native `inert` attribute (and `aria-hidden="true"` when requested) either directly to a target element or to all document-level siblings outside the target, using reference counting so stacked modals and drawers restore the DOM cleanly.
 
 ## Installation
 
@@ -12,11 +14,60 @@ description: "Manages the `inert` and `aria-hidden` attributes on a target eleme
 ## Usage
 
 ```tsx
-useInert(modalRef, isOpen, { trapSiblings: true });
+import { useInert } from "@/hooks/useInert"
+```
+
+```tsx
+useInert(modalRef, isOpen, { trapSiblings: true })
+```
+
+## Examples
+
+### Isolating an Open Modal (`trapSiblings: true`)
+
+Pass `trapSiblings: true` so every sibling outside the modal becomes non-interactive and hidden from assistive technologies while the modal is open.
+
+```tsx
+const [isOpen, setIsOpen] = useState(false)
+const dialogRef = useRef<HTMLDivElement>(null)
+
+useInert(dialogRef, isOpen, { trapSiblings: true })
+
+return (
+  <>
+    <button onClick={() => setIsOpen(true)}>Open dialog</button>
+    {isOpen && (
+      <div ref={dialogRef} role="dialog" aria-modal="true">
+        <p>Background content is inert while this dialog is open.</p>
+        <button onClick={() => setIsOpen(false)}>Close</button>
+      </div>
+    )}
+  </>
+)
+```
+
+### Disabling a Specific Section Directly
+
+With `trapSiblings: false` (the default), `useInert` marks the target element itself as `inert`—useful for disabling a form or panel while saving.
+
+```tsx
+const formRef = useRef<HTMLFormElement>(null)
+const [isSaving, setIsSaving] = useState(false)
+
+useInert(formRef, isSaving)
+
+return (
+  <form ref={formRef}>
+    <input placeholder="Full name" />
+    <button type="submit">Save</button>
+  </form>
+)
 ```
 
 ## API Reference
 
-### `UseInertOptions`
+### UseInertOptions
+
+Configuration options for sibling trapping and `aria-hidden` synchronization.
 
 <AutoTypeTable path="./hooks/useInert.ts" name="UseInertOptions" />

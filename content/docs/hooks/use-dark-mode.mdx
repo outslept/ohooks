@@ -1,9 +1,11 @@
 ---
 title: useDarkMode
-description: "Manages dark mode state with system preference detection, `localStorage` persistence, and automatic DOM class toggling."
+description: Manages dark mode state with system preference detection, localStorage persistence, and automatic DOM class toggling.
 ---
 
 {/* Preview */}
+
+The `useDarkMode` hook resolves dark mode from the user's stored preference (`'light' | 'dark' | 'system'`) and the OS `prefers-color-scheme: dark` media query, persists changes to `localStorage`, and toggles a class on `document.documentElement`.
 
 ## Installation
 
@@ -12,15 +14,67 @@ description: "Manages dark mode state with system preference detection, `localSt
 ## Usage
 
 ```tsx
-const { isDarkMode, preference, toggle, resetToSystem } = useDarkMode();
+import { useDarkMode } from "@/hooks/useDarkMode"
+```
+
+```tsx
+const { isDarkMode, preference, toggle, resetToSystem } = useDarkMode()
+```
+
+## Examples
+
+### Theme Switcher (`Light` / `Dark` / `System`)
+
+Use `enable`, `disable`, and `resetToSystem` (or `setPreference`) to build a three-way theme selector.
+
+```tsx
+const { isDarkMode, preference, setPreference } = useDarkMode()
+
+return (
+  <div>
+    <p>Active theme: {isDarkMode ? "Dark" : "Light"}</p>
+    <select
+      value={preference}
+      onChange={(e) =>
+        setPreference(e.target.value as "light" | "dark" | "system")
+      }
+    >
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </div>
+)
+```
+
+### Custom Storage Key and Class Name
+
+Customize the `localStorage` key, class name, or disable automatic DOM class toggling when integrating with a custom theme provider.
+
+```tsx
+const { isDarkMode, toggle } = useDarkMode({
+  storageKey: "app-color-scheme",
+  classNameDark: "theme-dark",
+  defaultValue: "dark",
+})
+
+return (
+  <button onClick={toggle}>
+    Switch to {isDarkMode ? "light" : "dark"} mode
+  </button>
+)
 ```
 
 ## API Reference
 
-### `UseDarkModeOptions`
+### UseDarkModeOptions
+
+Configuration options for storage persistence and DOM class syncing.
 
 <AutoTypeTable path="./hooks/useDarkMode.ts" name="UseDarkModeOptions" />
 
-### `UseDarkModeReturn`
+### UseDarkModeReturn
+
+Resolved dark mode state and helper functions returned by the hook.
 
 <AutoTypeTable path="./hooks/useDarkMode.ts" name="UseDarkModeReturn" />

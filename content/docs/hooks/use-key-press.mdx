@@ -1,9 +1,11 @@
 ---
 title: useKeyPress
-description: "Tracks whether a specific key, hotkey combination, or custom key predicate is currently held down."
+description: Tracks whether a specific key, hotkey combination, or custom key predicate is currently held down.
 ---
 
 {/* Preview */}
+
+The `useKeyPress` hook listens for `keydown` and `keyup` events (and resets automatically on window `blur`) to return `true` while a matching key, shortcut combo, or predicate is actively pressed.
 
 ## Installation
 
@@ -12,11 +14,48 @@ description: "Tracks whether a specific key, hotkey combination, or custom key p
 ## Usage
 
 ```tsx
-const isShiftPressed = useKeyPress('shift');
+import { useKeyPress } from "@/hooks/useKeyPress"
+```
+
+```tsx
+const isShiftPressed = useKeyPress("shift")
+```
+
+## Examples
+
+### Multi-Key Combinations and Aliases
+
+Pass a key chord (such as `'mod+k'` or `'shift+enter'`) or an array of keys (`['ArrowUp', 'w']`) to track whether any matching key is held down.
+
+```tsx
+const isMovingUp = useKeyPress(["ArrowUp", "w"])
+const isSprintHeld = useKeyPress("shift")
+
+return (
+  <p>
+    Moving up: {isMovingUp ? "Yes" : "No"} | Sprinting:{" "}
+    {isSprintHeld ? "Yes" : "No"}
+  </p>
+)
+```
+
+### Custom Key Predicate Function
+
+Pass a predicate function `(event: KeyboardEvent) => boolean` for custom key matching logic, such as detecting any numeric digit key.
+
+```tsx
+const isDigitPressed = useKeyPress(
+  (event) => /^[0-9]$/.test(event.key),
+  { preventDefault: true }
+)
+
+return <p>Digit key held: {isDigitPressed ? "Yes" : "No"}</p>
 ```
 
 ## API Reference
 
-### `UseKeyPressOptions`
+### UseKeyPressOptions
+
+Configuration options for target element, form tag filtering, and default behavior.
 
 <AutoTypeTable path="./hooks/useKeyPress.ts" name="UseKeyPressOptions" />

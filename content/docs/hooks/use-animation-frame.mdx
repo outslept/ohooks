@@ -1,9 +1,11 @@
 ---
 title: useAnimationFrame
-description: "Runs a callback on every `requestAnimationFrame` tick with delta time tracking, FPS limiting, and playback controls."
+description: Runs a callback on every requestAnimationFrame tick with delta time tracking, FPS limiting, and playback controls.
 ---
 
 {/* Preview */}
+
+The `useAnimationFrame` hook runs a callback on every `requestAnimationFrame` tick, providing frame timing metadata (`timestamp`, `deltaTime`, `elapsedTime`), optional FPS throttling, and imperative playback controls.
 
 ## Installation
 
@@ -12,21 +14,69 @@ description: "Runs a callback on every `requestAnimationFrame` tick with delta t
 ## Usage
 
 ```tsx
-const { isActive, toggle } = useAnimationFrame(({ deltaTime }) => {
-  updatePosition(deltaTime);
-}, { fpsLimit: 60 });
+import { useAnimationFrame } from "@/hooks/useAnimationFrame"
+```
+
+```tsx
+const { isActive, start, stop, toggle } = useAnimationFrame(
+  ({ deltaTime, elapsedTime }) => {
+    updatePosition(deltaTime)
+  }
+)
+```
+
+## Features
+
+- Automatic `requestAnimationFrame` loop cleanup on unmount
+- Frame timing metadata (`timestamp`, `deltaTime`, and total `elapsedTime`)
+- Optional `fpsLimit` to throttle execution without drift
+- Imperative `start`, `stop`, and `toggle` controls with reactive `isActive` state
+- Always invokes the latest callback without restarting the animation loop
+
+## Examples
+
+### FPS Limiting
+
+Use `fpsLimit` to cap how often the callback runs per second while keeping smooth frame pacing.
+
+```tsx
+useAnimationFrame(
+  ({ deltaTime }) => {
+    renderCanvas(deltaTime)
+  },
+  { fpsLimit: 30 }
+)
+```
+
+### Manual Start
+
+Set `immediate: false` to keep the loop paused on mount and start it on user interaction.
+
+```tsx
+const { isActive, toggle } = useAnimationFrame(
+  ({ elapsedTime }) => {
+    setProgress(elapsedTime)
+  },
+  { immediate: false }
+)
 ```
 
 ## API Reference
 
-### `AnimationFrameInfo`
+### AnimationFrameInfo
+
+Timing metadata passed to the callback on each animation frame.
 
 <AutoTypeTable path="./hooks/useAnimationFrame.ts" name="AnimationFrameInfo" />
 
-### `UseAnimationFrameOptions`
+### UseAnimationFrameOptions
+
+Configuration options for the animation loop.
 
 <AutoTypeTable path="./hooks/useAnimationFrame.ts" name="UseAnimationFrameOptions" />
 
-### `UseAnimationFrameControls`
+### UseAnimationFrameControls
+
+Playback controls and state returned by the hook.
 
 <AutoTypeTable path="./hooks/useAnimationFrame.ts" name="UseAnimationFrameControls" />

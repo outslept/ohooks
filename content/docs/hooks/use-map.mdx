@@ -1,9 +1,11 @@
 ---
 title: useMap
-description: "Manages a reactive `Map` state with immutable helper actions for setting, deleting, clearing, and querying entries."
+description: Manages a reactive Map state with immutable helper actions for setting, deleting, clearing, and querying entries.
 ---
 
 {/* Preview */}
+
+The `useMap` hook manages a JavaScript `Map` in React state and provides memoized helper methods (`set`, `setAll`, `remove`, `clear`, `reset`, and `get`) that clone the map on every mutation to trigger re-renders cleanly.
 
 ## Installation
 
@@ -12,11 +14,72 @@ description: "Manages a reactive `Map` state with immutable helper actions for s
 ## Usage
 
 ```tsx
-const [map, { set, remove, clear }] = useMap<string, number>([['a', 1]]);
+import { useMap } from "@/hooks/useMap"
+```
+
+```tsx
+const [map, { set, remove, clear }] = useMap<string, number>([["a", 1]])
+```
+
+## Examples
+
+### Adding and Removing Key-Value Entries
+
+Use `set`, `remove`, and `clear` to update entries reactively without mutating the underlying `Map` instance in place.
+
+```tsx
+const [scores, { set, remove, clear }] = useMap<string, number>([
+  ["Alice", 10],
+  ["Bob", 15],
+])
+
+return (
+  <div>
+    <ul>
+      {Array.from(scores.entries()).map(([player, score]) => (
+        <li key={player}>
+          {player}: {score}
+          <button onClick={() => set(player, score + 1)}>+1</button>
+          <button onClick={() => remove(player)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+    <button onClick={() => set("Charlie", 0)}>Add Charlie</button>
+    <button onClick={clear}>Clear all</button>
+  </div>
+)
+```
+
+### Bulk Replacing and Resetting (`setAll` and `reset`)
+
+Call `setAll` with any iterable of `[key, value]` pairs to replace the entire map, or `reset` to restore `initialEntries`.
+
+```tsx
+const [filters, { setAll, reset }] = useMap<string, string>([
+  ["status", "active"],
+])
+
+return (
+  <div>
+    <button
+      onClick={() =>
+        setAll([
+          ["status", "archived"],
+          ["sort", "newest"],
+        ])
+      }
+    >
+      Apply preset
+    </button>
+    <button onClick={reset}>Reset filters</button>
+  </div>
+)
 ```
 
 ## API Reference
 
-### `UseMapActions`
+### UseMapActions
+
+Memoized map mutation and lookup methods returned as the second tuple element.
 
 <AutoTypeTable path="./hooks/useMap.ts" name="UseMapActions" />

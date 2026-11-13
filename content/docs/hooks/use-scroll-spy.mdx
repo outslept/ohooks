@@ -1,9 +1,11 @@
 ---
 title: useScrollSpy
-description: "Observes a list of page sections and returns the `id` of the currently active section in view."
+description: Observes a list of page sections and returns the id of the currently active section in view.
 ---
 
 {/* Preview */}
+
+The `useScrollSpy` hook observes a list of section selectors or refs using `IntersectionObserver` and returns the `id` of the topmost visible section in the viewport—ideal for highlighting active links in a table of contents or sticky navigation bar.
 
 ## Installation
 
@@ -12,11 +14,57 @@ description: "Observes a list of page sections and returns the `id` of the curre
 ## Usage
 
 ```tsx
-const activeId = useScrollSpy(['#intro', '#features', '#pricing']);
+import { useScrollSpy } from "@/hooks/useScrollSpy"
+```
+
+```tsx
+const activeId = useScrollSpy(["#intro", "#features", "#pricing"])
+```
+
+## Examples
+
+### Table of Contents Active Highlighting
+
+Pass an array of section IDs or CSS selectors and compare `activeId` against each navigation link.
+
+```tsx
+const sections = ["introduction", "installation", "usage", "api"]
+const activeId = useScrollSpy(sections, { offset: 80 })
+
+return (
+  <nav aria-label="On this page">
+    <ul>
+      {sections.map((id) => (
+        <li key={id}>
+          <a
+            href={`#${id}`}
+            style={{ fontWeight: activeId === id ? 700 : 400 }}
+          >
+            {id}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)
+```
+
+### Custom Scroll Container and `rootMargin`
+
+Provide a `root` container ref and custom `rootMargin` when spying on sections inside a scrollable panel instead of the window.
+
+```tsx
+const scrollContainerRef = useRef<HTMLDivElement>(null)
+const activeId = useScrollSpy(["#step-1", "#step-2", "#step-3"], {
+  root: scrollContainerRef,
+  rootMargin: "-10% 0px -70% 0px",
+})
 ```
 
 ## API Reference
 
-### `UseScrollSpyOptions`
+### UseScrollSpyOptions
+
+Configuration options for intersection root, margins, and header offset.
 
 <AutoTypeTable path="./hooks/useScrollSpy.ts" name="UseScrollSpyOptions" />
