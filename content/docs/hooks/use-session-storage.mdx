@@ -3,7 +3,7 @@ title: useSessionStorage
 description: Persists reactive state in window.sessionStorage with automatic serialization and synchronization.
 ---
 
-{/* Preview */}
+<HookPreview name="useSessionStorage" />
 
 The `useSessionStorage` hook synchronizes React state with `window.sessionStorage` using `useSyncExternalStore`, keeping all components sharing the same key in sync within the current browser tab.
 
@@ -64,7 +64,7 @@ const [visitedIds, setVisitedIds] = useSessionStorage<number[]>(
 
 ## API Reference
 
-### StorageOptions
+### `StorageOptions`
 
 Configuration options for custom serialization and error handling.
 

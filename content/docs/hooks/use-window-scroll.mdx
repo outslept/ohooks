@@ -3,7 +3,7 @@ title: useWindowScroll
 description: Tracks the window scroll position (x, y) and provides a scrollTo helper.
 ---
 
-{/* Preview */}
+<HookPreview name="useWindowScroll" />
 
 The `useWindowScroll` hook tracks `window.scrollX` and `window.scrollY` with passive event listeners (optional `throttleMs`), and provides a programmatic `scrollTo` helper.
 
@@ -55,7 +55,7 @@ const { x, y } = useWindowScroll({
 
 ## API Reference
 
-### UseWindowScrollOptions
+### `UseWindowScrollOptions`
 
 Configuration options for scroll throttling and SSR fallback coordinates.
 
@@ -64,7 +64,7 @@ Configuration options for scroll throttling and SSR fallback coordinates.
   name="UseWindowScrollOptions"
 />
 
-### WindowScrollPosition
+### `WindowScrollPosition`
 
 Horizontal (`x`) and vertical (`y`) scroll coordinates.
 
@@ -73,7 +73,7 @@ Horizontal (`x`) and vertical (`y`) scroll coordinates.
   name="WindowScrollPosition"
 />
 
-### UseWindowScrollReturn
+### `UseWindowScrollReturn`
 
 Scroll coordinates and `scrollTo` helper returned by the hook.
 

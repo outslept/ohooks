@@ -3,7 +3,7 @@ title: useRovingTabIndex
 description: Implements the WAI-ARIA roving tabIndex keyboard navigation pattern for composite widgets.
 ---
 
-{/* Preview */}
+<HookPreview name="useRovingTabIndex" />
 
 The `useRovingTabIndex` hook implements the WAI-ARIA roving `tabIndex` pattern for toolbars, tablists, menus, and radio groups, managing arrow-key navigation, `Home`/`End` shortcuts, looping, disabled item skipping, and DOM focus synchronization.
 
@@ -93,7 +93,7 @@ return (
 
 ## API Reference
 
-### UseRovingTabIndexOptions
+### `UseRovingTabIndexOptions`
 
 Configuration options for orientation, looping, and controlled/uncontrolled active index.
 
@@ -102,13 +102,13 @@ Configuration options for orientation, looping, and controlled/uncontrolled acti
   name="UseRovingTabIndexOptions"
 />
 
-### RovingItemOptions
+### `RovingItemOptions`
 
 Per-item options passed to `getItemProps(index, options)`.
 
 <AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="RovingItemOptions" />
 
-### RovingTabIndexItemProps
+### `RovingTabIndexItemProps`
 
 Props returned by `getItemProps` to spread onto each focusable item element.
 
@@ -117,7 +117,7 @@ Props returned by `getItemProps` to spread onto each focusable item element.
   name="RovingTabIndexItemProps"
 />
 
-### UseRovingTabIndexReturn
+### `UseRovingTabIndexReturn`
 
 Active index state and helper methods returned by the hook.
 

@@ -3,7 +3,7 @@ title: useElementSize
 description: Tracks the width and height of a DOM element reactively using ResizeObserver.
 ---
 
-{/* Preview */}
+<HookPreview name="useElementSize" />
 
 The `useElementSize` hook observes a target DOM element with `ResizeObserver` and returns its live `{ width, height }` dimensions.
 
@@ -63,13 +63,13 @@ const { width, height } = useElementSize(element, {
 
 ## API Reference
 
-### UseElementSizeOptions
+### `UseElementSizeOptions`
 
 Configuration options for `ResizeObserver` box model and initial dimensions.
 
 <AutoTypeTable path="./hooks/useElementSize.ts" name="UseElementSizeOptions" />
 
-### ElementSize
+### `ElementSize`
 
 Dimensions object returned by the hook.
 

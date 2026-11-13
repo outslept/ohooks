@@ -3,7 +3,7 @@ title: useWindowSize
 description: Tracks the browser window's innerWidth and innerHeight on resize.
 ---
 
-{/* Preview */}
+<HookPreview name="useWindowSize" />
 
 The `useWindowSize` hook listens to window `resize` and `orientationchange` events (plus optional `visualViewport` resize events) and returns the current `{ width, height }` dimensions.
 
@@ -52,14 +52,14 @@ const { width, height } = useWindowSize({
 
 ## API Reference
 
-### UseWindowSizeOptions
+### `UseWindowSizeOptions`
 
 Configuration options for initial SSR dimensions, resize throttling, and `visualViewport` listening.
 
 <AutoTypeTable path="./hooks/useWindowSize.ts" name="UseWindowSizeOptions" />
 
-### WindowSize
+### `WindowSize`
 
-Window width and height dimensions returned by the hook.
+Window `width` and `height` dimensions returned by the hook.
 
 <AutoTypeTable path="./hooks/useWindowSize.ts" name="WindowSize" />

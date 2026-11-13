@@ -3,7 +3,7 @@ title: useCounter
 description: Manages a numeric counter state with optional min/max clamping and helper methods.
 ---
 
-{/* Preview */}
+<HookPreview name="useCounter" />
 
 The `useCounter` hook manages a numeric state with optional `min` and `max` boundaries and exposes memoized helpers (`inc`, `dec`, `set`, and `reset`) to update the value.
 
@@ -63,13 +63,13 @@ return (
 
 ## API Reference
 
-### UseCounterOptions
+### `UseCounterOptions`
 
 Optional boundary constraints for the counter.
 
 <AutoTypeTable path="./hooks/useCounter.ts" name="UseCounterOptions" />
 
-### UseCounterReturn
+### `UseCounterReturn`
 
 Counter value and helper methods returned by the hook.
 

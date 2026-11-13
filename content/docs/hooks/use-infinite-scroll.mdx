@@ -3,7 +3,7 @@ title: useInfiniteScroll
 description: Triggers an asynchronous onLoadMore callback when a sentinel element scrolls into view using IntersectionObserver.
 ---
 
-{/* Preview */}
+<HookPreview name="useInfiniteScroll" />
 
 The `useInfiniteScroll` hook observes a sentinel element with `IntersectionObserver`, invokes `onLoadMore` when it enters the viewport (with configurable `distance` pre-fetching), and prevents duplicate concurrent calls while a page is loading.
 
@@ -76,7 +76,7 @@ const { isLoading } = useInfiniteScroll(topSentinelRef, loadOlderMessages, {
 
 ## API Reference
 
-### UseInfiniteScrollOptions
+### `UseInfiniteScrollOptions`
 
 Configuration options for intersection root, pre-fetch distance, and pagination state.
 
@@ -85,7 +85,7 @@ Configuration options for intersection root, pre-fetch distance, and pagination 
   name="UseInfiniteScrollOptions"
 />
 
-### UseInfiniteScrollReturn
+### `UseInfiniteScrollReturn`
 
 Loading status and error state returned by the hook.
 

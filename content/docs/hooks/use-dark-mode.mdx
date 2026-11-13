@@ -3,7 +3,7 @@ title: useDarkMode
 description: Manages dark mode state with system preference detection, localStorage persistence, and automatic DOM class toggling.
 ---
 
-{/* Preview */}
+<HookPreview name="useDarkMode" />
 
 The `useDarkMode` hook resolves dark mode from the user's stored preference (`'light' | 'dark' | 'system'`) and the OS `prefers-color-scheme: dark` media query, persists changes to `localStorage`, and toggles a class on `document.documentElement`.
 
@@ -67,13 +67,13 @@ return (
 
 ## API Reference
 
-### UseDarkModeOptions
+### `UseDarkModeOptions`
 
 Configuration options for storage persistence and DOM class syncing.
 
 <AutoTypeTable path="./hooks/useDarkMode.ts" name="UseDarkModeOptions" />
 
-### UseDarkModeReturn
+### `UseDarkModeReturn`
 
 Resolved dark mode state and helper functions returned by the hook.
 

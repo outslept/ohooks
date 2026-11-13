@@ -3,7 +3,7 @@ title: useSelection
 description: Manages single or multi-item selection state with range selection and bulk toggle helpers.
 ---
 
-{/* Preview */}
+<HookPreview name="useSelection" />
 
 The `useSelection` hook manages item selection for data tables, lists, and galleries, supporting key extraction (`getKey`), bulk selection (`selectAll`, `clearSelection`, `toggleAll`), `Shift+Click` range selection (`selectRange`), and computed `isAllSelected` / `isPartiallySelected` flags for indeterminate header checkboxes.
 
@@ -98,13 +98,13 @@ const handleRowClick = (id: string, event: React.MouseEvent) => {
 
 ## API Reference
 
-### UseSelectionOptions
+### `UseSelectionOptions`
 
 Configuration options for key extraction, single/multiple mode, and controlled/uncontrolled selection keys.
 
 <AutoTypeTable path="./hooks/useSelection.ts" name="UseSelectionOptions" />
 
-### UseSelectionReturn
+### `UseSelectionReturn`
 
 Selection state, flags, and helper methods returned by the hook.
 

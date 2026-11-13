@@ -3,7 +3,7 @@ title: useNetworkInformation
 description: Tracks network connectivity status and connection quality metrics (effectiveType, downlink, rtt, saveData) via the Network Information API.
 ---
 
-{/* Preview */}
+<HookPreview name="useNetworkInformation" />
 
 The `useNetworkInformation` hook subscribes to `online`/`offline` events and the browser's `navigator.connection` (`NetworkInformation`) API using `useSyncExternalStore`, exposing live connection speed, latency, and data-saver preferences.
 
@@ -66,7 +66,7 @@ return (
 
 ## API Reference
 
-### NetworkInformationState
+### `NetworkInformationState`
 
 Network connectivity and quality metrics returned by the hook.
 

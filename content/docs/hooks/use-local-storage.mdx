@@ -3,7 +3,7 @@ title: useLocalStorage
 description: Persists and synchronizes state with window.localStorage across components and browser tabs.
 ---
 
-{/* Preview */}
+<HookPreview name="useLocalStorage" />
 
 The `useLocalStorage` hook synchronizes React state with `window.localStorage` using `useSyncExternalStore`, automatically updating all subscribed components in the current tab as well as across other open tabs via the `storage` event.
 
@@ -69,7 +69,7 @@ const [tags, setTags] = useLocalStorage<Set<string>>("saved-tags", new Set(), {
 
 ## API Reference
 
-### StorageOptions
+### `StorageOptions`
 
 Configuration options for custom serialization, cross-tab sync, and error handling.
 

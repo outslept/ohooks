@@ -3,7 +3,7 @@ title: useMap
 description: Manages a reactive Map state with immutable helper actions for setting, deleting, clearing, and querying entries.
 ---
 
-{/* Preview */}
+<HookPreview name="useMap" />
 
 The `useMap` hook manages a JavaScript `Map` in React state and provides memoized helper methods (`set`, `setAll`, `remove`, `clear`, `reset`, and `get`) that clone the map on every mutation to trigger re-renders cleanly.
 
@@ -50,35 +50,9 @@ return (
 )
 ```
 
-### Bulk Replacing and Resetting (`setAll` and `reset`)
-
-Call `setAll` with any iterable of `[key, value]` pairs to replace the entire map, or `reset` to restore `initialEntries`.
-
-```tsx
-const [filters, { setAll, reset }] = useMap<string, string>([
-  ["status", "active"],
-])
-
-return (
-  <div>
-    <button
-      onClick={() =>
-        setAll([
-          ["status", "archived"],
-          ["sort", "newest"],
-        ])
-      }
-    >
-      Apply preset
-    </button>
-    <button onClick={reset}>Reset filters</button>
-  </div>
-)
-```
-
 ## API Reference
 
-### UseMapActions
+### `UseMapActions`
 
 Memoized map mutation and lookup methods returned as the second tuple element.
 

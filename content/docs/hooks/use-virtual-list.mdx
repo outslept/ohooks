@@ -3,7 +3,7 @@ title: useVirtualList
 description: Virtualizes a large list of fixed or variable-height items so only visible rows are rendered.
 ---
 
-{/* Preview */}
+<HookPreview name="useVirtualList" />
 
 The `useVirtualList` hook virtualizes large lists of fixed or variable-height items by observing scroll position and container height, rendering only the visible slice (plus configurable `overscan` rows) and providing a `scrollToIndex` helper.
 
@@ -88,7 +88,7 @@ const { virtualItems, wrapperProps } = useVirtualList(messages, {
 
 ## API Reference
 
-### UseVirtualListOptions
+### `UseVirtualListOptions`
 
 Configuration options for scroll container target, row height calculation, and overscan count.
 
@@ -97,15 +97,15 @@ Configuration options for scroll container target, row height calculation, and o
   name="UseVirtualListOptions"
 />
 
-### VirtualItem
+### `VirtualItem`
 
 Metadata and positioning descriptor for each visible virtualized row.
 
 <AutoTypeTable path="./hooks/useVirtualList.ts" name="VirtualItem" />
 
-### UseVirtualListReturn
+### `UseVirtualListReturn`
 
-Visible virtual items, total height, wrapper props, and `scrollToIndex` helper returned by the hook.
+Visible virtual items, total `height`, wrapper `props`, and `scrollToIndex` helper returned by the hook.
 
 <AutoTypeTable
   path="./hooks/useVirtualList.ts"

@@ -3,7 +3,7 @@ title: useHover
 description: Tracks whether the pointer is hovering over a target DOM element, with optional enter and leave delays.
 ---
 
-{/* Preview */}
+<HookPreview name="useHover" />
 
 The `useHover` hook tracks `pointerenter` and `pointerleave` events on a target DOM element and supports configurable `enterDelay` and `leaveDelay` timers.
 
@@ -21,45 +21,9 @@ import { useHover } from "@/hooks/useHover"
 const isHovered = useHover(cardRef, { enterDelay: 100, leaveDelay: 150 })
 ```
 
-## Examples
-
-### Basic Hover Detection
-
-Attach a `RefObject` to an element and read the returned boolean to conditionally render UI or styles.
-
-```tsx
-const boxRef = useRef<HTMLDivElement>(null)
-const isHovered = useHover(boxRef)
-
-return (
-  <div ref={boxRef}>
-    {isHovered ? "Pointer is inside" : "Hover over me"}
-  </div>
-)
-```
-
-### Delayed Hover Card / Tooltip
-
-Configure `enterDelay` and `leaveDelay` to avoid accidental triggers when the user moves the cursor quickly across the screen.
-
-```tsx
-const triggerRef = useRef<HTMLButtonElement>(null)
-const showPreview = useHover(triggerRef, {
-  enterDelay: 250,
-  leaveDelay: 200,
-})
-
-return (
-  <div>
-    <button ref={triggerRef}>User profile</button>
-    {showPreview && <div role="tooltip">Profile preview card</div>}
-  </div>
-)
-```
-
 ## API Reference
 
-### UseHoverOptions
+### `UseHoverOptions`
 
 Configuration options for hover enter and leave delays.
 

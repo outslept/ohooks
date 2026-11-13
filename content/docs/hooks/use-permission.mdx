@@ -3,7 +3,7 @@ title: usePermission
 description: Queries and subscribes to browser permission status changes via navigator.permissions.query.
 ---
 
-{/* Preview */}
+<HookPreview name="usePermission" />
 
 The `usePermission` hook queries `navigator.permissions.query` for a given permission name or descriptor and subscribes to live `PermissionStatus` changes (`'granted'`, `'denied'`, `'prompt'`, `'loading'`, or `'unsupported'`).
 
@@ -50,7 +50,7 @@ return <p>MIDI SysEx access: {midiState}</p>
 
 ## API Reference
 
-### ExtendedPermissionDescriptor
+### `ExtendedPermissionDescriptor`
 
 Permission descriptor object accepted by `usePermission`.
 

@@ -3,7 +3,7 @@ title: useScrollSpy
 description: Observes a list of page sections and returns the id of the currently active section in view.
 ---
 
-{/* Preview */}
+<HookPreview name="useScrollSpy" />
 
 The `useScrollSpy` hook observes a list of section selectors or refs using `IntersectionObserver` and returns the `id` of the topmost visible section in the viewport—ideal for highlighting active links in a table of contents or sticky navigation bar.
 
@@ -63,7 +63,7 @@ const activeId = useScrollSpy(["#step-1", "#step-2", "#step-3"], {
 
 ## API Reference
 
-### UseScrollSpyOptions
+### `UseScrollSpyOptions`
 
 Configuration options for intersection root, margins, and header offset.
 

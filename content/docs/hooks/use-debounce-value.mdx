@@ -3,7 +3,7 @@ title: useDebounceValue
 description: Debounces a reactive value and provides a debounced setter with .cancel(), .flush(), and .isPending() controls.
 ---
 
-{/* Preview */}
+<HookPreview name="useDebounceValue" />
 
 The `useDebounceValue` hook delays updates to a reactive value until `delay` milliseconds have passed without further changes, returning a tuple of the debounced value and the underlying debounced setter function.
 
@@ -68,13 +68,13 @@ return (
 
 ## API Reference
 
-### DebounceOptions
+### `DebounceOptions`
 
 Configuration options for controlling debounce timing and execution edges.
 
 <AutoTypeTable path="./hooks/useDebounceCallback.ts" name="DebounceOptions" />
 
-### DebouncedFunction
+### `DebouncedFunction`
 
 Debounced setter returned as the second tuple element.
 

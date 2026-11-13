@@ -3,7 +3,7 @@ title: useVisualViewport
 description: Tracks the browser's VisualViewport dimensions, offsets, and pinch-zoom scale (useful for virtual keyboards).
 ---
 
-{/* Preview */}
+<HookPreview name="useVisualViewport" />
 
 The `useVisualViewport` hook subscribes to `window.visualViewport` resize and scroll events via `useSyncExternalStore`, tracking the visible viewport's `width`, `height`, `offsetLeft`, `offsetTop`, `pageLeft`, `pageTop`, and pinch-zoom `scale`.
 
@@ -62,7 +62,7 @@ return (
 
 ## API Reference
 
-### VisualViewportState
+### `VisualViewportState`
 
 Visual viewport dimensions, offsets, and zoom scale returned by the hook.
 

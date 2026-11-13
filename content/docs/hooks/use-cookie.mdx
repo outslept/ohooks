@@ -3,7 +3,7 @@ title: useCookie
 description: Reads, writes, and deletes a browser cookie reactively using useSyncExternalStore.
 ---
 
-{/* Preview */}
+<HookPreview name="useCookie" />
 
 The `useCookie` hook reads, updates, and removes a browser cookie reactively across all components and tabs using `useSyncExternalStore` and the Cookie Store API when available.
 
@@ -76,13 +76,13 @@ return (
 
 ## API Reference
 
-### CookieAttributes
+### `CookieAttributes`
 
 Attributes used when writing or deleting the cookie (`path`, `domain`, `maxAge`, `expires`, `secure`, and `sameSite`).
 
 <AutoTypeTable path="./hooks/useCookie.ts" name="CookieAttributes" />
 
-### UseCookieOptions
+### `UseCookieOptions`
 
 Configuration options for the cookie hook, extending `CookieAttributes` with a fallback `defaultValue`.
 

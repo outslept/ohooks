@@ -3,7 +3,7 @@ title: useObjectUrl
 description: Creates a temporary object URL (URL.createObjectURL) for a Blob, File, or MediaSource and automatically revokes it on change or unmount.
 ---
 
-{/* Preview */}
+<HookPreview name="useObjectUrl" />
 
 The `useObjectUrl` hook generates a `blob:` URL via `URL.createObjectURL` whenever a `Blob`, `File`, or `MediaSource` is provided and automatically calls `URL.revokeObjectURL` when the input changes or the component unmounts to prevent memory leaks.
 

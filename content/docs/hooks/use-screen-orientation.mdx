@@ -3,7 +3,7 @@ title: useScreenOrientation
 description: Tracks the device screen orientation and provides lock and unlock controls.
 ---
 
-{/* Preview */}
+<HookPreview name="useScreenOrientation" />
 
 The `useScreenOrientation` hook subscribes to `screen.orientation` changes via `useSyncExternalStore` and exposes the current orientation `type` (`'portrait-primary'`, `'landscape-primary'`, etc.), rotation `angle`, and `lock` / `unlock` helper methods.
 
@@ -57,7 +57,7 @@ return (
 
 ## API Reference
 
-### ScreenOrientationState
+### `ScreenOrientationState`
 
 Reactive screen orientation state properties.
 
@@ -66,7 +66,7 @@ Reactive screen orientation state properties.
   name="ScreenOrientationState"
 />
 
-### UseScreenOrientationReturn
+### `UseScreenOrientationReturn`
 
 Screen orientation state and lock/unlock methods returned by the hook.
 

@@ -3,7 +3,7 @@ title: useKeyPress
 description: Tracks whether a specific key, hotkey combination, or custom key predicate is currently held down.
 ---
 
-{/* Preview */}
+<HookPreview name="useKeyPress" />
 
 The `useKeyPress` hook listens for `keydown` and `keyup` events (and resets automatically on window `blur`) to return `true` while a matching key, shortcut combo, or predicate is actively pressed.
 
@@ -54,7 +54,7 @@ return <p>Digit key held: {isDigitPressed ? "Yes" : "No"}</p>
 
 ## API Reference
 
-### UseKeyPressOptions
+### `UseKeyPressOptions`
 
 Configuration options for target element, form tag filtering, and default behavior.
 

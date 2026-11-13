@@ -3,7 +3,7 @@ title: useSwipe
 description: Detects pointer swipe gestures and directions on a target element.
 ---
 
-{/* Preview */}
+<HookPreview name="useSwipe" />
 
 The `useSwipe` hook detects directional swipe gestures (`'left'`, `'right'`, `'up'`, `'down'`) on a target element using Pointer Events, enforcing both a minimum distance (`threshold`) and a maximum gesture duration (`timeout`).
 
@@ -67,13 +67,13 @@ return <div ref={sheetRef}>Swipe down to close</div>
 
 ## API Reference
 
-### UseSwipeOptions
+### `UseSwipeOptions`
 
 Configuration options and directional callbacks for swipe detection.
 
 <AutoTypeTable path="./hooks/useSwipe.ts" name="UseSwipeOptions" />
 
-### SwipeState
+### `SwipeState`
 
 Live swipe status, direction, and movement deltas returned by the hook.
 

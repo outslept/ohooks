@@ -3,7 +3,7 @@ title: useUrlSearchParams
 description: Reads and updates window.location.search as reactive URLSearchParams synchronized with browser history.
 ---
 
-{/* Preview */}
+<HookPreview name="useUrlSearchParams" />
 
 The `useUrlSearchParams` hook reads `window.location.search` via `useSyncExternalStore` and returns a `[searchParams, setSearchParams]` tuple that updates the URL using `history.pushState` or `history.replaceState` while notifying all subscribed components.
 
@@ -74,7 +74,7 @@ return (
 
 ## API Reference
 
-### UseUrlSearchParamsOptions
+### `UseUrlSearchParamsOptions`
 
 Configuration options for browser history mode and initial SSR search params.
 

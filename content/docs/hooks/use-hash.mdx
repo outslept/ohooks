@@ -3,7 +3,7 @@ title: useHash
 description: Reads and updates window.location.hash reactively using useSyncExternalStore.
 ---
 
-{/* Preview */}
+<HookPreview name="useHash" />
 
 The `useHash` hook reads `window.location.hash` (without the leading `#` character) and updates it reactively across the app via `useSyncExternalStore`.
 
@@ -59,13 +59,13 @@ return (
 
 ## API Reference
 
-### UseHashOptions
+### `UseHashOptions`
 
 Configuration options for initial SSR fallback value.
 
 <AutoTypeTable path="./hooks/useHash.ts" name="UseHashOptions" />
 
-### SetHashOptions
+### `SetHashOptions`
 
 Options for controlling history navigation when updating the hash.
 

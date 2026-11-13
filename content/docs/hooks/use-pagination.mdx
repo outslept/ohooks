@@ -3,7 +3,7 @@ title: usePagination
 description: Computes pagination state, page ranges with ellipsis markers, data slice indices, and navigation helpers.
 ---
 
-{/* Preview */}
+<HookPreview name="usePagination" />
 
 The `usePagination` hook calculates total pages, `[startIndex, endIndex)` array slice bounds, and a UI-ready `items` array containing page numbers and `'ellipsis'` markers, while supporting both controlled and uncontrolled current page state.
 
@@ -86,13 +86,13 @@ const visibleUsers = allUsers.slice(startIndex, endIndex)
 
 ## API Reference
 
-### UsePaginationOptions
+### `UsePaginationOptions`
 
 Configuration options for item counts, page size, and sibling/boundary ranges.
 
 <AutoTypeTable path="./hooks/usePagination.ts" name="UsePaginationOptions" />
 
-### UsePaginationReturn
+### `UsePaginationReturn`
 
 Computed pagination state, slice indices, and navigation methods returned by the hook.
 

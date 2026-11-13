@@ -3,7 +3,7 @@ title: useFullscreen
 description: Manages fullscreen state for a target DOM element (or document.documentElement) with vendor prefix support.
 ---
 
-{/* Preview */}
+<HookPreview name="useFullscreen" />
 
 The `useFullscreen` hook enters, exits, and toggles fullscreen mode for a target DOM element (defaulting to `document.documentElement` when no target is provided), handling standard and vendor-prefixed Fullscreen APIs automatically.
 
@@ -62,13 +62,13 @@ return (
 
 ## API Reference
 
-### UseFullscreenOptions
+### `UseFullscreenOptions`
 
 Lifecycle callbacks for fullscreen transitions and errors.
 
 <AutoTypeTable path="./hooks/useFullscreen.ts" name="UseFullscreenOptions" />
 
-### UseFullscreenReturn
+### `UseFullscreenReturn`
 
 Fullscreen state and control methods returned by the hook.
 

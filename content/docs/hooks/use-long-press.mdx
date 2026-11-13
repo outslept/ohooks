@@ -3,7 +3,7 @@ title: useLongPress
 description: Detects long-press pointer gestures with movement threshold cancellation and click suppression.
 ---
 
-{/* Preview */}
+<HookPreview name="useLongPress" />
 
 The `useLongPress` hook returns pointer and click event handlers that invoke a callback when the user presses and holds an element for `threshold` milliseconds, cancelling automatically if the pointer moves beyond `moveThreshold` and suppressing the subsequent synthetic `click` event.
 
@@ -76,13 +76,13 @@ return (
 
 ## API Reference
 
-### UseLongPressOptions
+### `UseLongPressOptions`
 
 Configuration options and lifecycle callbacks for the long-press gesture.
 
 <AutoTypeTable path="./hooks/useLongPress.ts" name="UseLongPressOptions" />
 
-### UseLongPressHandlers
+### `UseLongPressHandlers`
 
 DOM event handlers returned by the hook to spread onto the target element.
 

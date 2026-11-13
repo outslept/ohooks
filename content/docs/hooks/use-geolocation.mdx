@@ -3,7 +3,7 @@ title: useGeolocation
 description: Watches the user's geographic location reactively using navigator.geolocation.watchPosition.
 ---
 
-{/* Preview */}
+<HookPreview name="useGeolocation" />
 
 The `useGeolocation` hook subscribes to device position updates via `navigator.geolocation.watchPosition` and returns live coordinates, accuracy metrics, loading status, and error state.
 
@@ -70,13 +70,13 @@ return (
 
 ## API Reference
 
-### UseGeolocationOptions
+### `UseGeolocationOptions`
 
 Configuration options extending standard `PositionOptions` with an `enabled` flag.
 
 <AutoTypeTable path="./hooks/useGeolocation.ts" name="UseGeolocationOptions" />
 
-### GeolocationState
+### `GeolocationState`
 
 Reactive geolocation coordinates and status returned by the hook.
 

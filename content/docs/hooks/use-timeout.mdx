@@ -3,7 +3,7 @@ title: useTimeout
 description: Declarative setTimeout hook that invokes a callback after delay milliseconds.
 ---
 
-{/* Preview */}
+<HookPreview name="useTimeout" />
 
 The `useTimeout` hook schedules a callback to run after `delay` milliseconds (pausing when `delay` is `null`), always invoking the latest callback reference and exposing `reset` and `clear` controls.
 
@@ -73,11 +73,3 @@ useTimeout(
   shouldRedirect ? 2000 : null
 )
 ```
-
-## API Reference
-
-### UseTimeoutReturn
-
-Timer status and `clear` / `reset` controls returned by the hook.
-
-<AutoTypeTable path="./hooks/useTimeout.ts" name="UseTimeoutReturn" />

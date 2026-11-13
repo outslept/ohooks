@@ -3,7 +3,7 @@ title: useLatest
 description: Returns a ref object whose .current property is synchronously updated to the latest value after every render.
 ---
 
-{/* Preview */}
+<HookPreview name="useLatest" />
 
 The `useLatest` hook stores any value in a `RefObject` and keeps `.current` synchronized via `useIsomorphicLayoutEffect` so asynchronous callbacks, timers, and subscriptions can read the freshest value without stale closures.
 

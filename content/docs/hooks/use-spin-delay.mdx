@@ -3,7 +3,7 @@ title: useSpinDelay
 description: Prevents loading indicator flashes by delaying appearance and enforcing a minimum display duration.
 ---
 
-{/* Preview */}
+<HookPreview name="useSpinDelay" />
 
 The `useSpinDelay` hook smooths loading states by waiting `delay` milliseconds before returning `true` (so fast requests under the threshold never show a spinner) and keeping the spinner visible for at least `minDuration` milliseconds once shown to avoid jarring flickers.
 
@@ -57,7 +57,7 @@ const showOverlay = useSpinDelay(isSaving, {
 
 ## API Reference
 
-### SpinDelayOptions
+### `SpinDelayOptions`
 
 Timing thresholds for delaying and sustaining the loading state.
 

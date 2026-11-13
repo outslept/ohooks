@@ -3,7 +3,7 @@ title: useScript
 description: Dynamically loads an external <script> tag, deduplicating across components and tracking its status.
 ---
 
-{/* Preview */}
+<HookPreview name="useScript" />
 
 The `useScript` hook injects an external `<script>` tag into `document.body` (or attaches to an existing tag with the same `src`), deduplicates concurrent requests across multiple mounted components, and returns the current loading status (`'idle'`, `'loading'`, `'ready'`, or `'error'`).
 
@@ -62,7 +62,7 @@ return (
 
 ## API Reference
 
-### UseScriptOptions
+### `UseScriptOptions`
 
 Configuration options for script attributes, conditional loading, and unmount cleanup.
 

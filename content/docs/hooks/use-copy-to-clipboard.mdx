@@ -3,7 +3,7 @@ title: useCopyToClipboard
 description: Copies text to the system clipboard and tracks the copied state with an optional auto-reset timer.
 ---
 
-{/* Preview */}
+<HookPreview name="useCopyToClipboard" />
 
 The `useCopyToClipboard` hook writes text to the system clipboard via the Clipboard API (with a legacy `execCommand('copy')` fallback), tracks the last copied string, and optionally resets `isCopied` after a timeout.
 
@@ -62,7 +62,7 @@ return (
 
 ## API Reference
 
-### UseCopyToClipboardOptions
+### `UseCopyToClipboardOptions`
 
 Configuration options for the clipboard hook.
 
@@ -71,7 +71,7 @@ Configuration options for the clipboard hook.
   name="UseCopyToClipboardOptions"
 />
 
-### UseCopyToClipboardReturn
+### `UseCopyToClipboardReturn`
 
 Clipboard state and helper methods returned by the hook.
 

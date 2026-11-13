@@ -3,7 +3,7 @@ title: useLockBodyScroll
 description: Locks scrolling on document.body (or a target element) with scrollbar gap compensation and reference counting across multiple active locks.
 ---
 
-{/* Preview */}
+<HookPreview name="useLockBodyScroll" />
 
 The `useLockBodyScroll` hook prevents background scrolling by setting `overflow: hidden` on `document.body` (or a custom target element), compensates for the disappearing scrollbar width via `padding-right` to prevent layout shift, and reference-counts concurrent locks so nested modals unlock safely.
 
@@ -71,7 +71,7 @@ return (
 
 ## API Reference
 
-### UseLockBodyScrollOptions
+### `UseLockBodyScrollOptions`
 
 Configuration options for target element and scrollbar gap reservation.
 

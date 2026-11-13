@@ -3,7 +3,7 @@ title: useDropZone
 description: Handles file drag-and-drop interactions with MIME/extension filtering via a target ref or getRootProps.
 ---
 
-{/* Preview */}
+<HookPreview name="useDropZone" />
 
 The `useDropZone` hook manages drag-and-drop file uploads, tracks nested drag-enter depth so `isOver` does not flicker over child elements, and filters dropped files by MIME type or file extension.
 
@@ -76,19 +76,19 @@ return (
 
 ## API Reference
 
-### UseDropZoneOptions
+### `UseDropZoneOptions`
 
 Configuration options and event callbacks for the drop zone.
 
 <AutoTypeTable path="./hooks/useDropZone.ts" name="UseDropZoneOptions" />
 
-### DropZoneRootProps
+### `DropZoneRootProps`
 
 Drag event handlers returned by `getRootProps()`.
 
 <AutoTypeTable path="./hooks/useDropZone.ts" name="DropZoneRootProps" />
 
-### UseDropZoneReturn
+### `UseDropZoneReturn`
 
 State and helper functions returned by the hook.
 

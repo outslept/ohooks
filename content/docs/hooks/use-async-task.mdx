@@ -3,7 +3,7 @@ title: useAsyncTask
 description: Manages the manual execution, cancellation, and state of an asynchronous task with AbortSignal support.
 ---
 
-{/* Preview */}
+<HookPreview name="useAsyncTask" />
 
 The `useAsyncTask` hook runs an asynchronous task on demand, tracks its pending state and result, and passes an `AbortSignal` to the task so in-flight work can be cancelled.
 
@@ -64,19 +64,19 @@ return isPending ? (
 
 ## API Reference
 
-### AsyncTaskContext
+### `AsyncTaskContext`
 
 Context object passed as the first argument to the task.
 
 <AutoTypeTable path="./hooks/useAsyncTask.ts" name="AsyncTaskContext" />
 
-### UseAsyncTaskOptions
+### `UseAsyncTaskOptions`
 
 Configuration options for the task.
 
 <AutoTypeTable path="./hooks/useAsyncTask.ts" name="UseAsyncTaskOptions" />
 
-### UseAsyncTaskReturn
+### `UseAsyncTaskReturn`
 
 Task state and controls returned by the hook.
 

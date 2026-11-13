@@ -3,7 +3,7 @@ title: useRafCallback
 description: Throttles a callback so it executes at most once per requestAnimationFrame with the latest arguments.
 ---
 
-{/* Preview */}
+<HookPreview name="useRafCallback" />
 
 The `useRafCallback` hook wraps a function so repeated calls within the same frame coalesce into a single `requestAnimationFrame` callback invoked with the most recent arguments, and automatically cancels any pending frame on unmount.
 
@@ -65,7 +65,7 @@ return (
 
 ## API Reference
 
-### RafScheduledFunction
+### `RafScheduledFunction`
 
 Frame-throttled function returned by the hook, including `.cancel()` and `.isPending()` methods.
 

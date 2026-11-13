@@ -3,7 +3,7 @@ title: useDevicePixelRatio
 description: Tracks the current window.devicePixelRatio reactively across screen changes and browser zoom levels.
 ---
 
-{/* Preview */}
+<HookPreview name="useDevicePixelRatio" />
 
 The `useDevicePixelRatio` hook tracks `window.devicePixelRatio` using `useSyncExternalStore` and dynamic `(resolution: ...dppx)` media queries so components update automatically when the window moves between displays or the browser zoom level changes.
 
@@ -54,7 +54,7 @@ return <img src={`/images/logo${suffix}.png`} alt="Logo" />
 
 ## API Reference
 
-### UseDevicePixelRatioOptions
+### `UseDevicePixelRatioOptions`
 
 Configuration options for `useDevicePixelRatio`.
 

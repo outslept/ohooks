@@ -3,7 +3,7 @@ title: useThrottleValue
 description: Throttles state updates to a value so it changes at most once per wait milliseconds.
 ---
 
-{/* Preview */}
+<HookPreview name="useThrottleValue" />
 
 The `useThrottleValue` hook throttles updates to a reactive value so it changes at most once every `wait` milliseconds, returning a `[throttledValue, controls]` tuple.
 
@@ -69,13 +69,13 @@ return (
 
 ## API Reference
 
-### ThrottleOptions
+### `ThrottleOptions`
 
 Configuration options for leading and trailing execution edges.
 
 <AutoTypeTable path="./hooks/useThrottleCallback.ts" name="ThrottleOptions" />
 
-### ThrottledFunction
+### `ThrottledFunction`
 
 Throttled setter returned as the second tuple element.
 

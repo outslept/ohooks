@@ -3,7 +3,7 @@ title: usePreferredLanguage
 description: Tracks the user's preferred browser language (navigator.language) and updates on changes.
 ---
 
-{/* Preview */}
+<HookPreview name="usePreferredLanguage" />
 
 The `usePreferredLanguage` hook reads `navigator.language` and subscribes to the window `languagechange` event via `useSyncExternalStore` so localized formatting updates immediately if the user changes their browser language preferences.
 
@@ -40,14 +40,4 @@ return (
     Locale ({locale}): {formattedPrice}
   </p>
 )
-```
-
-### Custom SSR Fallback Locale
-
-Provide a `defaultValue` matching your server's default locale to prevent hydration mismatches.
-
-```tsx
-const locale = usePreferredLanguage("de-DE")
-
-return <p>Preferred language: {locale}</p>
 ```

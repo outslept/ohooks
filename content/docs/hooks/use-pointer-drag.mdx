@@ -3,7 +3,7 @@ title: usePointerDrag
 description: Tracks pointer drag gestures on a target element with axis locking and movement thresholds.
 ---
 
-{/* Preview */}
+<HookPreview name="usePointerDrag" />
 
 The `usePointerDrag` hook tracks pointer drag gestures on a target element using `setPointerCapture` so dragging continues smoothly even when the pointer leaves the element bounds, supporting axis locking (`'x'`, `'y'`, or `'both'`) and activation distance thresholds.
 
@@ -57,36 +57,15 @@ return (
 )
 ```
 
-### Horizontal Slider (`axis: "x"` and `threshold`)
-
-Lock movement to the horizontal axis and set a pixel `threshold` so small accidental pointer movements during clicks do not start a drag.
-
-```tsx
-const handleRef = useRef<HTMLDivElement>(null)
-const { isDragging, deltaX } = usePointerDrag(handleRef, {
-  axis: "x",
-  threshold: 4,
-})
-
-return (
-  <div
-    ref={handleRef}
-    style={{ transform: `translateX(${deltaX}px)` }}
-  >
-    {isDragging ? `Dragging: ${Math.round(deltaX)}px` : "Slide horizontally"}
-  </div>
-)
-```
-
 ## API Reference
 
-### UsePointerDragOptions
+### `UsePointerDragOptions`
 
 Configuration options and gesture callbacks for pointer dragging.
 
 <AutoTypeTable path="./hooks/usePointerDrag.ts" name="UsePointerDragOptions" />
 
-### PointerDragState
+### `PointerDragState`
 
 Live coordinates and movement deltas returned by the hook.
 

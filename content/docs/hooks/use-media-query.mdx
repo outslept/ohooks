@@ -3,7 +3,7 @@ title: useMediaQuery
 description: Evaluates a CSS media query string and subscribes to changes reactively using useSyncExternalStore.
 ---
 
-{/* Preview */}
+<HookPreview name="useMediaQuery" />
 
 The `useMediaQuery` hook subscribes to `window.matchMedia(query)` using `useSyncExternalStore` and returns a boolean indicating whether the CSS media query currently matches.
 
@@ -39,19 +39,10 @@ return (
 )
 ```
 
-### Providing an SSR Default Value
-
-Pass `defaultValue` so server-rendered HTML uses a predictable fallback before hydrating on the client.
-
-```tsx
-const isLargeScreen = useMediaQuery("(min-width: 1280px)", {
-  defaultValue: true,
-})
-```
 
 ## API Reference
 
-### UseMediaQueryOptions
+### `UseMediaQueryOptions`
 
 Configuration options for `useMediaQuery`.
 

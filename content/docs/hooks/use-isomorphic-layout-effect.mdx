@@ -3,7 +3,7 @@ title: useIsomorphicLayoutEffect
 description: Uses useLayoutEffect in browser environments and falls back to useEffect during server-side rendering to avoid React SSR warnings.
 ---
 
-{/* Preview */}
+<HookPreview name="useIsomorphicLayoutEffect" />
 
 The `useIsomorphicLayoutEffect` hook resolves to `useLayoutEffect` on the client (where `window` is defined) and `useEffect` on the server, allowing synchronous DOM measurements before paint without triggering SSR warnings.
 
@@ -21,41 +21,4 @@ import { useIsomorphicLayoutEffect } from "@/hooks/useIsomorphicLayoutEffect"
 useIsomorphicLayoutEffect(() => {
   measureNode()
 }, [])
-```
-
-## Examples
-
-### Measuring DOM Layout Before Paint
-
-Read an element's bounding rect synchronously before the browser paints to position a popover or tooltip without visual flicker.
-
-```tsx
-const triggerRef = useRef<HTMLButtonElement>(null)
-const [top, setTop] = useState(0)
-
-useIsomorphicLayoutEffect(() => {
-  if (triggerRef.current) {
-    const rect = triggerRef.current.getBoundingClientRect()
-    setTop(rect.bottom + 8)
-  }
-}, [])
-
-return (
-  <div>
-    <button ref={triggerRef}>Anchor</button>
-    <div style={{ position: "fixed", top }}>Positioned tooltip</div>
-  </div>
-)
-```
-
-### Synchronizing a Ref Before Effects Run
-
-Keep a mutable ref updated before child `useEffect` hooks execute.
-
-```tsx
-const latestValueRef = useRef(value)
-
-useIsomorphicLayoutEffect(() => {
-  latestValueRef.current = value
-}, [value])
 ```

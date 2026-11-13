@@ -3,7 +3,7 @@ title: useThrottleCallback
 description: Creates a throttled version of a callback that executes at most once every wait milliseconds.
 ---
 
-{/* Preview */}
+<HookPreview name="useThrottleCallback" />
 
 The `useThrottleCallback` hook returns a stable, throttled version of a callback that executes at most once per `wait` milliseconds, supporting `leading` and `trailing` execution edges as well as `.cancel()`, `.flush()`, and `.isPending()` controls.
 
@@ -68,13 +68,13 @@ return (
 
 ## API Reference
 
-### ThrottleOptions
+### `ThrottleOptions`
 
 Configuration options for leading and trailing execution edges.
 
 <AutoTypeTable path="./hooks/useThrottleCallback.ts" name="ThrottleOptions" />
 
-### ThrottledFunction
+### `ThrottledFunction`
 
 Throttled function returned by the hook, augmented with `.cancel()`, `.flush()`, and `.isPending()`.
 
