@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 export interface UseFocusTrapOptions {
   /** Whether the focus trap is currently active (default: `true`) */

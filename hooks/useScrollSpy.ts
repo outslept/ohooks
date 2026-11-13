@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import {
   EventListenerTarget,
-  isRefObject,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { isRefObject, resolveTargetElement } from '@/lib/utils';
 
 /** Section target accepted by `useScrollSpy` (element ID, CSS selector, ref, or DOM element). */
 export type ScrollSpyTarget = string | EventListenerTarget<HTMLElement>;

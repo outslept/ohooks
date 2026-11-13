@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 /** Configuration options for `useTextareaAutosize`. */
 export interface UseTextareaAutosizeOptions {

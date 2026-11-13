@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 /** Configuration options for `useResizeObserver`. */
 export interface UseResizeObserverOptions extends ResizeObserverOptions {

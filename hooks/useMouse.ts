@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
+import { resolveTargetElement } from '@/lib/utils';
 
 export interface MousePositionState {
   /** Horizontal coordinate relative to the whole document (`pageX`) */

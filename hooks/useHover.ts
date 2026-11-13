@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 export interface UseHoverOptions {
   /** Delay in milliseconds before `isHovered` becomes `true` after `mouseenter` (default: `0`) */

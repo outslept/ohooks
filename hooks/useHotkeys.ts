@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 export type HotkeyCallback = (event: KeyboardEvent, combo: string) => void;
 

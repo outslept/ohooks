@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 /** Allowed movement axes for pointer dragging. */
 export type PointerDragAxis = 'both' | 'x' | 'y';

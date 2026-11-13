@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import {
   type EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import {
   type UseResizeObserverOptions,
   useResizeObserver,
 } from './useResizeObserver';
+import { resolveTargetElement } from '@/lib/utils';
 
 export interface ElementSize {
   /** Measured width of the element in pixels */

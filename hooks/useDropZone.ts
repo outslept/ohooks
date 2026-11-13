@@ -9,9 +9,9 @@ import {
 import { useEventCallback } from './useEventCallback';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 export interface UseDropZoneOptions {
   /** Accepted MIME types or file extensions (e.g., `'image/*,.pdf'` or `['image/png', '.jpg']`) */

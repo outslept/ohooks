@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 export interface UseMutationObserverOptions extends MutationObserverInit {
   /** Whether the mutation observer is active (default: `true`) */

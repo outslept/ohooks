@@ -1,6 +1,6 @@
+import { resolveTargetElement } from '@/lib/utils';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 

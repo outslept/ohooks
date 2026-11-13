@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useEventCallback } from './useEventCallback';
 import {
   type EventListenerTarget,
-  resolveTargetElement,
   useEventListener,
 } from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useThrottleCallback } from './useThrottleCallback';
 import { useUnmount } from './useUnmount';
+import { resolveTargetElement } from '@/lib/utils';
 
 export interface ScrollDirections {
   /** Whether the element is currently scrolling left */

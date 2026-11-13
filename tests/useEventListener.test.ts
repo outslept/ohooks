@@ -2,10 +2,9 @@ import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 import useEventListenerDefault, {
-  isRefObject,
-  resolveTargetElement,
   useEventListener,
 } from '@/hooks/useEventListener';
+import { isRefObject, resolveTargetElement } from '@/lib/utils';
 
 describe('useEventListener', () => {
   it('exports helper utilities and default export', () => {

@@ -1,9 +1,9 @@
 import { CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 /** Metadata for a single visible item in a virtualized list. */
 export interface VirtualItem<T> {

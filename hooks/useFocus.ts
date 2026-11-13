@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 export interface UseFocusOptions {
   /** Only mark as focused when the element matches `:focus-visible` (default: `false`) */

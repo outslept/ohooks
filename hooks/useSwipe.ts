@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 /** Detected cardinal direction of a swipe gesture. */
 export type SwipeDirection = 'up' | 'down' | 'left' | 'right' | 'none';

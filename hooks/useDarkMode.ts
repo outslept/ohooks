@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useHydrated } from './useHydrated';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { useLocalStorage } from './useLocalStorage';
 import { useMediaQuery } from './useMediaQuery';
+import { resolveTargetElement } from '@/lib/utils';
 
 export type ColorSchemePreference = 'light' | 'dark' | 'system';
 

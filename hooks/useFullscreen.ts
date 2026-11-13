@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
 import { useLatest } from './useLatest';
+import { resolveTargetElement } from '@/lib/utils';
 
 export interface UseFullscreenOptions {
   /** Callback fired when fullscreen mode is entered */

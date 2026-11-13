@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import {
   EventListenerTarget,
-  resolveTargetElement,
 } from './useEventListener';
+import { resolveTargetElement } from '@/lib/utils';
 
 /** Reactive state representing the user's current DOM text selection. */
 export interface TextSelectionState {
