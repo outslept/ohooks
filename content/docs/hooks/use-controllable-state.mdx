@@ -1,0 +1,26 @@
+---
+title: useControllableState
+description: "Manages state that can be either controlled externally or uncontrolled with an internal fallback."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useControllableState" />
+
+## Usage
+
+```tsx
+const [open, setOpen, isControlled] = useControllableState({
+  value: props.open,
+  defaultValue: false,
+  onChange: props.onOpenChange,
+});
+```
+
+## API Reference
+
+### `UseControllableStateOptions`
+
+<AutoTypeTable path="./hooks/useControllableState.ts" name="UseControllableStateOptions" />

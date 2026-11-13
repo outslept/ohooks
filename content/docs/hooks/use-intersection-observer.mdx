@@ -1,0 +1,23 @@
+---
+title: useIntersectionObserver
+description: "Observes changes in the intersection of a target DOM element with an ancestor element or the viewport."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useIntersectionObserver" />
+
+## Usage
+
+```tsx
+const entry = useIntersectionObserver(sectionRef, { threshold: 0.5 });
+const isVisible = Boolean(entry?.isIntersecting);
+```
+
+## API Reference
+
+### `UseIntersectionObserverOptions`
+
+<AutoTypeTable path="./hooks/useIntersectionObserver.ts" name="UseIntersectionObserverOptions" />

@@ -1,0 +1,41 @@
+---
+title: useRovingTabIndex
+description: "Implements the WAI-ARIA roving `tabIndex` keyboard navigation pattern for composite widgets."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useRovingTabIndex" />
+
+## Usage
+
+```tsx
+const { getItemProps } = useRovingTabIndex({ orientation: 'horizontal' });
+return (
+  <div role="toolbar">
+    {items.map((item, i) => (
+      <button key={item.id} {...getItemProps(i)}>{item.label}</button>
+    ))}
+  </div>
+);
+```
+
+## API Reference
+
+### `UseRovingTabIndexOptions`
+
+<AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="UseRovingTabIndexOptions" />
+
+### `RovingItemOptions`
+
+<AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="RovingItemOptions" />
+
+### `RovingTabIndexItemProps`
+
+<AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="RovingTabIndexItemProps" />
+
+### `UseRovingTabIndexReturn`
+
+<AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="UseRovingTabIndexReturn" />

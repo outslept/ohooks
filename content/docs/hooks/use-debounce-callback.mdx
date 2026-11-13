@@ -1,0 +1,28 @@
+---
+title: useDebounceCallback
+description: "Creates a debounced version of a callback function with `leading`, `trailing`, `maxWait`, `cancel`, and `flush` support."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useDebounceCallback" />
+
+## Usage
+
+```tsx
+const handleSearch = useDebounceCallback((query: string) => {
+  fetchResults(query);
+}, 300);
+```
+
+## API Reference
+
+### `DebounceOptions`
+
+<AutoTypeTable path="./hooks/useDebounceCallback.ts" name="DebounceOptions" />
+
+### `DebouncedFunction`
+
+<AutoTypeTable path="./hooks/useDebounceCallback.ts" name="DebouncedFunction" />

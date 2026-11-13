@@ -1,0 +1,23 @@
+---
+title: useUrlSearchParams
+description: "Reads and updates `window.location.search` as reactive `URLSearchParams` synchronized with browser history."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useUrlSearchParams" />
+
+## Usage
+
+```tsx
+const [searchParams, setSearchParams] = useUrlSearchParams();
+const query = searchParams.get('q') ?? '';
+```
+
+## API Reference
+
+### `UseUrlSearchParamsOptions`
+
+<AutoTypeTable path="./hooks/useUrlSearchParams.ts" name="UseUrlSearchParamsOptions" />

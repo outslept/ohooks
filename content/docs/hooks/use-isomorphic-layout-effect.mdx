@@ -1,0 +1,18 @@
+---
+title: useIsomorphicLayoutEffect
+description: "Uses `useLayoutEffect` in browser environments and falls back to `useEffect` during server-side rendering to avoid React SSR warnings."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useIsomorphicLayoutEffect" />
+
+## Usage
+
+```tsx
+useIsomorphicLayoutEffect(() => {
+  measureNode();
+}, []);
+```

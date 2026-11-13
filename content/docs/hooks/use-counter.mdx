@@ -1,0 +1,26 @@
+---
+title: useCounter
+description: "Manages a numeric counter state with optional min/max clamping and helper methods."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useCounter" />
+
+## Usage
+
+```tsx
+const { count, inc, dec, reset } = useCounter(0, { min: 0, max: 10 });
+```
+
+## API Reference
+
+### `UseCounterOptions`
+
+<AutoTypeTable path="./hooks/useCounter.ts" name="UseCounterOptions" />
+
+### `UseCounterReturn`
+
+<AutoTypeTable path="./hooks/useCounter.ts" name="UseCounterReturn" />

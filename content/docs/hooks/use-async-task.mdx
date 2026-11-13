@@ -1,0 +1,35 @@
+---
+title: useAsyncTask
+description: "Manages the manual execution, cancellation, and state of an asynchronous task with `AbortSignal` support."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useAsyncTask" />
+
+## Usage
+
+```tsx
+const { run, abort, isPending, data } = useAsyncTask(
+  async ({ signal }, id: string) => {
+    const res = await fetch(`/api/users/${id}`, { signal });
+    return res.json();
+  },
+);
+```
+
+## API Reference
+
+### `AsyncTaskContext`
+
+<AutoTypeTable path="./hooks/useAsyncTask.ts" name="AsyncTaskContext" />
+
+### `UseAsyncTaskOptions`
+
+<AutoTypeTable path="./hooks/useAsyncTask.ts" name="UseAsyncTaskOptions" />
+
+### `UseAsyncTaskReturn`
+
+<AutoTypeTable path="./hooks/useAsyncTask.ts" name="UseAsyncTaskReturn" />

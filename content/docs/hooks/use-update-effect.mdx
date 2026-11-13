@@ -1,0 +1,18 @@
+---
+title: useUpdateEffect
+description: "Runs a `useEffect` callback only on dependency updates, skipping the initial mount."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useUpdateEffect" />
+
+## Usage
+
+```tsx
+useUpdateEffect(() => {
+  saveDraft(content);
+}, [content]);
+```

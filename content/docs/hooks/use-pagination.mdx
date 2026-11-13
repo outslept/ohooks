@@ -1,0 +1,29 @@
+---
+title: usePagination
+description: "Computes pagination state, page ranges with ellipsis markers, data slice indices, and navigation helpers."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="usePagination" />
+
+## Usage
+
+```tsx
+const { page, items, nextPage, prevPage, setPage } = usePagination({
+  totalItems: 250,
+  pageSize: 20,
+});
+```
+
+## API Reference
+
+### `UsePaginationOptions`
+
+<AutoTypeTable path="./hooks/usePagination.ts" name="UsePaginationOptions" />
+
+### `UsePaginationReturn`
+
+<AutoTypeTable path="./hooks/usePagination.ts" name="UsePaginationReturn" />

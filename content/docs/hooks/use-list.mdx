@@ -1,0 +1,22 @@
+---
+title: useList
+description: "Manages an array state with immutable helper methods for pushing, inserting, updating, removing, filtering, and sorting items."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useList" />
+
+## Usage
+
+```tsx
+const [items, { push, removeAt, clear }] = useList<string>(['a', 'b']);
+```
+
+## API Reference
+
+### `UseListActions`
+
+<AutoTypeTable path="./hooks/useList.ts" name="UseListActions" />

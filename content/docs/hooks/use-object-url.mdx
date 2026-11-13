@@ -1,0 +1,17 @@
+---
+title: useObjectUrl
+description: "Creates a temporary object URL (`URL.createObjectURL`) for a `Blob`, `File`, or `MediaSource` and automatically revokes it on change or unmount."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useObjectUrl" />
+
+## Usage
+
+```tsx
+const previewUrl = useObjectUrl(selectedFile);
+// {previewUrl && <img src={previewUrl} alt="Preview" />}
+```

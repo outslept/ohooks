@@ -1,0 +1,29 @@
+---
+title: useCookie
+description: "Reads, writes, and deletes a browser cookie reactively using `useSyncExternalStore`."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useCookie" />
+
+## Usage
+
+```tsx
+const [token, setToken, deleteToken] = useCookie('auth_token', {
+  path: '/',
+  sameSite: 'lax',
+});
+```
+
+## API Reference
+
+### `CookieAttributes`
+
+<AutoTypeTable path="./hooks/useCookie.ts" name="CookieAttributes" />
+
+### `UseCookieOptions`
+
+<AutoTypeTable path="./hooks/useCookie.ts" name="UseCookieOptions" />

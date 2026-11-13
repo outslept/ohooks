@@ -1,0 +1,28 @@
+---
+title: useInfiniteScroll
+description: "Triggers an asynchronous `onLoadMore` callback when a sentinel element scrolls into view using `IntersectionObserver`."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useInfiniteScroll" />
+
+## Usage
+
+```tsx
+const { isLoading } = useInfiniteScroll(sentinelRef, fetchNextPage, {
+  hasMore: hasNextPage,
+});
+```
+
+## API Reference
+
+### `UseInfiniteScrollOptions`
+
+<AutoTypeTable path="./hooks/useInfiniteScroll.ts" name="UseInfiniteScrollOptions" />
+
+### `UseInfiniteScrollReturn`
+
+<AutoTypeTable path="./hooks/useInfiniteScroll.ts" name="UseInfiniteScrollReturn" />

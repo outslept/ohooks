@@ -1,0 +1,17 @@
+---
+title: useHydrated
+description: "Returns `false` during server-side rendering and initial hydration, and `true` once hydrated on the client."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useHydrated" />
+
+## Usage
+
+```tsx
+const isHydrated = useHydrated();
+if (!isHydrated) return <Skeleton />;
+```

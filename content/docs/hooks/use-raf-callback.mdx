@@ -1,0 +1,24 @@
+---
+title: useRafCallback
+description: "Throttles a callback so it executes at most once per `requestAnimationFrame` with the latest arguments."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useRafCallback" />
+
+## Usage
+
+```tsx
+const onPointerMove = useRafCallback((x: number, y: number) => {
+  updatePosition(x, y);
+});
+```
+
+## API Reference
+
+### `RafScheduledFunction`
+
+<AutoTypeTable path="./hooks/useRafCallback.ts" name="RafScheduledFunction" />

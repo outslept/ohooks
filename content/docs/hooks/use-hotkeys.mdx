@@ -1,0 +1,24 @@
+---
+title: useHotkeys
+description: "Listens for keyboard shortcut combinations (including cross-platform `mod` support) and invokes a callback when matched."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useHotkeys" />
+
+## Usage
+
+```tsx
+useHotkeys('mod+k', () => {
+  setCommandPaletteOpen(true);
+});
+```
+
+## API Reference
+
+### `UseHotkeysOptions`
+
+<AutoTypeTable path="./hooks/useHotkeys.ts" name="UseHotkeysOptions" />

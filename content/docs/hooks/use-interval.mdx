@@ -1,0 +1,18 @@
+---
+title: useInterval
+description: "Runs a callback repeatedly at a specified millisecond interval, pausing when `delay` is `null`."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useInterval" />
+
+## Usage
+
+```tsx
+useInterval(() => {
+  pollStatus();
+}, isPolling ? 5000 : null);
+```

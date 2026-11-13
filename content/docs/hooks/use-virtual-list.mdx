@@ -1,0 +1,34 @@
+---
+title: useVirtualList
+description: "Virtualizes a large list of fixed or variable-height items so only visible rows are rendered."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useVirtualList" />
+
+## Usage
+
+```tsx
+const containerRef = useRef<HTMLDivElement>(null);
+const { virtualItems, wrapperProps } = useVirtualList(rows, {
+  containerTarget: containerRef,
+  itemHeight: 40,
+});
+```
+
+## API Reference
+
+### `VirtualItem`
+
+<AutoTypeTable path="./hooks/useVirtualList.ts" name="VirtualItem" />
+
+### `UseVirtualListOptions`
+
+<AutoTypeTable path="./hooks/useVirtualList.ts" name="UseVirtualListOptions" />
+
+### `UseVirtualListReturn`
+
+<AutoTypeTable path="./hooks/useVirtualList.ts" name="UseVirtualListReturn" />

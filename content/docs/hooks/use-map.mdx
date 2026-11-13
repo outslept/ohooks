@@ -1,0 +1,22 @@
+---
+title: useMap
+description: "Manages a reactive `Map` state with immutable helper actions for setting, deleting, clearing, and querying entries."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useMap" />
+
+## Usage
+
+```tsx
+const [map, { set, remove, clear }] = useMap<string, number>([['a', 1]]);
+```
+
+## API Reference
+
+### `UseMapActions`
+
+<AutoTypeTable path="./hooks/useMap.ts" name="UseMapActions" />

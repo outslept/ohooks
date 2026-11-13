@@ -1,0 +1,28 @@
+---
+title: useSelection
+description: "Manages single or multi-item selection state with range selection and bulk toggle helpers."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useSelection" />
+
+## Usage
+
+```tsx
+const { isSelected, toggle, toggleAll, isAllSelected } = useSelection(users, {
+  getKey: (u) => u.id,
+});
+```
+
+## API Reference
+
+### `UseSelectionOptions`
+
+<AutoTypeTable path="./hooks/useSelection.ts" name="UseSelectionOptions" />
+
+### `UseSelectionReturn`
+
+<AutoTypeTable path="./hooks/useSelection.ts" name="UseSelectionReturn" />

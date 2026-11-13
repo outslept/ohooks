@@ -1,0 +1,29 @@
+---
+title: useLongPress
+description: "Detects long-press pointer gestures with movement threshold cancellation and click suppression."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useLongPress" />
+
+## Usage
+
+```tsx
+const longPressProps = useLongPress(() => {
+  openContextMenu();
+}, { threshold: 500 });
+// <button {...longPressProps}>Hold me</button>
+```
+
+## API Reference
+
+### `UseLongPressOptions`
+
+<AutoTypeTable path="./hooks/useLongPress.ts" name="UseLongPressOptions" />
+
+### `UseLongPressHandlers`
+
+<AutoTypeTable path="./hooks/useLongPress.ts" name="UseLongPressHandlers" />

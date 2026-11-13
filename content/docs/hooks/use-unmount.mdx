@@ -1,0 +1,18 @@
+---
+title: useUnmount
+description: "Executes a cleanup callback when the component unmounts, always using the latest function reference."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useUnmount" />
+
+## Usage
+
+```tsx
+useUnmount(() => {
+  analytics.trackExit(latestStep);
+});
+```

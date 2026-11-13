@@ -1,0 +1,26 @@
+---
+title: useBroadcastChannel
+description: "Communicates between browser tabs, windows, or iframes of the same origin using the `BroadcastChannel` API."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useBroadcastChannel" />
+
+## Usage
+
+```tsx
+const { lastMessage, postMessage } = useBroadcastChannel<string>('auth-channel');
+```
+
+## API Reference
+
+### `UseBroadcastChannelOptions`
+
+<AutoTypeTable path="./hooks/useBroadcastChannel.ts" name="UseBroadcastChannelOptions" />
+
+### `UseBroadcastChannelReturn`
+
+<AutoTypeTable path="./hooks/useBroadcastChannel.ts" name="UseBroadcastChannelReturn" />

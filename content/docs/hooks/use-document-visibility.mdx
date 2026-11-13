@@ -1,0 +1,17 @@
+---
+title: useDocumentVisibility
+description: "Tracks the current `document.visibilityState` (`'visible'` or `'hidden'`) using `useSyncExternalStore`."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useDocumentVisibility" />
+
+## Usage
+
+```tsx
+const visibility = useDocumentVisibility();
+const isHidden = visibility === 'hidden';
+```

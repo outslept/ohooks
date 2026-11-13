@@ -1,0 +1,25 @@
+---
+title: useFocusTrap
+description: "Traps keyboard `Tab` / `Shift+Tab` focus within a container element and optionally restores focus on unmount."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useFocusTrap" />
+
+## Usage
+
+```tsx
+useFocusTrap(modalRef, {
+  enabled: isOpen,
+  onEscape: () => setIsOpen(false),
+});
+```
+
+## API Reference
+
+### `UseFocusTrapOptions`
+
+<AutoTypeTable path="./hooks/useFocusTrap.ts" name="UseFocusTrapOptions" />

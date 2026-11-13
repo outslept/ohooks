@@ -1,0 +1,22 @@
+---
+title: useNetworkInformation
+description: "Tracks network connectivity status and connection quality metrics (`effectiveType`, `downlink`, `rtt`, `saveData`) via the Network Information API."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useNetworkInformation" />
+
+## Usage
+
+```tsx
+const { isOnline, effectiveType, saveData } = useNetworkInformation();
+```
+
+## API Reference
+
+### `NetworkInformationState`
+
+<AutoTypeTable path="./hooks/useNetworkInformation.ts" name="NetworkInformationState" />

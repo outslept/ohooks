@@ -1,0 +1,28 @@
+---
+title: useGeolocation
+description: "Watches the user's geographic location reactively using `navigator.geolocation.watchPosition`."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useGeolocation" />
+
+## Usage
+
+```tsx
+const { latitude, longitude, loading, error } = useGeolocation({
+  enableHighAccuracy: true,
+});
+```
+
+## API Reference
+
+### `UseGeolocationOptions`
+
+<AutoTypeTable path="./hooks/useGeolocation.ts" name="UseGeolocationOptions" />
+
+### `GeolocationState`
+
+<AutoTypeTable path="./hooks/useGeolocation.ts" name="GeolocationState" />

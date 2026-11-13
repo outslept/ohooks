@@ -1,0 +1,30 @@
+---
+title: useCountdown
+description: "Manages a configurable countdown (or count-up) timer with start, pause, and reset controls."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useCountdown" />
+
+## Usage
+
+```tsx
+const { count, isRunning, start, pause, reset } = useCountdown({
+  countStart: 60,
+  countStop: 0,
+  intervalMs: 1000,
+});
+```
+
+## API Reference
+
+### `UseCountdownOptions`
+
+<AutoTypeTable path="./hooks/useCountdown.ts" name="UseCountdownOptions" />
+
+### `UseCountdownReturn`
+
+<AutoTypeTable path="./hooks/useCountdown.ts" name="UseCountdownReturn" />

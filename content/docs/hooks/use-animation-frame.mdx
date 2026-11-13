@@ -1,0 +1,32 @@
+---
+title: useAnimationFrame
+description: "Runs a callback on every `requestAnimationFrame` tick with delta time tracking, FPS limiting, and playback controls."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useAnimationFrame" />
+
+## Usage
+
+```tsx
+const { isActive, toggle } = useAnimationFrame(({ deltaTime }) => {
+  updatePosition(deltaTime);
+}, { fpsLimit: 60 });
+```
+
+## API Reference
+
+### `AnimationFrameInfo`
+
+<AutoTypeTable path="./hooks/useAnimationFrame.ts" name="AnimationFrameInfo" />
+
+### `UseAnimationFrameOptions`
+
+<AutoTypeTable path="./hooks/useAnimationFrame.ts" name="UseAnimationFrameOptions" />
+
+### `UseAnimationFrameControls`
+
+<AutoTypeTable path="./hooks/useAnimationFrame.ts" name="UseAnimationFrameControls" />

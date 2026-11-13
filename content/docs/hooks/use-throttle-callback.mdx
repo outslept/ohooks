@@ -1,0 +1,28 @@
+---
+title: useThrottleCallback
+description: "Creates a throttled version of a callback that executes at most once every `wait` milliseconds."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useThrottleCallback" />
+
+## Usage
+
+```tsx
+const handleScroll = useThrottleCallback((scrollY: number) => {
+  saveScrollPosition(scrollY);
+}, 200);
+```
+
+## API Reference
+
+### `ThrottleOptions`
+
+<AutoTypeTable path="./hooks/useThrottleCallback.ts" name="ThrottleOptions" />
+
+### `ThrottledFunction`
+
+<AutoTypeTable path="./hooks/useThrottleCallback.ts" name="ThrottledFunction" />

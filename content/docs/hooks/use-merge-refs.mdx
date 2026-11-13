@@ -1,0 +1,17 @@
+---
+title: useMergeRefs
+description: "Combines multiple React refs (callback refs, `RefObject`s, or `null`/`undefined`) into a single stable callback ref with React 19 cleanup support."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useMergeRefs" />
+
+## Usage
+
+```tsx
+const mergedRef = useMergeRefs(localRef, forwardedRef);
+// <div ref={mergedRef} />
+```

@@ -1,0 +1,25 @@
+---
+title: useResizeObserver
+description: "Observes size changes on a target DOM element using the `ResizeObserver` API."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useResizeObserver" />
+
+## Usage
+
+```tsx
+const boxRef = useRef<HTMLDivElement>(null);
+useResizeObserver(boxRef, (entry) => {
+  console.log(entry.contentRect.width);
+});
+```
+
+## API Reference
+
+### `UseResizeObserverOptions`
+
+<AutoTypeTable path="./hooks/useResizeObserver.ts" name="UseResizeObserverOptions" />

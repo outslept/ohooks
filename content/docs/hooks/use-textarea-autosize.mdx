@@ -1,0 +1,27 @@
+---
+title: useTextareaAutosize
+description: "Automatically adjusts the height of a `<textarea>` element to fit its content."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useTextareaAutosize" />
+
+## Usage
+
+```tsx
+const textareaRef = useRef<HTMLTextAreaElement>(null);
+useTextareaAutosize(textareaRef, text, { maxHeight: 300 });
+```
+
+## API Reference
+
+### `UseTextareaAutosizeOptions`
+
+<AutoTypeTable path="./hooks/useTextareaAutosize.ts" name="UseTextareaAutosizeOptions" />
+
+### `UseTextareaAutosizeReturn`
+
+<AutoTypeTable path="./hooks/useTextareaAutosize.ts" name="UseTextareaAutosizeReturn" />

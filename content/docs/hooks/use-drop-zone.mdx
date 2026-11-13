@@ -1,0 +1,33 @@
+---
+title: useDropZone
+description: "Handles file drag-and-drop interactions with MIME/extension filtering via a target ref or `getRootProps`."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useDropZone" />
+
+## Usage
+
+```tsx
+const { isOver, files, getRootProps } = useDropZone({
+  accept: 'image/*',
+  onDrop: (accepted) => console.log(accepted),
+});
+```
+
+## API Reference
+
+### `UseDropZoneOptions`
+
+<AutoTypeTable path="./hooks/useDropZone.ts" name="UseDropZoneOptions" />
+
+### `DropZoneRootProps`
+
+<AutoTypeTable path="./hooks/useDropZone.ts" name="DropZoneRootProps" />
+
+### `UseDropZoneReturn`
+
+<AutoTypeTable path="./hooks/useDropZone.ts" name="UseDropZoneReturn" />

@@ -1,0 +1,18 @@
+---
+title: useEventCallback
+description: "Returns a referentially stable callback that always invokes the latest version of `fn`."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useEventCallback" />
+
+## Usage
+
+```tsx
+const handleSubmit = useEventCallback((data: FormData) => {
+  send(data, latestProp);
+});
+```

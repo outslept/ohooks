@@ -1,0 +1,22 @@
+---
+title: useLocalStorage
+description: "Persists and synchronizes state with `window.localStorage` across components and browser tabs."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useLocalStorage" />
+
+## Usage
+
+```tsx
+const [theme, setTheme, removeTheme] = useLocalStorage('theme', 'light');
+```
+
+## API Reference
+
+### `StorageOptions`
+
+<AutoTypeTable path="./hooks/useLocalStorage.ts" name="StorageOptions" />

@@ -1,0 +1,24 @@
+---
+title: useMutationObserver
+description: "Observes DOM tree, attribute, or character data mutations on a target node using `MutationObserver`."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useMutationObserver" />
+
+## Usage
+
+```tsx
+useMutationObserver(containerRef, (mutations) => {
+  console.log('DOM mutated:', mutations);
+}, { childList: true, subtree: true });
+```
+
+## API Reference
+
+### `UseMutationObserverOptions`
+
+<AutoTypeTable path="./hooks/useMutationObserver.ts" name="UseMutationObserverOptions" />

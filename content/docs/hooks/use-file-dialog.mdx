@@ -1,0 +1,26 @@
+---
+title: useFileDialog
+description: "Opens the native file selection dialog programmatically without rendering a visible `<input type=\"file\">` element."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useFileDialog" />
+
+## Usage
+
+```tsx
+const { files, open, reset } = useFileDialog({ accept: 'image/*', multiple: false });
+```
+
+## API Reference
+
+### `UseFileDialogOptions`
+
+<AutoTypeTable path="./hooks/useFileDialog.ts" name="UseFileDialogOptions" />
+
+### `UseFileDialogReturn`
+
+<AutoTypeTable path="./hooks/useFileDialog.ts" name="UseFileDialogReturn" />

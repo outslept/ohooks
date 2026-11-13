@@ -1,0 +1,26 @@
+---
+title: useCopyToClipboard
+description: "Copies text to the system clipboard and tracks the copied state with an optional auto-reset timer."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useCopyToClipboard" />
+
+## Usage
+
+```tsx
+const { isCopied, copy } = useCopyToClipboard({ resetInterval: 2000 });
+```
+
+## API Reference
+
+### `UseCopyToClipboardOptions`
+
+<AutoTypeTable path="./hooks/useCopyToClipboard.ts" name="UseCopyToClipboardOptions" />
+
+### `UseCopyToClipboardReturn`
+
+<AutoTypeTable path="./hooks/useCopyToClipboard.ts" name="UseCopyToClipboardReturn" />

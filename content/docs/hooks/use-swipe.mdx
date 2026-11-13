@@ -1,0 +1,30 @@
+---
+title: useSwipe
+description: "Detects pointer swipe gestures and directions on a target element."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="useSwipe" />
+
+## Usage
+
+```tsx
+const cardRef = useRef<HTMLDivElement>(null);
+const { direction } = useSwipe(cardRef, {
+  onSwipeLeft: () => nextSlide(),
+  onSwipeRight: () => prevSlide(),
+});
+```
+
+## API Reference
+
+### `SwipeState`
+
+<AutoTypeTable path="./hooks/useSwipe.ts" name="SwipeState" />
+
+### `UseSwipeOptions`
+
+<AutoTypeTable path="./hooks/useSwipe.ts" name="UseSwipeOptions" />

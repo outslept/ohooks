@@ -1,0 +1,27 @@
+---
+title: usePointerDrag
+description: "Tracks pointer drag gestures on a target element with axis locking and movement thresholds."
+---
+
+{/* Preview */}
+
+## Installation
+
+<HookInstallation name="usePointerDrag" />
+
+## Usage
+
+```tsx
+const boxRef = useRef<HTMLDivElement>(null);
+const { isDragging, deltaX, deltaY } = usePointerDrag(boxRef);
+```
+
+## API Reference
+
+### `PointerDragState`
+
+<AutoTypeTable path="./hooks/usePointerDrag.ts" name="PointerDragState" />
+
+### `UsePointerDragOptions`
+
+<AutoTypeTable path="./hooks/usePointerDrag.ts" name="UsePointerDragOptions" />
