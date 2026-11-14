@@ -18,7 +18,7 @@ concurrency:
 jobs:
   diff:
     name: dependency diff
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     if: >-
       !contains(github.event.pull_request.title, '[skip ci]') &&
       !contains(github.event.pull_request.title, '[ci skip]') &&
@@ -26,12 +26,12 @@ jobs:
 
     steps:
       - name: checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: create dependency diff
-        uses: e18e/action-dependency-diff@v1
+        uses: e18e/action-dependency-diff@9a7f09f5f2993256322e0db17ee4c8d9339dab77 # v1.7.1
         with:
           base-ref: dev
           size-threshold: -1
