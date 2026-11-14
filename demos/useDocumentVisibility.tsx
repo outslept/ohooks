@@ -1,177 +1,200 @@
-'use client';
+"use client"
 
-import { useEffect, useRef, useState } from 'react';
-import { useDocumentVisibility } from '@/hooks/useDocumentVisibility';
+import { useEffect, useRef, useState } from "react"
+import { EyeIcon, EyeOffIcon, RotateCcwIcon } from "lucide-react"
+import { cn } from "cn"
+
+import { useDocumentVisibility } from "@/hooks/useDocumentVisibility"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 
 export default function UseDocumentVisibilityDemo() {
-  const visibility = useDocumentVisibility();
-  const [awayCount, setAwayCount] = useState(0);
-  const [lastAwayMs, setLastAwayMs] = useState<number | null>(null);
-  const [isSimulating, setIsSimulating] = useState(false);
+  const visibility = useDocumentVisibility()
+  const [awayCount, setAwayCount] = useState(0)
+  const [lastAwayMs, setLastAwayMs] = useState<number | null>(null)
+  const [isSimulating, setIsSimulating] = useState(false)
 
-  const prevVisibilityRef = useRef<DocumentVisibilityState>(visibility);
-  const hiddenSinceRef = useRef<number | null>(null);
-  const simTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevVisibilityRef = useRef<DocumentVisibilityState>(visibility)
+  const hiddenSinceRef = useRef<number | null>(null)
+  const simTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const restoreNativeVisibility = () => {
     if (simTimerRef.current !== null) {
-      clearTimeout(simTimerRef.current);
-      simTimerRef.current = null;
+      clearTimeout(simTimerRef.current)
+      simTimerRef.current = null
     }
-    if (typeof document !== 'undefined') {
+    if (typeof document !== "undefined") {
       delete (document as { visibilityState?: DocumentVisibilityState })
-        .visibilityState;
-      document.dispatchEvent(new Event('visibilitychange'));
+        .visibilityState
+      document.dispatchEvent(new Event("visibilitychange"))
     }
-    setIsSimulating(false);
-  };
+    setIsSimulating(false)
+  }
 
   useEffect(() => {
-    const prev = prevVisibilityRef.current;
-    if (prev === visibility) return;
-    prevVisibilityRef.current = visibility;
+    if (typeof document === "undefined") return
 
-    if (visibility === 'hidden') {
-      hiddenSinceRef.current = performance.now();
-      setAwayCount((c) => c + 1);
-    } else if (visibility === 'visible' && hiddenSinceRef.current !== null) {
-      const elapsed = Math.max(0, performance.now() - hiddenSinceRef.current);
-      hiddenSinceRef.current = null;
-      setLastAwayMs(Math.round(elapsed));
+    const handleVisibilityChange = () => {
+      const current = document.visibilityState
+      const prev = prevVisibilityRef.current
+      if (prev === current) return
+      prevVisibilityRef.current = current
+
+      if (current === "hidden") {
+        hiddenSinceRef.current = performance.now()
+        setAwayCount((c) => c + 1)
+      } else if (current === "visible" && hiddenSinceRef.current !== null) {
+        const elapsed = Math.max(0, performance.now() - hiddenSinceRef.current)
+        hiddenSinceRef.current = null
+        setLastAwayMs(Math.round(elapsed))
+      }
     }
-  }, [visibility]);
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [])
 
   useEffect(() => {
     return () => {
       if (simTimerRef.current !== null) {
-        clearTimeout(simTimerRef.current);
+        clearTimeout(simTimerRef.current)
       }
-      if (typeof document !== 'undefined') {
+      if (typeof document !== "undefined") {
         delete (document as { visibilityState?: DocumentVisibilityState })
-          .visibilityState;
+          .visibilityState
       }
-    };
-  }, []);
+    }
+  }, [])
 
   const triggerSimulatedAway = () => {
-    if (typeof document === 'undefined') return;
+    if (typeof document === "undefined") return
     if (isSimulating) {
-      restoreNativeVisibility();
-      return;
+      restoreNativeVisibility()
+      return
     }
 
-    setIsSimulating(true);
-    Object.defineProperty(document, 'visibilityState', {
+    setIsSimulating(true)
+    Object.defineProperty(document, "visibilityState", {
       configurable: true,
-      get: () => 'hidden',
-    });
-    document.dispatchEvent(new Event('visibilitychange'));
+      get: () => "hidden",
+    })
+    document.dispatchEvent(new Event("visibilitychange"))
 
     simTimerRef.current = setTimeout(() => {
-      restoreNativeVisibility();
-    }, 1200);
-  };
+      restoreNativeVisibility()
+    }, 1200)
+  }
 
   const resetStats = () => {
-    setAwayCount(0);
-    setLastAwayMs(null);
-  };
+    setAwayCount(0)
+    setLastAwayMs(null)
+  }
 
-  const isVisible = visibility === 'visible';
+  const isVisible = visibility === "visible"
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
 
-        <div
-          style={{
-            transform: isVisible ? 'scale3d(1, 1, 1)' : 'scale3d(0.97, 0.97, 1)',
-          }}
-          className={`relative flex w-56 flex-col items-center justify-center gap-2 border bg-fd-card/85 px-4 py-3.5 shadow-2xs backdrop-blur-[2px] transition-[transform,border-color,opacity] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${
-            isVisible
-              ? 'border-fd-primary/30 opacity-100'
-              : 'border-fd-border opacity-80'
-          }`}
-        >
-          <span
-            className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isVisible ? 1 : 0.35 }}
-          />
-          <span
-            className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isVisible ? 1 : 0.35 }}
-          />
-          <span
-            className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isVisible ? 1 : 0.35 }}
-          />
-          <span
-            className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isVisible ? 1 : 0.35 }}
-          />
+        <div className="flex items-center justify-between gap-2">
 
-          <div className="flex items-center gap-2">
-            <span
-              className={`size-2 rounded-full transition-colors duration-150 ease-out ${
-                isVisible ? 'bg-emerald-500' : 'bg-amber-500'
-              }`}
-            />
-            <span className="font-mono text-base font-semibold tracking-tight text-fd-foreground">
-              {visibility}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3 font-mono text-[11px] tabular-nums text-fd-muted-foreground">
-            <span>
-              away:{' '}
-              <strong className="font-semibold text-fd-foreground">
-                {awayCount}
-              </strong>
-            </span>
-            <span>·</span>
-            <span>
-              last:{' '}
-              <strong className="font-semibold text-fd-foreground">
-                {lastAwayMs !== null ? `${(lastAwayMs / 1000).toFixed(1)}s` : '—'}
-              </strong>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={triggerSimulatedAway}
-            className="rounded-lg bg-fd-primary/10 px-2.5 py-1 font-mono text-[11px] font-semibold text-fd-primary transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/20 motion-reduce:transition-none"
+          <Badge
+            variant={isVisible ? "accent" : "warning"}
+            size="compact"
+            className="font-mono uppercase"
           >
-            {isSimulating ? 'Restore visible' : 'Simulate away (1.2s)'}
-          </button>
-
-          {awayCount > 0 && (
-            <button
-              type="button"
-              onClick={resetStats}
-              className="rounded-lg border bg-fd-muted/40 px-2.5 py-1 font-mono text-[11px] font-medium text-fd-muted-foreground transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-foreground motion-reduce:transition-none"
-            >
-              Reset
-            </button>
-          )}
+            {visibility}
+          </Badge>
         </div>
 
-        <span className="font-mono text-[11px] text-fd-muted-foreground">
-          or switch browser tab
-        </span>
+
+        <div
+          className={cn(
+            "flex items-center justify-between rounded-md border px-3.5 py-3 transition-all duration-150",
+            isVisible
+              ? "border-border-subtle bg-subtle/35"
+              : "border-warning/30 bg-warning/5"
+          )}
+        >
+          <div className="flex items-center gap-2.5">
+            <div
+              className={cn(
+                "flex size-7 items-center justify-center rounded-sm border transition-colors",
+                isVisible
+                  ? "border-border-subtle bg-control text-foreground"
+                  : "border-warning/30 bg-warning/10 text-warning"
+              )}
+            >
+              {isVisible ? (
+                <EyeIcon className="size-3.5" />
+              ) : (
+                <EyeOffIcon className="size-3.5" />
+              )}
+            </div>
+            <div className="flex flex-col">
+              <span className="font-mono text-xs font-semibold text-foreground">
+                {isVisible ? "Document Visible" : "Document Hidden"}
+              </span>
+              <span className="font-mono text-3xs text-muted-foreground">
+                Switch browser tab or simulate
+              </span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+
+
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Away Count
+          </span>
+          <span className="font-mono text-xs font-semibold text-foreground tabular-nums">
+            {awayCount}
+          </span>
+        </div>
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Last Away Duration
+          </span>
+          <span className="font-mono text-xs font-semibold text-primary tabular-nums">
+            {lastAwayMs !== null ? `${(lastAwayMs / 1000).toFixed(1)}s` : "—"}
+          </span>
+        </div>
       </div>
-    </div>
-  );
+
+      <CardFooter className="border-t">
+        <Button
+          variant={isSimulating ? "secondary" : "primary"}
+          size="compact"
+          onClick={triggerSimulatedAway}
+          className="flex-1"
+        >
+          {isSimulating ? (
+            <>
+              <EyeIcon />
+              Restore Visible
+            </>
+          ) : (
+            <>
+              <EyeOffIcon />
+              Simulate Away (1.2s)
+            </>
+          )}
+        </Button>
+        <Button
+          variant="tertiary"
+          size="compact"
+          onClick={resetStats}
+          disabled={awayCount === 0}
+        >
+          <RotateCcwIcon />
+          Reset
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }

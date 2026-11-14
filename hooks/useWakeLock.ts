@@ -62,11 +62,18 @@ export function useWakeLock(
 
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
+  const [prevEnabled, setPrevEnabled] = useState<boolean>(enabled);
   const onErrorRef = useLatest(onError);
+
+  if (prevEnabled !== enabled) {
+    setPrevEnabled(enabled);
+    if (!enabled && isLocked) {
+      setIsLocked(false);
+    }
+  }
 
   useEffect(() => {
     if (!enabled || !isWakeLockSupported() || typeof document === 'undefined') {
-      setIsLocked(false);
       return;
     }
 
@@ -144,13 +151,12 @@ export function useWakeLock(
         void sentinel.release().catch(() => {});
         sentinel = null;
       }
-      setIsLocked(false);
     };
   }, [enabled, reacquireOnVisible, onErrorRef]);
 
   return {
     isSupported: isWakeLockSupported(),
-    isLocked,
+    isLocked: enabled ? isLocked : false,
     error,
   };
 }

@@ -1,64 +1,51 @@
-'use client';
+"use client";
 
-import { useBoolean } from '@/hooks/useBoolean';
+import { Check, RefreshCw, X } from "lucide-react";
+import { useBoolean } from "@/hooks/useBoolean";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { cn } from "cn";
 
-const BOOL_OPTIONS = [
-  { value: true, label: 'setTrue' },
-  { value: false, label: 'setFalse' },
-] as const;
-
-export default function UseBooleanDemo() {
+export function UseBooleanDemo() {
   const { value, setValue, setTrue, setFalse, toggle } = useBoolean(true);
 
-  const activeIdx = value ? 0 : 1;
-
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
 
-        <div
-          style={{
-            transform: value ? 'scale3d(1, 1, 1)' : 'scale3d(0.97, 0.97, 1)',
-          }}
-          className={`relative flex w-52 flex-col items-center justify-center gap-2.5 border bg-fd-card/85 px-4 py-3.5 shadow-2xs backdrop-blur-[2px] transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${
-            value ? 'border-fd-primary/35' : 'border-fd-border'
-          }`}
-        >
+        <div className="relative flex h-24 w-full flex-col items-center justify-center gap-2.5 rounded-md border border-border-subtle bg-subtle/35 px-4">
           <span
-            className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: value ? 1 : 0.35 }}
+            aria-hidden="true"
+            className={cn(
+              "absolute top-1.5 left-1.5 size-2 border-t-[1.5px] border-l-[1.5px] border-foreground transition-opacity duration-200",
+              value ? "opacity-85" : "opacity-25"
+            )}
           />
           <span
-            className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: value ? 1 : 0.35 }}
+            aria-hidden="true"
+            className={cn(
+              "absolute top-1.5 right-1.5 size-2 border-t-[1.5px] border-r-[1.5px] border-foreground transition-opacity duration-200",
+              value ? "opacity-85" : "opacity-25"
+            )}
           />
           <span
-            className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: value ? 1 : 0.35 }}
+            aria-hidden="true"
+            className={cn(
+              "absolute bottom-1.5 left-1.5 size-2 border-b-[1.5px] border-l-[1.5px] border-foreground transition-opacity duration-200",
+              value ? "opacity-85" : "opacity-25"
+            )}
           />
           <span
-            className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: value ? 1 : 0.35 }}
+            aria-hidden="true"
+            className={cn(
+              "absolute right-1.5 bottom-1.5 size-2 border-r-[1.5px] border-b-[1.5px] border-foreground transition-opacity duration-200",
+              value ? "opacity-85" : "opacity-25"
+            )}
           />
 
-          <div className="flex items-center gap-2">
-            <span
-              className={`size-2 rounded-full transition-colors duration-150 ease-out ${
-                value ? 'bg-emerald-500' : 'bg-fd-muted-foreground/40'
-              }`}
-            />
-            <span className="font-mono text-lg font-semibold tracking-tight text-fd-foreground">
-              {String(value)}
-            </span>
-          </div>
+          <span className="font-mono text-xl font-semibold tracking-tight text-foreground">
+            {String(value)}
+          </span>
 
           <button
             type="button"
@@ -66,64 +53,63 @@ export default function UseBooleanDemo() {
             aria-checked={value}
             aria-label="Toggle boolean via setValue"
             onClick={() => setValue((prev) => !prev)}
-            className={`relative h-5 w-9 rounded-full border p-0.5 transition-colors duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
+            className={cn(
+              "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border p-0.5 outline-none select-none",
+              "transition-[background-color,border-color,transform] duration-150 ease-out active:scale-95",
+              "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
               value
-                ? 'border-fd-primary/40 bg-fd-primary/20'
-                : 'border-fd-border bg-fd-muted'
-            }`}
+                ? "border-primary bg-primary"
+                : "border-border-hover bg-muted"
+            )}
           >
             <span
-              className={`block size-3.5 rounded-full transition-[transform,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${
-                value ? 'bg-fd-primary' : 'bg-fd-muted-foreground/60'
-              }`}
+              className={cn(
+                "block size-3.5 rounded-full shadow-2xs transition-[transform,background-color] duration-200 ease-snappy",
+                value ? "bg-primary-foreground" : "bg-muted-foreground"
+              )}
               style={{
                 transform: `translate3d(${value ? 16 : 0}px, 0, 0)`,
               }}
             />
           </button>
         </div>
-      </div>
+      </CardContent>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <button
-          type="button"
+      <CardFooter className="border-t">
+        <Button
+          size="compact"
+          variant="primary"
+          leadingIcon={RefreshCw}
           onClick={toggle}
-          className="rounded-lg bg-fd-primary/10 px-2.5 py-1 font-mono text-[11px] font-semibold text-fd-primary transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/20 motion-reduce:transition-none"
+          className="flex-1 font-mono"
         >
           toggle()
-        </button>
+        </Button>
 
-        <div
-          role="group"
-          aria-label="Explicit boolean setters"
-          className="relative grid grid-cols-2 rounded-lg border bg-fd-muted/40 p-0.5"
+        <Button
+          size="compact"
+          variant="secondary"
+          leadingIcon={Check}
+          disabled={value}
+          onClick={setTrue}
+          className="font-mono"
         >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/2)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${activeIdx * 100}%, 0, 0)`,
-            }}
-          />
-          {BOOL_OPTIONS.map((option) => {
-            const active = value === option.value;
-            return (
-              <button
-                key={option.label}
-                type="button"
-                onClick={option.value ? setTrue : setFalse}
-                className={`relative z-10 rounded-md px-2 py-0.5 font-mono text-[11px] font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-foreground'
-                }`}
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
+          setTrue
+        </Button>
+
+        <Button
+          size="compact"
+          variant="secondary"
+          leadingIcon={X}
+          disabled={!value}
+          onClick={setFalse}
+          className="font-mono"
+        >
+          setFalse
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
+
+export default UseBooleanDemo;

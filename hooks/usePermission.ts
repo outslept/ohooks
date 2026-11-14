@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLatest } from './useLatest';
 
 export type ExtendedPermissionName =
   | PermissionName
@@ -19,6 +20,14 @@ export interface ExtendedPermissionDescriptor {
 
 export type UsePermissionState = PermissionState | 'loading' | 'unsupported';
 
+function isPermissionsSupported(): boolean {
+  return (
+    typeof navigator !== 'undefined' &&
+    Boolean(navigator.permissions) &&
+    typeof navigator.permissions.query === 'function'
+  );
+}
+
 /**
  * Queries and subscribes to browser permission status changes via `navigator.permissions.query`.
  *
@@ -34,12 +43,24 @@ export type UsePermissionState = PermissionState | 'loading' | 'unsupported';
 export function usePermission(
   permission: ExtendedPermissionName | ExtendedPermissionDescriptor,
 ): UsePermissionState {
-  const [state, setState] = useState<UsePermissionState>('loading');
+  const isSupported = isPermissionsSupported();
+
+  const [state, setState] = useState<UsePermissionState>(() =>
+    isSupported ? 'loading' : 'unsupported',
+  );
+
+  const permissionRef = useLatest(permission);
 
   const descriptorKey =
     typeof permission === 'string'
       ? permission
       : JSON.stringify(permission);
+
+  const [prevDescriptorKey, setPrevDescriptorKey] = useState(descriptorKey);
+  if (prevDescriptorKey !== descriptorKey) {
+    setPrevDescriptorKey(descriptorKey);
+    setState(isSupported ? 'loading' : 'unsupported');
+  }
 
   useEffect(() => {
     if (
@@ -47,7 +68,6 @@ export function usePermission(
       !navigator.permissions ||
       typeof navigator.permissions.query !== 'function'
     ) {
-      setState('unsupported');
       return;
     }
 
@@ -60,12 +80,11 @@ export function usePermission(
       }
     };
 
+    const currentPermission = permissionRef.current;
     const descriptor: PermissionDescriptor =
-      typeof permission === 'string'
-        ? ({ name: permission } as PermissionDescriptor)
-        : (permission as unknown as PermissionDescriptor);
-
-    setState('loading');
+      typeof currentPermission === 'string'
+        ? ({ name: currentPermission } as PermissionDescriptor)
+        : (currentPermission as unknown as PermissionDescriptor);
 
     navigator.permissions
       .query(descriptor)
@@ -89,7 +108,7 @@ export function usePermission(
         permissionStatus.removeEventListener('change', handleChange);
       }
     };
-  }, [descriptorKey]);
+  }, [descriptorKey, permissionRef]);
 
   return state;
 }

@@ -1,198 +1,212 @@
-'use client';
+"use client"
 
-import { Loader2, PartyPopper, RotateCcw } from 'lucide-react';
-import { useState } from 'react';
-import { useScript } from '@/hooks/useScript';
+import { useRef, useState } from "react"
+import { cn } from "cn"
+import { ArrowDown, RotateCcw } from "lucide-react"
 
-const CONFETTI_CDN =
-  'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js';
-const ERROR_CDN = 'https://invalid.example.invalid/missing.js';
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useScrollSpy } from "@/hooks/useScrollSpy"
 
-const SOURCES = [
-  { key: 'idle', label: 'Idle', src: null, shortSrc: 'null' },
+const SECTIONS = [
   {
-    key: 'cdn',
-    label: 'CDN',
-    src: CONFETTI_CDN,
-    shortSrc: 'cdn.jsdelivr.net/.../confetti.browser.min.js',
+    id: "spy-intro",
+    label: "Intro",
+    metric: "01 · Overview",
+    detail: "IntersectionObserver tracks section entry in real time.",
   },
   {
-    key: 'error',
-    label: 'Error',
-    src: ERROR_CDN,
-    shortSrc: 'invalid.example.invalid/missing.js',
+    id: "spy-config",
+    label: "Config",
+    metric: "02 · Root Margin",
+    detail: "Ranks intersecting targets relative to the scroll root.",
   },
-] as const;
+  {
+    id: "spy-perf",
+    label: "Perf",
+    metric: "03 · Zero Polling",
+    detail: "Passive observer callbacks without scroll listener thrashing.",
+  },
+  {
+    id: "spy-api",
+    label: "API",
+    metric: "04 · Return Value",
+    detail: "Returns the active section ID or null when out of view.",
+  },
+] as const
 
-type SourceKey = (typeof SOURCES)[number]['key'];
+const TARGET_SELECTORS = SECTIONS.map((s) => `#${s.id}`)
 
-export default function UseScriptDemo() {
-  const [sourceKey, setSourceKey] = useState<SourceKey>('idle');
-  const activeSource =
-    SOURCES.find((s) => s.key === sourceKey) ?? SOURCES[0];
+const ZONES = [
+  { key: "top", label: "Top", rootMargin: "0px 0px -60% 0px" },
+  { key: "mid", label: "Center", rootMargin: "-30% 0px -30% 0px" },
+] as const
 
-  const status = useScript(activeSource.src, {
-    removeOnUnmount: true,
-  });
+type ZoneKey = (typeof ZONES)[number]["key"]
 
-  const fireConfetti = () => {
-    const win = window as unknown as {
-      confetti?: (opts: Record<string, unknown>) => void;
-    };
-    win.confetti?.({
-      particleCount: 65,
-      spread: 60,
-      origin: { y: 0.65 },
-      disableForReducedMotion: true,
-    });
-  };
+export default function UseScrollSpyDemo() {
+  const scrollRootRef = useRef<HTMLDivElement>(null)
+  const [zoneKey, setZoneKey] = useState<ZoneKey>("top")
 
-  const sourceIndex = SOURCES.findIndex((s) => s.key === sourceKey);
+  const activeZone = ZONES.find((z) => z.key === zoneKey) ?? ZONES[0]
+
+  const activeId = useScrollSpy(TARGET_SELECTORS, {
+    root: scrollRootRef,
+    rootMargin: activeZone.rootMargin,
+    threshold: 0.1,
+  })
+
+  const scrollToSection = (id: string) => {
+    const container = scrollRootRef.current
+    const target = container?.querySelector<HTMLElement>(`#${id}`)
+    if (!container || !target) return
+
+    container.scrollTo({
+      top: target.offsetTop - container.offsetTop - 6,
+      behavior: "smooth",
+    })
+  }
+
+  const handleNextSection = () => {
+    const currentIndex = SECTIONS.findIndex((s) => s.id === activeId)
+    const nextIndex = (currentIndex + 1) % SECTIONS.length
+    scrollToSection(SECTIONS[nextIndex].id)
+  }
+
+  const handleResetScroll = () => {
+    scrollRootRef.current?.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const activeIndex = SECTIONS.findIndex((s) => s.id === activeId)
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
+        <div className="flex items-center justify-between">
 
-        <div className="relative flex w-80 max-w-[calc(100%-1.5rem)] flex-col gap-2.5 border border-fd-primary/25 bg-fd-card/70 p-3.5 shadow-2xs backdrop-blur-[2px]">
-          <span
-            className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: status === 'ready' ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: status === 'ready' ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: status === 'ready' ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: status === 'ready' ? 1 : 0.45 }}
-          />
-
-          <div className="flex items-center justify-between">
-            <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold tracking-wider uppercase text-fd-muted-foreground">
-              {status === 'loading' ? (
-                <Loader2 className="size-2.5 animate-spin text-fd-primary motion-reduce:animate-none" />
-              ) : (
-                <span
-                  className={`size-1.5 rounded-full transition-colors duration-150 ease-out ${
-                    status === 'ready'
-                      ? 'bg-fd-primary'
-                      : status === 'error'
-                        ? 'bg-red-500'
-                        : 'bg-fd-muted-foreground/40'
-                  }`}
-                />
-              )}
-              status:{' '}
-              <strong
-                className={
-                  status === 'ready'
-                    ? 'text-fd-primary'
-                    : status === 'error'
-                      ? 'text-red-500'
-                      : 'text-fd-card-foreground'
-                }
-              >
-                {status}
-              </strong>
-            </span>
-            <span className="font-mono text-[10px] tabular-nums text-fd-muted-foreground">
-              {activeSource.src ? 'in <body />' : 'unmounted'}
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-1 border-y border-fd-border/60 py-2 font-mono text-[11px]">
-            <div className="truncate text-fd-muted-foreground">
-              <span className="text-fd-card-foreground">&lt;script</span>{' '}
-              src=&quot;
-              <span className="text-fd-primary">{activeSource.shortSrc}</span>
-              &quot;
-            </div>
-            <div className="flex items-center justify-between text-[10px] text-fd-muted-foreground">
-              <span>data-status=&quot;{status}&quot;</span>
-              <span>async removeOnUnmount</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between font-mono text-[10px] tabular-nums text-fd-muted-foreground">
-            <span>
-              {status === 'ready'
-                ? 'window.confetti → fn()'
-                : status === 'error'
-                  ? 'onerror event fired'
-                  : status === 'loading'
-                    ? 'fetching script...'
-                    : 'waiting for src'}
-            </span>
-            <span className="uppercase">{sourceKey}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={fireConfetti}
-            disabled={status !== 'ready'}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-fd-primary/10 px-2.5 py-1 text-[11px] font-semibold text-fd-primary transition-[transform,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/15"
-          >
-            <PartyPopper className="size-3" />
-            Fire Confetti
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSourceKey('idle')}
-            disabled={sourceKey === 'idle'}
-            aria-label="Unload script"
-            className="inline-flex size-6 items-center justify-center rounded-lg border bg-fd-muted/40 text-fd-muted-foreground transition-[transform,color,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground"
-          >
-            <RotateCcw className="size-3" />
-          </button>
-        </div>
-
-        <div
-          role="group"
-          aria-label="Script source"
-          className="relative grid grid-cols-3 rounded-lg border bg-fd-muted/50 p-0.5"
-        >
           <div
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/3)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${sourceIndex * 100}%, 0, 0)`,
-            }}
-          />
-          {SOURCES.map((item) => {
-            const active = sourceKey === item.key;
+            role="group"
+            aria-label="Observer trigger zone"
+            className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {ZONES.map((zone) => {
+              const active = zoneKey === zone.key
+              return (
+                <button
+                  key={zone.key}
+                  type="button"
+                  onClick={() => setZoneKey(zone.key)}
+                  className={cn(
+                    "rounded-[3px] px-2 py-0.5 font-mono text-2xs font-medium transition-all",
+                    active
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {zone.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-1 rounded-sm border border-border-subtle bg-subtle/40 p-1">
+          {SECTIONS.map((section) => {
+            const isActive = activeId === section.id
             return (
               <button
-                key={item.key}
+                key={section.id}
                 type="button"
-                onClick={() => setSourceKey(item.key)}
-                className={`relative z-10 rounded-md px-2.5 py-0.5 font-mono text-[11px] font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-card-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground'
-                }`}
+                onClick={() => scrollToSection(section.id)}
+                className={cn(
+                  "rounded-[3px] py-1 font-mono text-2xs font-medium transition-all",
+                  isActive
+                    ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30"
+                    : "text-muted-foreground hover:bg-control/60 hover:text-foreground"
+                )}
               >
-                {item.label}
+                {section.label}
               </button>
-            );
+            )
           })}
         </div>
+
+        <div
+          ref={scrollRootRef}
+          className="relative flex h-32 flex-col gap-2 overflow-y-auto rounded-md border border-border-subtle bg-subtle/35 p-2 scroll-smooth"
+        >
+          {SECTIONS.map((section) => {
+            const isActive = activeId === section.id
+            return (
+              <section
+                key={section.id}
+                id={section.id}
+                className={cn(
+                  "flex min-h-22 shrink-0 flex-col justify-between rounded-sm border p-2.5 transition-colors",
+                  isActive
+                    ? "border-primary/40 bg-card shadow-control"
+                    : "border-border-subtle bg-card/50 opacity-75"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-2xs font-semibold text-foreground">
+                    {section.metric}
+                  </span>
+                  <Badge
+                    variant={isActive ? "accent" : "code"}
+                    size="compact"
+                  >
+                    #{section.id}
+                  </Badge>
+                </div>
+                <p className="text-2xs leading-relaxed text-muted-foreground">
+                  {section.detail}
+                </p>
+              </section>
+            )
+          })}
+        </div>
+      </CardContent>
+
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col gap-0.5 px-4 py-2.5">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Active ID
+          </span>
+          <span className="truncate font-mono text-xs font-semibold text-primary">
+            {activeId ? `#${activeId}` : "null"}
+          </span>
+        </div>
+        <div className="flex flex-col gap-0.5 px-4 py-2.5">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Section Index
+          </span>
+          <span className="font-mono text-xs font-semibold tabular-nums text-foreground">
+            {activeIndex >= 0 ? `${activeIndex + 1} / ${SECTIONS.length}` : "—"}
+          </span>
+        </div>
       </div>
-    </div>
-  );
+
+      <CardFooter className="border-t">
+        <Button
+          variant="primary"
+          size="compact"
+          leadingIcon={ArrowDown}
+          onClick={handleNextSection}
+          className="flex-1"
+        >
+          Next Section
+        </Button>
+        <Button
+          variant="tertiary"
+          size="icon-compact"
+          onClick={handleResetScroll}
+          aria-label="Scroll back to top"
+        >
+          <RotateCcw />
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }

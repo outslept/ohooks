@@ -1,13 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useControllableState } from '@/hooks/useControllableState';
+import * as React from "react";
+import { Minus, Plus, RotateCcw } from "lucide-react";
+import { useControllableState } from "@/hooks/useControllableState";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { cn } from "cn";
 
-type ControlMode = 'controlled' | 'uncontrolled';
+type ControlMode = "controlled" | "uncontrolled";
 
 const MODES: { value: ControlMode; label: string }[] = [
-  { value: 'controlled', label: 'Controlled' },
-  { value: 'uncontrolled', label: 'Uncontrolled' },
+  { value: "controlled", label: "Controlled" },
+  { value: "uncontrolled", label: "Uncontrolled" },
 ];
 
 function ControllableCounter({
@@ -26,140 +31,160 @@ function ControllableCounter({
   });
 
   return (
-    <div className="relative flex w-60 flex-col items-center justify-center gap-2.5 border border-fd-primary/30 bg-fd-card/85 px-4 py-3.5 shadow-2xs backdrop-blur-[2px] animate-in fade-in zoom-in-95 duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:animate-none">
+    <div className="relative flex h-24 w-full flex-col items-center justify-center gap-2 rounded-md border border-border-subtle bg-subtle/35 px-4">
       <span
-        className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-        style={{ opacity: isControlled ? 1 : 0.45 }}
+        aria-hidden="true"
+        className={cn(
+          "absolute top-1.5 left-1.5 size-2 border-t-[1.5px] border-l-[1.5px] border-foreground transition-opacity duration-200",
+          isControlled ? "opacity-85" : "opacity-30"
+        )}
       />
       <span
-        className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out"
-        style={{ opacity: isControlled ? 1 : 0.45 }}
+        aria-hidden="true"
+        className={cn(
+          "absolute top-1.5 right-1.5 size-2 border-t-[1.5px] border-r-[1.5px] border-foreground transition-opacity duration-200",
+          isControlled ? "opacity-85" : "opacity-30"
+        )}
       />
       <span
-        className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-        style={{ opacity: isControlled ? 1 : 0.45 }}
+        aria-hidden="true"
+        className={cn(
+          "absolute bottom-1.5 left-1.5 size-2 border-b-[1.5px] border-l-[1.5px] border-foreground transition-opacity duration-200",
+          isControlled ? "opacity-85" : "opacity-30"
+        )}
       />
       <span
-        className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out"
-        style={{ opacity: isControlled ? 1 : 0.45 }}
+        aria-hidden="true"
+        className={cn(
+          "absolute right-1.5 bottom-1.5 size-2 border-r-[1.5px] border-b-[1.5px] border-foreground transition-opacity duration-200",
+          isControlled ? "opacity-85" : "opacity-30"
+        )}
       />
 
-      <div className="flex w-full items-center justify-between font-mono text-[10px]">
-        <span className="uppercase text-fd-muted-foreground">
-          isControlled
-        </span>
-        <span
-          className={`rounded px-1.5 py-0.2 font-semibold ${
-            isControlled
-              ? 'bg-fd-primary/15 text-fd-primary'
-              : 'bg-fd-muted text-fd-muted-foreground'
-          }`}
-        >
-          {String(isControlled)}
-        </span>
-      </div>
-
-      <div className="flex items-center gap-3 font-mono tabular-nums">
-        <button
-          type="button"
+      <div className="flex items-center gap-4 font-mono tabular-nums">
+        <Button
+          size="icon-compact"
+          variant="secondary"
           onClick={() => setCount((c) => c - 1)}
           aria-label="Decrement child state"
-          className="rounded-md border bg-fd-muted/40 px-2.5 py-1 text-xs font-semibold text-fd-foreground transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 motion-reduce:transition-none"
         >
-          -1
-        </button>
+          <Minus />
+        </Button>
 
-        <span className="min-w-[3ch] text-center text-xl font-semibold tracking-tight text-fd-foreground">
+        <span className="min-w-[3ch] text-center text-2xl font-semibold tracking-tight text-foreground">
           {count}
         </span>
 
-        <button
-          type="button"
+        <Button
+          size="icon-compact"
+          variant="secondary"
           onClick={() => setCount((c) => c + 1)}
           aria-label="Increment child state"
-          className="rounded-md bg-fd-primary/10 px-2.5 py-1 text-xs font-semibold text-fd-primary transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/20 motion-reduce:transition-none"
         >
-          +1
-        </button>
+          <Plus />
+        </Button>
       </div>
+
+      <Badge
+        size="compact"
+        variant={isControlled ? "code" : "secondary"}
+        className="font-mono"
+      >
+        isControlled: {String(isControlled)}
+      </Badge>
     </div>
   );
 }
 
-export default function UseControllableStateDemo() {
-  const [mode, setMode] = useState<ControlMode>('controlled');
-  const [parentValue, setParentValue] = useState(10);
+export function UseControllableStateDemo() {
+  const [mode, setMode] = React.useState<ControlMode>("controlled");
+  const [parentValue, setParentValue] = React.useState(10);
 
-  const activeModeIdx = MODES.findIndex((m) => m.value === mode);
+  const isControlledMode = mode === "controlled";
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
+        <div className="flex items-center justify-between">
+
+          <div
+            role="group"
+            aria-label="Control mode"
+            className="inline-flex items-center gap-0.5 rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {MODES.map((option) => {
+              const selected = mode === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setMode(option.value)}
+                  className={cn(
+                    "rounded-2xs px-1.5 py-0.5 font-mono text-3xs font-medium outline-none select-none",
+                    "transition-colors duration-150 ease-out",
+                    selected
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground pointer-hover:hover:text-foreground",
+                    "focus-visible:ring-1 focus-visible:ring-ring"
+                  )}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         <ControllableCounter
           key={mode}
-          value={mode === 'controlled' ? parentValue : undefined}
+          value={isControlledMode ? parentValue : undefined}
           defaultValue={parentValue}
           onChange={setParentValue}
         />
-      </div>
+      </CardContent>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5 font-mono text-[11px] tabular-nums">
-          <span className="text-fd-muted-foreground">
-            parent:{' '}
-            <strong className="font-semibold text-fd-foreground">
-              {parentValue}
-            </strong>
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col items-center py-2.5">
+          <span className="text-3xs font-medium tracking-wider text-muted-foreground uppercase">
+            Parent State
           </span>
-          <button
-            type="button"
-            onClick={() => setParentValue((v) => v + 10)}
-            className="rounded-lg border bg-fd-muted/40 px-2 py-1 font-medium text-fd-card-foreground transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 motion-reduce:transition-none"
-          >
-            Parent +10
-          </button>
+          <span className="mt-0.5 font-mono text-xs font-medium text-foreground tabular-nums">
+            {parentValue}
+          </span>
         </div>
-
-        <div
-          role="group"
-          aria-label="Control mode"
-          className="relative grid grid-cols-2 rounded-lg border bg-fd-muted/40 p-0.5"
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/2)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${activeModeIdx * 100}%, 0, 0)`,
-            }}
-          />
-          {MODES.map((option) => {
-            const active = mode === option.value;
-            return (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setMode(option.value)}
-                className={`relative z-10 rounded-md px-2 py-0.5 font-mono text-[11px] font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-foreground'
-                }`}
-              >
-                {option.label}
-              </button>
-            );
-          })}
+        <div className="flex flex-col items-center py-2.5">
+          <span className="text-3xs font-medium tracking-wider text-muted-foreground uppercase">
+            Prop Value
+          </span>
+          <span className="mt-0.5 font-mono text-xs font-medium text-foreground tabular-nums">
+            {isControlledMode ? parentValue : "undefined"}
+          </span>
         </div>
       </div>
-    </div>
+
+      <CardFooter className="border-t">
+        <Button
+          size="compact"
+          variant="secondary"
+          leadingIcon={Plus}
+          onClick={() => setParentValue((v) => v + 10)}
+          className="flex-1 font-mono"
+        >
+          Parent +10
+        </Button>
+
+        <Button
+          size="compact"
+          variant="secondary"
+          leadingIcon={RotateCcw}
+          onClick={() => setParentValue(10)}
+          aria-label="Reset parent state"
+        >
+          Reset
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
+
+export default UseControllableStateDemo;

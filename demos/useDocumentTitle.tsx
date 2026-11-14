@@ -1,154 +1,162 @@
-'use client';
+"use client"
 
-import { useEffect, useState } from 'react';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useState, useSyncExternalStore } from "react"
+import { MinusIcon, PlusIcon, RotateCcwIcon } from "lucide-react"
+import { cn } from "cn"
+
+import { useDocumentTitle } from "@/hooks/useDocumentTitle"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 
 function TitleUpdater({ title }: { title: string }) {
-  useDocumentTitle(title, { restoreOnUnmount: true });
-  return null;
+  useDocumentTitle(title, { restoreOnUnmount: true })
+  return null
 }
 
 const MOUNT_MODES = [
-  { value: true, label: 'Mounted' },
-  { value: false, label: 'Unmounted' },
-] as const;
+  { value: true, label: "Mounted" },
+  { value: false, label: "Unmounted" },
+] as const
+
+function subscribeToDocumentTitle(callback: () => void) {
+  if (typeof document === "undefined") return () => {}
+  const target = document.querySelector("title") ?? document.head
+  if (!target) return () => {}
+  const observer = new MutationObserver(callback)
+  observer.observe(target, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+  })
+  return () => observer.disconnect()
+}
+
+function getDocumentTitleSnapshot(): string {
+  return typeof document !== "undefined" ? document.title : ""
+}
+
+function getServerDocumentTitleSnapshot(): string {
+  return ""
+}
 
 export default function UseDocumentTitleDemo() {
-  const [unread, setUnread] = useState(3);
-  const [isMounted, setIsMounted] = useState(true);
-  const [docTitle, setDocTitle] = useState<string>('');
+  const [unread, setUnread] = useState(3)
+  const [isMounted, setIsMounted] = useState(true)
 
   const targetTitle =
-    unread > 0 ? `(${unread}) Inbox — Hooks` : 'Inbox — Hooks';
+    unread > 0 ? `(${unread}) Inbox — Hooks` : "Inbox — Hooks"
 
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      setDocTitle(document.title);
-    }
-  }, [targetTitle, isMounted]);
-
-  const activeModeIdx = isMounted ? 0 : 1;
+  const docTitle = useSyncExternalStore(
+    subscribeToDocumentTitle,
+    getDocumentTitleSnapshot,
+    getServerDocumentTitleSnapshot
+  )
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
+    <Card className="w-full max-w-80">
       {isMounted && <TitleUpdater title={targetTitle} />}
 
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
 
-        <div className="relative flex w-64 flex-col gap-1.5 border border-fd-primary/25 bg-fd-card/85 px-4 py-3 shadow-2xs backdrop-blur-[2px]">
-          <span
-            className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isMounted ? 1 : 0.35 }}
-          />
-          <span
-            className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isMounted ? 1 : 0.35 }}
-          />
-          <span
-            className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isMounted ? 1 : 0.35 }}
-          />
-          <span
-            className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isMounted ? 1 : 0.35 }}
-          />
+        <div className="flex items-center justify-between gap-2">
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span
-                className={`size-1.5 rounded-full transition-colors duration-150 ease-out ${
-                  isMounted ? 'bg-emerald-500' : 'bg-fd-muted-foreground/40'
-                }`}
-              />
-              <span className="font-mono text-[10px] tracking-wider uppercase text-fd-muted-foreground">
-                document.title
-              </span>
-            </div>
+          <div
+            role="group"
+            aria-label="Hook mount state"
+            className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {MOUNT_MODES.map((mode) => {
+              const active = isMounted === mode.value
+              return (
+                <button
+                  key={String(mode.value)}
+                  type="button"
+                  onClick={() => setIsMounted(mode.value)}
+                  className={cn(
+                    "rounded-[3px] px-1.5 py-0.5 font-mono text-3xs font-medium transition-all",
+                    active
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {mode.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
-            <span
-              className={`rounded px-1.5 py-0.2 font-mono text-[10px] font-semibold tabular-nums transition-colors duration-150 ease-out ${
-                isMounted
-                  ? 'bg-fd-primary/15 text-fd-primary'
-                  : 'bg-fd-muted text-fd-muted-foreground'
-              }`}
-            >
-              {isMounted ? `unread: ${unread}` : 'restored'}
+
+        <div className="flex flex-col gap-2 rounded-md border border-border-subtle bg-subtle/35 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+              Active Tab Title
             </span>
+            <Badge
+              variant={isMounted ? "accent" : "secondary"}
+              size="compact"
+              className="tabular-nums"
+            >
+              {isMounted ? `unread: ${unread}` : "restored"}
+            </Badge>
           </div>
 
-          <div className="truncate font-mono text-xs font-semibold tabular-nums text-fd-foreground">
+          <p className="truncate font-mono text-xs font-semibold text-foreground tabular-nums">
             {docTitle || targetTitle}
-          </div>
+          </p>
+        </div>
+      </CardContent>
+
+
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Restore On Unmount
+          </span>
+          <span className="font-mono text-xs font-medium text-foreground">
+            true
+          </span>
+        </div>
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Hook Status
+          </span>
+          <span className="font-mono text-xs font-medium text-foreground">
+            {isMounted ? "Syncing" : "Detached"}
+          </span>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setUnread((n) => Math.max(0, n - 1))}
-            disabled={!isMounted || unread === 0}
-            className="rounded-lg border bg-fd-muted/40 px-2.5 py-1 font-mono text-[11px] font-medium tabular-nums text-fd-card-foreground transition-[transform,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 motion-reduce:transition-none"
-          >
-            -1
-          </button>
-          <button
-            type="button"
-            onClick={() => setUnread((n) => n + 1)}
-            disabled={!isMounted}
-            className="rounded-lg bg-fd-primary/10 px-2.5 py-1 font-mono text-[11px] font-semibold tabular-nums text-fd-primary transition-[transform,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/20 motion-reduce:transition-none"
-          >
-            +1
-          </button>
-          <button
-            type="button"
-            onClick={() => setUnread(0)}
-            disabled={!isMounted || unread === 0}
-            className="rounded-lg border bg-fd-muted/40 px-2.5 py-1 font-mono text-[11px] font-medium text-fd-muted-foreground transition-[transform,background-color,color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-foreground motion-reduce:transition-none"
-          >
-            Clear
-          </button>
-        </div>
-
-        <div
-          role="group"
-          aria-label="Hook mount state"
-          className="relative grid grid-cols-2 rounded-lg border bg-fd-muted/40 p-0.5"
+      <CardFooter className="border-t">
+        <Button
+          variant="secondary"
+          size="compact"
+          onClick={() => setUnread((n) => Math.max(0, n - 1))}
+          disabled={!isMounted || unread === 0}
+          className="flex-1 font-mono tabular-nums"
         >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/2)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${activeModeIdx * 100}%, 0, 0)`,
-            }}
-          />
-          {MOUNT_MODES.map((mode) => {
-            const active = isMounted === mode.value;
-            return (
-              <button
-                key={String(mode.value)}
-                type="button"
-                onClick={() => setIsMounted(mode.value)}
-                className={`relative z-10 rounded-md px-2 py-0.5 font-mono text-[11px] font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-foreground'
-                }`}
-              >
-                {mode.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
+          <MinusIcon />1
+        </Button>
+        <Button
+          variant="primary"
+          size="compact"
+          onClick={() => setUnread((n) => n + 1)}
+          disabled={!isMounted}
+          className="flex-1 font-mono tabular-nums"
+        >
+          <PlusIcon />1
+        </Button>
+        <Button
+          variant="tertiary"
+          size="compact"
+          onClick={() => setUnread(0)}
+          disabled={!isMounted || unread === 0}
+        >
+          <RotateCcwIcon />
+          Clear
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }

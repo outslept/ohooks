@@ -106,13 +106,21 @@ export function useFullscreen(
   const [isFullscreen, setIsFullscreen] = useState<boolean>(() =>
     isTargetCurrentlyFullscreen(target)
   );
+  const [prevTarget, setPrevTarget] =
+    useState<EventListenerTarget<HTMLElement> | undefined>(target);
+
+  if (prevTarget !== target) {
+    setPrevTarget(target);
+    const nextIsFullscreen = isTargetCurrentlyFullscreen(target);
+    if (isFullscreen !== nextIsFullscreen) {
+      setIsFullscreen(nextIsFullscreen);
+    }
+  }
 
   useEffect(() => {
     if (typeof document === 'undefined') {
       return;
     }
-
-    setIsFullscreen(isTargetCurrentlyFullscreen(target));
 
     const handleChange = () => {
       const nextIsFullscreen = isTargetCurrentlyFullscreen(target);

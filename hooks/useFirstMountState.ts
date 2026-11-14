@@ -19,5 +19,7 @@ export function useFirstMountState(): boolean {
     isFirst.current = false;
   }, []);
 
+  // oxlint-disable-next-line react/refs
+  // eslint-disable-next-line react/refs, react-hooks/refs
   return isFirst.current;
 }

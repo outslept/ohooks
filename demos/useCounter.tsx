@@ -1,165 +1,164 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { useCounter } from '@/hooks/useCounter';
+import { useState } from "react"
+import { MinusIcon, PlusIcon, RotateCcwIcon } from "lucide-react"
 
-const MIN = 0;
-const MAX = 10;
-const INITIAL = 5;
-const STEPS = [1, 3] as const;
+import { useCounter } from "@/hooks/useCounter"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import {cn} from "cn"
+
+const MIN = 0
+const MAX = 10
+const INITIAL = 5
+const STEPS = [1, 3] as const
 
 export default function UseCounterDemo() {
-  const [step, setStep] = useState<(typeof STEPS)[number]>(1);
+  const [step, setStep] = useState<(typeof STEPS)[number]>(1)
   const { count, inc, dec, set, reset } = useCounter(INITIAL, {
     min: MIN,
     max: MAX,
-  });
+  })
 
-  const progress = (count - MIN) / (MAX - MIN);
-  const atEdge = count <= MIN || count >= MAX;
-  const activeStepIdx = STEPS.indexOf(step);
+  const progress = (count - MIN) / (MAX - MIN)
+  const atMin = count <= MIN
+  const atMax = count >= MAX
+  const atEdge = atMin || atMax
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
 
-        <div className="relative flex w-60 flex-col gap-2.5 border border-fd-primary/25 bg-fd-card/85 px-4 py-3 shadow-2xs backdrop-blur-[2px]">
-          <span
-            className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: atEdge ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: atEdge ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: atEdge ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: atEdge ? 1 : 0.45 }}
-          />
+        <div className="flex items-center justify-between gap-2">
 
-          <div className="flex items-center justify-between font-mono text-[10px] tabular-nums text-fd-muted-foreground">
-            <span>
-              range: [{MIN}, {MAX}]
-            </span>
-            <span
-              className={`rounded px-1.5 py-0.2 font-semibold uppercase transition-colors duration-150 ease-out ${
-                atEdge
-                  ? 'bg-fd-primary/15 text-fd-primary'
-                  : 'bg-fd-muted text-fd-muted-foreground'
-              }`}
-            >
-              {count <= MIN ? 'Min' : count >= MAX ? 'Max' : 'Clamped'}
-            </span>
+          <div
+            role="group"
+            aria-label="Step delta"
+            className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {STEPS.map((s) => {
+              const active = step === s
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setStep(s)}
+                  className={cn(
+                    "rounded-[3px] px-2 py-0.5 font-mono text-3xs font-medium tabular-nums transition-all",
+                    active
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  ±{s}
+                </button>
+              )
+            })}
           </div>
+        </div>
 
-          <div className="flex items-center justify-between gap-2 font-mono tabular-nums">
-            <button
-              type="button"
+
+        <div className="flex flex-col gap-2.5 rounded-md border border-border-subtle bg-subtle/35 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <Button
+              variant="secondary"
+              size="compact"
               onClick={() => dec(step)}
-              disabled={count <= MIN}
+              disabled={atMin}
               aria-label={`Decrement by ${step}`}
-              className="rounded-md border bg-fd-muted/40 px-2.5 py-1 text-xs font-semibold text-fd-foreground transition-[transform,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 motion-reduce:transition-none"
+              className="w-14 font-mono tabular-nums"
             >
-              -{step}
-            </button>
+              <MinusIcon />
+              {step}
+            </Button>
 
-            <output className="text-2xl font-semibold tracking-tight text-fd-foreground">
+            <output className="font-mono text-2xl font-semibold tracking-tight text-foreground tabular-nums">
               {count}
             </output>
 
-            <button
-              type="button"
+            <Button
+              variant="primary"
+              size="compact"
               onClick={() => inc(step)}
-              disabled={count >= MAX}
+              disabled={atMax}
               aria-label={`Increment by ${step}`}
-              className="rounded-md bg-fd-primary/10 px-2.5 py-1 text-xs font-semibold text-fd-primary transition-[transform,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/20 motion-reduce:transition-none"
+              className="w-14 font-mono tabular-nums"
             >
-              +{step}
-            </button>
+              <PlusIcon />
+              {step}
+            </Button>
           </div>
 
-          <div className="h-1 w-full overflow-hidden rounded-full bg-fd-muted">
+          <div className="h-1.5 w-full overflow-hidden rounded-full border border-border-subtle/60 bg-subtle">
             <div
-              className="h-full w-full origin-left bg-fd-primary transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
+              className={cn(
+                "h-full w-full origin-left transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+                atEdge ? "bg-warning" : "bg-primary"
+              )}
               style={{
                 transform: `scale3d(${progress}, 1, 1)`,
               }}
             />
           </div>
         </div>
+      </CardContent>
+
+
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Bound State
+          </span>
+          <div className="flex items-center">
+            <Badge
+              variant={atEdge ? "warning" : "default"}
+              className="font-mono uppercase"
+            >
+              {atMin ? "Min Limit" : atMax ? "Max Limit" : "In Range"}
+            </Badge>
+          </div>
+        </div>
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Step Delta
+          </span>
+          <span className="font-mono text-xs font-medium text-foreground tabular-nums">
+            ±{step} per click
+          </span>
+        </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5 font-mono text-[11px] tabular-nums">
-          <button
-            type="button"
-            onClick={() => set(MIN)}
-            disabled={count === MIN}
-            className="rounded-lg border bg-fd-muted/40 px-2.5 py-1 font-medium text-fd-card-foreground transition-[transform,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 motion-reduce:transition-none"
-          >
-            Min ({MIN})
-          </button>
-          <button
-            type="button"
-            onClick={() => set(MAX)}
-            disabled={count === MAX}
-            className="rounded-lg border bg-fd-muted/40 px-2.5 py-1 font-medium text-fd-card-foreground transition-[transform,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 motion-reduce:transition-none"
-          >
-            Max ({MAX})
-          </button>
-          <button
-            type="button"
-            onClick={reset}
-            disabled={count === INITIAL}
-            className="rounded-lg border bg-fd-muted/40 px-2.5 py-1 font-medium text-fd-muted-foreground transition-[transform,background-color,color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-foreground motion-reduce:transition-none"
-          >
-            Reset ({INITIAL})
-          </button>
-        </div>
-
-        <div
-          role="group"
-          aria-label="Step delta"
-          className="relative grid grid-cols-2 rounded-lg border bg-fd-muted/40 p-0.5"
+      <CardFooter className="border-t">
+        <Button
+          variant="secondary"
+          size="compact"
+          onClick={() => set(MIN)}
+          disabled={count === MIN}
+          className="flex-1 font-mono tabular-nums"
         >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/2)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${activeStepIdx * 100}%, 0, 0)`,
-            }}
-          />
-          {STEPS.map((s) => {
-            const active = step === s;
-            return (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setStep(s)}
-                className={`relative z-10 rounded-md px-2 py-0.5 font-mono text-[11px] font-medium tabular-nums transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-foreground'
-                }`}
-              >
-                ±{s}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
+          Min ({MIN})
+        </Button>
+        <Button
+          variant="secondary"
+          size="compact"
+          onClick={() => set(MAX)}
+          disabled={count === MAX}
+          className="flex-1 font-mono tabular-nums"
+        >
+          Max ({MAX})
+        </Button>
+        <Button
+          variant="tertiary"
+          size="compact"
+          onClick={reset}
+          disabled={count === INITIAL}
+          className="font-mono tabular-nums"
+        >
+          <RotateCcwIcon />
+          {INITIAL}
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }

@@ -36,8 +36,16 @@ export function useHover<T extends HTMLElement = HTMLElement>(
   const { enterDelay = 0, leaveDelay = 0, onEnter, onLeave } = options;
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [prevTarget, setPrevTarget] = useState<EventListenerTarget<T>>(target);
   const onEnterRef = useLatest(onEnter);
   const onLeaveRef = useLatest(onLeave);
+
+  if (prevTarget !== target) {
+    setPrevTarget(target);
+    if (isHovered) {
+      setIsHovered(false);
+    }
+  }
 
   const enterTimerRef: { current: ReturnType<typeof setTimeout> | null } =
     useRef(null);
@@ -47,7 +55,6 @@ export function useHover<T extends HTMLElement = HTMLElement>(
   useEffect(() => {
     const element = resolveTargetElement(target);
     if (!element) {
-      setIsHovered(false);
       return;
     }
 

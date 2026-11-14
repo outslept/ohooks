@@ -1,8 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Loader2, Play, RotateCcw, Square } from 'lucide-react';
-import { useAsyncTask } from '@/hooks/useAsyncTask';
+import * as React from "react";
+import { Loader2, Play, RotateCcw, Square } from "lucide-react";
+import { useAsyncTask } from "@/hooks/useAsyncTask";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { cn } from "cn";
 
 interface TaskPayload {
   id: number;
@@ -10,14 +20,14 @@ interface TaskPayload {
 }
 
 const MODE_OPTIONS = [
-  { label: 'Resolve', shouldFail: false },
-  { label: 'Reject', shouldFail: true },
+  { label: "Resolve", shouldFail: false },
+  { label: "Reject", shouldFail: true },
 ] as const;
 
-export default function UseAsyncTaskDemo() {
-  const [modeIdx, setModeIdx] = useState(0);
-  const [runId, setRunId] = useState(0);
-  const [fillBar, setFillBar] = useState(false);
+export function UseAsyncTaskDemo() {
+  const [modeIdx, setModeIdx] = React.useState(0);
+  const [runId, setRunId] = React.useState(0);
+  const [activeRunId, setActiveRunId] = React.useState<number | null>(null);
 
   const shouldFail = MODE_OPTIONS[modeIdx].shouldFail;
 
@@ -27,39 +37,37 @@ export default function UseAsyncTaskDemo() {
         await new Promise<void>((resolve, reject) => {
           const timer = setTimeout(resolve, 1500);
           signal.addEventListener(
-            'abort',
+            "abort",
             () => {
               clearTimeout(timer);
-              reject(new DOMException('Aborted', 'AbortError'));
+              reject(new DOMException("Aborted", "AbortError"));
             },
-            { once: true },
+            { once: true }
           );
         });
 
         if (fail) {
-          throw new Error('503 Service Unavailable');
+          throw new Error("503 Service Unavailable");
         }
 
         return {
           id: Math.floor(Math.random() * 900 + 100),
           timestamp: new Date().toLocaleTimeString([], {
             hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
           }),
         };
-      },
+      }
     );
 
-  useEffect(() => {
-    if (!isPending) {
-      setFillBar(false);
-      return;
-    }
-    setFillBar(false);
+  const fillBar = isPending && activeRunId === runId;
+
+  React.useEffect(() => {
+    if (!isPending) return;
     const frame = requestAnimationFrame(() => {
-      setFillBar(true);
+      setActiveRunId(runId);
     });
     return () => cancelAnimationFrame(frame);
   }, [isPending, runId]);
@@ -69,187 +77,219 @@ export default function UseAsyncTaskDemo() {
     void run(shouldFail);
   };
 
-  return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage:
-              'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+  const cornerColorClass =
+    status === "error"
+      ? "border-destructive"
+      : status === "aborted"
+        ? "border-warning"
+        : status === "success"
+          ? "border-success"
+          : "border-foreground";
 
-        <div className="relative flex h-24 w-60 items-center justify-center border border-fd-primary/25 bg-fd-card/70 shadow-2xs backdrop-blur-[2px]">
+  return (
+    <Card className="w-full max-w-80">
+      <CardHeader>
+        <CardAction>
+          <div
+            role="group"
+            aria-label="Task outcome"
+            className="inline-flex items-center gap-0.5 rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {MODE_OPTIONS.map((option, idx) => {
+              const selected = idx === modeIdx;
+              return (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => setModeIdx(idx)}
+                  className={cn(
+                    "rounded-2xs px-1.5 py-0.5 font-mono text-3xs font-medium tabular-nums outline-none select-none",
+                    "transition-colors duration-150 ease-out",
+                    selected
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground pointer-hover:hover:text-foreground",
+                    "focus-visible:ring-1 focus-visible:ring-ring"
+                  )}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </CardAction>
+      </CardHeader>
+
+      <CardContent className="flex flex-col items-center justify-center py-6">
+        <div className="relative flex h-28 w-full items-center justify-center overflow-hidden rounded-md border border-border-subtle bg-subtle/35 px-4">
           <span
             aria-hidden="true"
-            className="absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isPending ? 1 : 0.45 }}
+            className={cn(
+              "absolute top-1.5 left-1.5 size-2 border-t-[1.5px] border-l-[1.5px] transition-[opacity,border-color] duration-200 ease-out",
+              cornerColorClass,
+              isPending ? "opacity-90" : "opacity-35"
+            )}
           />
           <span
             aria-hidden="true"
-            className="absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isPending ? 1 : 0.45 }}
+            className={cn(
+              "absolute top-1.5 right-1.5 size-2 border-t-[1.5px] border-r-[1.5px] transition-[opacity,border-color] duration-200 ease-out",
+              cornerColorClass,
+              isPending ? "opacity-90" : "opacity-35"
+            )}
           />
           <span
             aria-hidden="true"
-            className="absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isPending ? 1 : 0.45 }}
+            className={cn(
+              "absolute bottom-1.5 left-1.5 size-2 border-b-[1.5px] border-l-[1.5px] transition-[opacity,border-color] duration-200 ease-out",
+              cornerColorClass,
+              isPending ? "opacity-90" : "opacity-35"
+            )}
           />
           <span
             aria-hidden="true"
-            className="absolute -bottom-px -right-px size-2 border-b-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isPending ? 1 : 0.45 }}
+            className={cn(
+              "absolute bottom-1.5 right-1.5 size-2 border-r-[1.5px] border-b-[1.5px] transition-[opacity,border-color] duration-200 ease-out",
+              cornerColorClass,
+              isPending ? "opacity-90" : "opacity-35"
+            )}
           />
 
           {isPending && (
             <span
               key={runId}
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 origin-left bg-fd-primary transition-transform duration-[1500ms] ease-linear motion-reduce:transition-none"
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 origin-left bg-foreground transition-transform duration-1500 ease-linear motion-reduce:transition-none"
               style={{
-                transform: fillBar ? 'scaleX(1)' : 'scaleX(0)',
+                transform: fillBar ? "scaleX(1)" : "scaleX(0)",
               }}
             />
           )}
 
           <div
             key={`${status}-${runId}`}
-            className="animate-in fade-in zoom-in-95 flex flex-col items-center gap-1 px-3 font-mono tabular-nums duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:animate-none"
+            className="animate-in fade-in zoom-in-95 flex flex-col items-center gap-1.5 text-center font-mono tabular-nums duration-150 ease-snappy motion-reduce:animate-none"
           >
-            {status === 'idle' && (
+            {status === "idle" && (
               <>
-                <span className="text-lg font-semibold tracking-tight text-fd-card-foreground">
-                  idle
-                </span>
-                <span className="text-[11px] text-fd-muted-foreground">
-                  signal: standby
+                <Badge size="compact" variant="secondary" className="font-mono">
+                  STANDBY
+                </Badge>
+                <span className="text-2xs text-muted-foreground">
+                  Ready to dispatch
                 </span>
               </>
             )}
 
-            {status === 'pending' && (
+            {status === "pending" && (
               <>
-                <div className="flex items-center gap-1.5 text-lg font-semibold tracking-tight text-fd-card-foreground">
-                  <Loader2 className="size-4 animate-spin text-fd-primary [animation-duration:550ms]" />
-                  <span>pending</span>
+                <div className="flex items-center gap-1.5 text-sm font-semibold tracking-tight text-foreground">
+                  <Loader2 className="size-3.5 animate-spinner text-foreground" />
+                  <span>Running…</span>
                 </div>
-                <span className="text-[11px] text-fd-muted-foreground">
-                  1500ms · abortable
+                <span className="text-2xs text-muted-foreground">
+                  1500ms · AbortController
                 </span>
               </>
             )}
 
-            {status === 'success' && data && (
+            {status === "success" && data && (
               <>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-lg font-semibold tracking-tight text-fd-card-foreground">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-base font-semibold tracking-tight text-foreground">
                     #{data.id}
                   </span>
-                  <span className="rounded bg-fd-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-fd-primary">
+                  <Badge size="compact" variant="code">
                     200 OK
-                  </span>
+                  </Badge>
                 </div>
-                <span className="text-[11px] text-fd-muted-foreground">
-                  resolved · {data.timestamp}
+                <span className="text-2xs text-muted-foreground">
+                  Resolved at {data.timestamp}
                 </span>
               </>
             )}
 
-            {status === 'error' && error && (
+            {status === "error" && error && (
               <>
-                <span className="text-lg font-semibold tracking-tight text-red-500">
-                  error
-                </span>
-                <span className="text-[11px] text-fd-muted-foreground">
+                <Badge size="compact" variant="destructive" className="font-mono">
+                  503 ERROR
+                </Badge>
+                <span className="text-2xs text-muted-foreground">
                   {error.message}
                 </span>
               </>
             )}
 
-            {status === 'aborted' && (
+            {status === "aborted" && (
               <>
-                <span className="text-lg font-semibold tracking-tight text-fd-card-foreground">
-                  aborted
-                </span>
-                <span className="text-[11px] text-fd-muted-foreground">
+                <Badge size="compact" variant="warning" className="font-mono">
+                  ABORTED
+                </Badge>
+                <span className="text-2xs text-muted-foreground">
                   AbortSignal triggered
                 </span>
               </>
             )}
           </div>
         </div>
-      </div>
+      </CardContent>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5 font-mono tabular-nums">
-          <button
-            type="button"
-            onClick={handleRun}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-fd-primary/10 px-3 py-1 text-[11px] font-semibold text-fd-primary transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/15"
-          >
-            <Play className="size-3" />
-            Run
-          </button>
-          <button
-            type="button"
-            disabled={!isPending}
-            onClick={() => abort()}
-            className="inline-flex items-center gap-1 rounded-lg border bg-fd-muted/40 px-2.5 py-1 text-[11px] font-medium text-fd-card-foreground transition-[transform,opacity,background-color] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted"
-          >
-            <Square className="size-3" />
-            Abort
-          </button>
-          <button
-            type="button"
-            disabled={isIdle}
-            onClick={reset}
-            aria-label="Reset state"
-            className="inline-flex items-center gap-1 rounded-lg border bg-fd-muted/40 px-2.5 py-1 text-[11px] font-medium text-fd-card-foreground transition-[transform,opacity,background-color] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted"
-          >
-            <RotateCcw className="size-3" />
-            Reset
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[11px] text-fd-muted-foreground">
-            outcome
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col items-center py-2.5">
+          <span className="text-3xs font-medium tracking-wider text-muted-foreground uppercase">
+            Status
           </span>
-          <div
-            role="group"
-            aria-label="Task outcome"
-            className="relative grid grid-cols-2 rounded-lg border bg-fd-muted/50 p-0.5 font-mono text-[11px] tabular-nums"
-          >
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/2)] rounded-[6px] bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-              style={{
-                transform: `translate3d(${modeIdx * 100}%, 0, 0)`,
-              }}
-            />
-            {MODE_OPTIONS.map((opt, idx) => {
-              const active = idx === modeIdx;
-              return (
-                <button
-                  key={opt.label}
-                  type="button"
-                  onClick={() => setModeIdx(idx)}
-                  className={`relative z-10 rounded-[6px] px-2.5 py-1 text-center font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                    active
-                      ? 'text-fd-card-foreground'
-                      : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
+          <span className="mt-0.5 font-mono text-xs font-medium text-foreground uppercase tabular-nums">
+            {status}
+          </span>
+        </div>
+        <div className="flex flex-col items-center py-2.5">
+          <span className="text-3xs font-medium tracking-wider text-muted-foreground uppercase">
+            Signal
+          </span>
+          <span className="mt-0.5 font-mono text-xs font-medium text-foreground tabular-nums">
+            {status === "aborted"
+              ? "aborted"
+              : isPending
+                ? "active"
+                : "idle"}
+          </span>
         </div>
       </div>
-    </div>
+
+      <CardFooter className="border-t">
+        <Button
+          size="compact"
+          variant="secondary"
+          leadingIcon={Play}
+          onClick={handleRun}
+          className="flex-1"
+        >
+          Run
+        </Button>
+
+        <Button
+          size="compact"
+          variant={isPending ? "destructive" : "secondary"}
+          leadingIcon={Square}
+          disabled={!isPending}
+          onClick={() => abort()}
+        >
+          Abort
+        </Button>
+
+        <Button
+          size="compact"
+          variant="secondary"
+          leadingIcon={RotateCcw}
+          disabled={isIdle}
+          onClick={reset}
+          aria-label="Reset state"
+        >
+          Reset
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
+
+export default UseAsyncTaskDemo;

@@ -1,201 +1,144 @@
-'use client';
+"use client"
 
-import { RefreshCw, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { useSessionStorage } from '@/hooks/useSessionStorage';
+import { useSyncExternalStore } from "react"
+import { cn } from "cn"
+import { RefreshCw, Trash2 } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { useSessionStorage } from "@/hooks/useSessionStorage"
 
 interface CheckoutDraft {
-  step: number;
-  coupon: string;
+  step: number
+  coupon: string
 }
 
-const STORAGE_KEY = 'fumadocs-demo-session-draft';
-const STEPS = [1, 2, 3] as const;
-const COUPON_PRESETS = ['REACT2025', 'SHIPFREE', 'VIP50'] as const;
+const STORAGE_KEY = "fumadocs-demo-session-draft"
+const STEPS = [1, 2, 3] as const
+const COUPON_PRESETS = ["REACT2025", "SHIPFREE", "VIP50"] as const
+
+function subscribeToSessionStorage(callback: () => void) {
+  window.addEventListener("storage", callback)
+  return () => window.removeEventListener("storage", callback)
+}
+
+function getHasStoredKeySnapshot(): boolean {
+  try {
+    return window.sessionStorage.getItem(STORAGE_KEY) !== null
+  } catch {
+    return false
+  }
+}
+
+function getServerHasStoredKeySnapshot(): boolean {
+  return false
+}
 
 export default function UseSessionStorageDemo() {
   const [draft, setDraft, removeDraft] = useSessionStorage<CheckoutDraft>(
     STORAGE_KEY,
-    { step: 1, coupon: 'REACT2025' }
-  );
-  const [hasStoredKey, setHasStoredKey] = useState(false);
-  const frameRef = useRef<HTMLDivElement>(null);
+    { step: 1, coupon: "REACT2025" }
+  )
 
-  useEffect(() => {
-    try {
-      setHasStoredKey(window.sessionStorage.getItem(STORAGE_KEY) !== null);
-    } catch {
-      setHasStoredKey(false);
-    }
-  }, [draft]);
-
-  const pulseFrame = () => {
-    const el = frameRef.current;
-    if (!el) return;
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return;
-    }
-    el.animate(
-      [
-        { transform: 'scale3d(1.02, 1.02, 1)' },
-        { transform: 'scale3d(1, 1, 1)' },
-      ],
-      { duration: 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' }
-    );
-  };
+  const hasStoredKey = useSyncExternalStore(
+    subscribeToSessionStorage,
+    getHasStoredKeySnapshot,
+    getServerHasStoredKeySnapshot
+  )
 
   const handleCycleCoupon = () => {
     const currentIndex = COUPON_PRESETS.indexOf(
       draft.coupon as (typeof COUPON_PRESETS)[number]
-    );
+    )
     const nextCoupon =
-      COUPON_PRESETS[(currentIndex + 1) % COUPON_PRESETS.length];
-    setDraft((prev) => ({ ...prev, coupon: nextCoupon }));
-    pulseFrame();
-  };
+      COUPON_PRESETS[(currentIndex + 1) % COUPON_PRESETS.length]
+    setDraft((prev) => ({ ...prev, coupon: nextCoupon }))
+  }
 
   const handleRemove = () => {
-    removeDraft();
-    setHasStoredKey(false);
-    pulseFrame();
-  };
+    removeDraft()
+  }
 
-  const serialized = JSON.stringify(draft);
-  const stepIndex = Math.max(
-    0,
-    STEPS.indexOf(draft.step as (typeof STEPS)[number])
-  );
+  const serialized = JSON.stringify(draft)
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
+        <div className="flex items-center justify-between">
+
+          <div
+            role="group"
+            aria-label="Wizard step"
+            className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {STEPS.map((step) => {
+              const active = draft.step === step
+              return (
+                <button
+                  key={step}
+                  type="button"
+                  onClick={() => setDraft((prev) => ({ ...prev, step }))}
+                  className={cn(
+                    "rounded-[3px] px-2 py-0.5 font-mono text-2xs font-medium tabular-nums transition-all",
+                    active
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  S{step}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        <Input
+          type="text"
+          size="compact"
+          value={draft.coupon}
+          onChange={(e) =>
+            setDraft((prev) => ({ ...prev, coupon: e.target.value }))
+          }
+          placeholder="PROMO"
+          aria-label="Promo code"
+          className="font-mono"
         />
 
-        <div
-          ref={frameRef}
-          className="relative flex w-80 max-w-[calc(100%-1.5rem)] flex-col gap-2.5 border border-fd-primary/25 bg-fd-card/70 p-3.5 shadow-2xs backdrop-blur-[2px]"
-        >
-          <span
-            className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: hasStoredKey ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: hasStoredKey ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: hasStoredKey ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: hasStoredKey ? 1 : 0.45 }}
-          />
-
+        <div className="flex flex-col gap-1.5 rounded-md border border-border-subtle bg-subtle/35 p-2.5 font-mono">
           <div className="flex items-center justify-between">
-            <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold tracking-wider uppercase text-fd-muted-foreground">
-              <span
-                className={`size-1.5 rounded-full transition-colors duration-150 ease-out ${
-                  hasStoredKey ? 'bg-fd-primary' : 'bg-fd-muted-foreground/40'
-                }`}
-              />
-              {hasStoredKey ? 'persisted in session' : 'initial fallback'}
+            <span className="text-3xs tracking-wider text-muted-foreground uppercase">
+              sessionStorage Payload
             </span>
-            <span className="font-mono text-[10px] tabular-nums text-fd-muted-foreground">
+            <Badge variant="code" size="compact" className="tabular-nums">
               {serialized.length}B
-            </span>
+            </Badge>
           </div>
-
-          <div className="flex items-center gap-2 border-y border-fd-border/60 py-2">
-            <span className="shrink-0 font-mono text-[10px] font-medium tracking-wider uppercase text-fd-muted-foreground">
-              coupon
-            </span>
-            <input
-              type="text"
-              value={draft.coupon}
-              onChange={(e) =>
-                setDraft((prev) => ({ ...prev, coupon: e.target.value }))
-              }
-              placeholder="PROMO"
-              aria-label="Promo code"
-              className="w-full border border-fd-border/70 bg-fd-background/90 px-2 py-1 font-mono text-xs text-fd-card-foreground focus:border-fd-primary/60 focus:outline-none"
-            />
-          </div>
-
-          <div className="flex items-center justify-between gap-2 font-mono text-[11px] tabular-nums">
-            <span className="truncate text-fd-primary">{serialized}</span>
-            <span className="shrink-0 text-[10px] text-fd-muted-foreground">
-              step {draft.step}/3
-            </span>
-          </div>
+          <div className="truncate text-2xs text-primary">{serialized}</div>
         </div>
-      </div>
+      </CardContent>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={handleCycleCoupon}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-fd-primary/10 px-2.5 py-1 text-[11px] font-semibold text-fd-primary transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/15"
-          >
-            <RefreshCw className="size-3" />
-            Cycle Coupon
-          </button>
-
-          <button
-            type="button"
-            onClick={handleRemove}
-            disabled={!hasStoredKey}
-            className="inline-flex items-center gap-1 rounded-lg border bg-fd-muted/40 px-2.5 py-1 text-[11px] font-medium text-fd-card-foreground transition-[transform,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted"
-          >
-            <Trash2 className="size-3" />
-            Remove Key
-          </button>
-        </div>
-
-        <div
-          role="group"
-          aria-label="Wizard step"
-          className="relative grid grid-cols-3 rounded-lg border bg-fd-muted/50 p-0.5"
+      <CardFooter className="border-t">
+        <Button
+          variant="primary"
+          size="compact"
+          leadingIcon={RefreshCw}
+          onClick={handleCycleCoupon}
+          className="flex-1"
         >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/3)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${stepIndex * 100}%, 0, 0)`,
-            }}
-          />
-          {STEPS.map((step) => {
-            const active = draft.step === step;
-            return (
-              <button
-                key={step}
-                type="button"
-                onClick={() => {
-                  setDraft((prev) => ({ ...prev, step }));
-                  pulseFrame();
-                }}
-                className={`relative z-10 rounded-md px-2 py-0.5 font-mono text-[11px] font-medium tabular-nums transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-card-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground'
-                }`}
-              >
-                Step {step}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
+          Cycle Coupon
+        </Button>
+        <Button
+          variant="secondary"
+          size="compact"
+          leadingIcon={Trash2}
+          onClick={handleRemove}
+          disabled={!hasStoredKey}
+        >
+          Remove
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }

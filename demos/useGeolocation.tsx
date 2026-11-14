@@ -1,16 +1,22 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { useGeolocation } from '@/hooks/useGeolocation';
+import { useState } from "react"
+import { LocateFixedIcon, LocateOffIcon } from "lucide-react"
+import { cn } from "cn"
+
+import { useGeolocation } from "@/hooks/useGeolocation"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 
 const ACCURACY_OPTIONS = [
-  { label: 'standard', highAccuracy: false },
-  { label: 'highAccuracy', highAccuracy: true },
-] as const;
+  { label: "standard", highAccuracy: false },
+  { label: "highAccuracy", highAccuracy: true },
+] as const
 
 export default function UseGeolocationDemo() {
-  const [enabled, setEnabled] = useState<boolean>(false);
-  const [enableHighAccuracy, setEnableHighAccuracy] = useState<boolean>(false);
+  const [enabled, setEnabled] = useState<boolean>(false)
+  const [enableHighAccuracy, setEnableHighAccuracy] = useState<boolean>(false)
 
   const {
     isSupported,
@@ -22,153 +28,157 @@ export default function UseGeolocationDemo() {
   } = useGeolocation({
     enabled,
     enableHighAccuracy,
-  });
+  })
 
-  const isWatching = enabled && !loading && !error && latitude !== null;
-  const activeAccIdx = enableHighAccuracy ? 1 : 0;
+  const isWatching = enabled && !loading && !error && latitude !== null
 
   const statusLabel = !isSupported
-    ? 'unsupported'
+    ? "unsupported"
     : !enabled
-      ? 'paused'
+      ? "paused"
       : loading
-        ? 'locating...'
+        ? "locating..."
         : error
-          ? 'error'
-          : 'watching';
+          ? "error"
+          : "watching"
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30 px-4">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
 
-        <div className="relative z-10 flex w-full max-w-md flex-col gap-2.5 border border-fd-primary/25 bg-fd-card/85 p-3.5 shadow-2xs backdrop-blur-[2px]">
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: enabled ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: enabled ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: enabled ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: enabled ? 1 : 0.45 }}
-          />
-
-          <div className="flex items-center justify-between gap-2 border-b border-fd-border/60 pb-1.5">
-            <div className="flex items-center gap-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="relative flex size-2">
+              {(isWatching || loading) && (
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+              )}
               <span
-                className={`size-2 rounded-full transition-colors duration-150 ease-out ${
+                className={cn(
+                  "relative inline-flex size-2 rounded-full transition-colors",
                   error
-                    ? 'bg-red-500'
-                    : isWatching || loading
-                      ? 'bg-fd-primary'
-                      : 'bg-fd-muted-foreground/40'
-                }`}
+                    ? "bg-destructive"
+                    : isWatching
+                      ? "bg-success"
+                      : loading
+                        ? "bg-warning"
+                        : "bg-muted-foreground/40"
+                )}
               />
-              <span className="font-mono text-[10px] font-semibold tracking-wider text-fd-card-foreground uppercase">
-                {statusLabel}
-              </span>
-            </div>
-
-            <span className="truncate font-mono text-[10px] text-fd-muted-foreground tabular-nums">
-              {error ? error.message : `supported: ${String(isSupported)}`}
+            </span>
+            <span className="font-mono text-2xs tracking-wider text-muted-foreground uppercase">
+              {statusLabel}
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 font-mono text-[11px] tabular-nums">
-            <div className="flex flex-col rounded border bg-fd-muted/35 px-2.5 py-1.5">
-              <span className="text-[9px] text-fd-muted-foreground uppercase">
-                lat
-              </span>
-              <span className="truncate font-semibold text-fd-card-foreground">
-                {latitude !== null ? latitude.toFixed(5) : '—'}
-              </span>
-            </div>
-
-            <div className="flex flex-col rounded border bg-fd-muted/35 px-2.5 py-1.5">
-              <span className="text-[9px] text-fd-muted-foreground uppercase">
-                lng
-              </span>
-              <span className="truncate font-semibold text-fd-card-foreground">
-                {longitude !== null ? longitude.toFixed(5) : '—'}
-              </span>
-            </div>
-
-            <div className="flex flex-col rounded border bg-fd-muted/35 px-2.5 py-1.5">
-              <span className="text-[9px] text-fd-muted-foreground uppercase">
-                accuracy
-              </span>
-              <span className="truncate font-semibold text-fd-card-foreground">
-                {accuracy !== null ? `±${Math.round(accuracy)}m` : '—'}
-              </span>
-            </div>
+          <div
+            role="group"
+            aria-label="Geolocation accuracy mode"
+            className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {ACCURACY_OPTIONS.map((option) => {
+              const active = enableHighAccuracy === option.highAccuracy
+              return (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => setEnableHighAccuracy(option.highAccuracy)}
+                  className={cn(
+                    "rounded-[3px] px-1.5 py-0.5 font-mono text-3xs font-medium transition-all",
+                    active
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {option.label}
+                </button>
+              )
+            })}
           </div>
         </div>
-      </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setEnabled((prev) => !prev)}
-            disabled={!isSupported}
-            className="rounded-lg bg-fd-primary/10 px-2.5 py-1 text-[11px] font-semibold text-fd-primary transition-[background-color,transform,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/15 motion-reduce:transition-none"
-          >
-            {enabled ? 'Stop watching' : 'Watch location'}
-          </button>
-          <span className="font-mono text-[11px] text-fd-muted-foreground tabular-nums">
-            enabled: <strong className="text-fd-card-foreground">{String(enabled)}</strong>
+
+        <div className="grid grid-cols-3 gap-2 font-mono tabular-nums">
+          <div className="flex flex-col gap-0.5 rounded-md border border-border-subtle bg-subtle/35 px-2.5 py-2">
+            <span className="text-3xs tracking-wider text-muted-foreground uppercase">
+              Lat
+            </span>
+            <span className="truncate text-xs font-semibold text-foreground">
+              {latitude !== null ? latitude.toFixed(4) : "—"}
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-0.5 rounded-md border border-border-subtle bg-subtle/35 px-2.5 py-2">
+            <span className="text-3xs tracking-wider text-muted-foreground uppercase">
+              Lng
+            </span>
+            <span className="truncate text-xs font-semibold text-foreground">
+              {longitude !== null ? longitude.toFixed(4) : "—"}
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-0.5 rounded-md border border-border-subtle bg-subtle/35 px-2.5 py-2">
+            <span className="text-3xs tracking-wider text-muted-foreground uppercase">
+              Accuracy
+            </span>
+            <span className="truncate text-xs font-semibold text-primary">
+              {accuracy !== null ? `±${Math.round(accuracy)}m` : "—"}
+            </span>
+          </div>
+        </div>
+
+        {error && (
+          <div className="flex items-center justify-between gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-2.5 py-1.5">
+            <span className="truncate font-mono text-2xs text-destructive">
+              {error.message}
+            </span>
+            <Badge variant="destructive" size="compact">
+              Error
+            </Badge>
+          </div>
+        )}
+      </CardContent>
+
+
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Supported
+          </span>
+          <span className="font-mono text-xs font-medium text-foreground tabular-nums">
+            {String(isSupported)}
           </span>
         </div>
-
-        <div
-          role="group"
-          aria-label="Geolocation accuracy mode"
-          className="relative grid grid-cols-2 rounded-lg border bg-fd-muted/40 p-0.5"
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/2)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${activeAccIdx * 100}%, 0, 0)`,
-            }}
-          />
-          {ACCURACY_OPTIONS.map((option) => {
-            const active = enableHighAccuracy === option.highAccuracy;
-            return (
-              <button
-                key={option.label}
-                type="button"
-                onClick={() => setEnableHighAccuracy(option.highAccuracy)}
-                className={`relative z-10 rounded-md px-2.5 py-1 font-mono text-[11px] font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-card-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground'
-                }`}
-              >
-                {option.label}
-              </button>
-            );
-          })}
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Watcher Enabled
+          </span>
+          <span className="font-mono text-xs font-medium text-foreground tabular-nums">
+            {String(enabled)}
+          </span>
         </div>
       </div>
-    </div>
-  );
+
+      <CardFooter className="border-t">
+        <Button
+          variant={enabled ? "secondary" : "primary"}
+          size="compact"
+          onClick={() => setEnabled((prev) => !prev)}
+          disabled={!isSupported}
+          className="w-full"
+        >
+          {enabled ? (
+            <>
+              <LocateOffIcon />
+              Stop Watching
+            </>
+          ) : (
+            <>
+              <LocateFixedIcon />
+              Watch Location
+            </>
+          )}
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }

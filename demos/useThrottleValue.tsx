@@ -1,79 +1,77 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { useThrottleValue } from '@/hooks/useThrottleValue';
+import { useState } from "react"
+import { cn } from "cn"
 
-const WAIT_OPTIONS = [100, 250, 500] as const;
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useThrottleValue } from "@/hooks/useThrottleValue"
+
+const WAIT_OPTIONS = [100, 250, 500] as const
 
 export default function UseThrottleValueDemo() {
-  const [waitIdx, setWaitIdx] = useState(1);
-  const wait = WAIT_OPTIONS[waitIdx];
+  const [waitIdx, setWaitIdx] = useState(1)
+  const wait = WAIT_OPTIONS[waitIdx]
 
-  const [value, setValue] = useState(50);
-  const [throttledValue] = useThrottleValue(value, wait);
-
-  const isSyncing = value !== throttledValue;
+  const [value, setValue] = useState(50)
+  const [throttledValue] = useThrottleValue(value, wait)
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage:
-              'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
+        <div className="flex items-center justify-between">
 
-        <div className="relative flex h-28 w-64 flex-col justify-between border border-fd-primary/25 bg-fd-card/70 p-3.5 shadow-2xs backdrop-blur-[2px]">
-          <span
-            aria-hidden="true"
-            className="absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isSyncing ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isSyncing ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isSyncing ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="absolute -bottom-px -right-px size-2 border-b-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isSyncing ? 1 : 0.45 }}
-          />
-
-          <div className="flex items-baseline justify-between font-mono tabular-nums">
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-semibold tracking-tight text-fd-card-foreground">
-                {throttledValue}
-              </span>
-              <span className="text-xs text-fd-muted-foreground">%</span>
-            </div>
-            <span className="text-[11px] text-fd-muted-foreground">
-              live {value}%
-            </span>
+          <div
+            role="group"
+            aria-label="Throttle wait interval"
+            className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {WAIT_OPTIONS.map((ms, idx) => {
+              const active = idx === waitIdx
+              return (
+                <button
+                  key={ms}
+                  type="button"
+                  onClick={() => setWaitIdx(idx)}
+                  className={cn(
+                    "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs font-medium tabular-nums transition-all",
+                    active
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {ms}ms
+                </button>
+              )
+            })}
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-fd-muted">
+        <div className="flex flex-col gap-2.5 rounded-md border border-border-subtle bg-subtle/35 p-3">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+              <span>Live Input</span>
+              <span className="tabular-nums text-foreground">{value}%</span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-subtle">
               <div
-                className="h-full w-full origin-left bg-fd-muted-foreground/45 will-change-transform"
+                className="h-full w-full origin-left bg-muted-foreground/45 will-change-transform"
                 style={{
                   transform: `scale3d(${(value / 100).toFixed(3)}, 1, 1)`,
                 }}
               />
             </div>
+          </div>
 
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-fd-muted">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between font-mono text-3xs tracking-wider text-primary uppercase">
+              <span>Throttled ({wait}ms)</span>
+              <span className="font-semibold tabular-nums">
+                {throttledValue}%
+              </span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-subtle">
               <div
-                className="h-full w-full origin-left bg-fd-primary transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform motion-reduce:transition-none"
+                className="h-full w-full origin-left bg-primary transition-transform duration-150 ease-out will-change-transform motion-reduce:transition-none"
                 style={{
                   transform: `scale3d(${(throttledValue / 100).toFixed(3)}, 1, 1)`,
                 }}
@@ -81,57 +79,21 @@ export default function UseThrottleValueDemo() {
             </div>
           </div>
         </div>
-      </div>
+      </CardContent>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 px-0.5 text-xs">
-        <div className="flex min-w-[160px] flex-1 items-center gap-2.5 font-mono tabular-nums">
-          <input
-            type="range"
-            min={0}
-            max={100}
-            aria-label="Live input value"
-            value={value}
-            onChange={(e) => setValue(Number(e.target.value))}
-            className="h-1.5 w-full max-w-[200px] cursor-pointer appearance-none rounded-full bg-fd-muted accent-fd-primary"
-          />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[11px] text-fd-muted-foreground">
-            wait
-          </span>
-          <div
-            role="group"
-            aria-label="Throttle wait interval"
-            className="relative grid grid-cols-3 rounded-lg border bg-fd-muted/50 p-0.5 font-mono text-[11px] tabular-nums"
-          >
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/3)] rounded-[6px] bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-              style={{
-                transform: `translate3d(${waitIdx * 100}%, 0, 0)`,
-              }}
-            />
-            {WAIT_OPTIONS.map((ms, idx) => {
-              const active = idx === waitIdx;
-              return (
-                <button
-                  key={ms}
-                  type="button"
-                  onClick={() => setWaitIdx(idx)}
-                  className={`relative z-10 rounded-[6px] px-2 py-1 text-center font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                    active
-                      ? 'text-fd-card-foreground'
-                      : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground'
-                  }`}
-                >
-                  {ms}ms
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+      <CardFooter className="flex items-center gap-3 border-t">
+        <span className="font-mono text-2xs text-muted-foreground">0%</span>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          aria-label="Live input value"
+          value={value}
+          onChange={(e) => setValue(Number(e.target.value))}
+          className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-subtle accent-primary"
+        />
+        <span className="font-mono text-2xs text-muted-foreground">100%</span>
+      </CardFooter>
+    </Card>
+  )
 }

@@ -50,12 +50,15 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 
   const handlerRef = useLatest(handler);
   const targetRef = useLatest(target);
+  const eventsRef = useLatest(events);
   const eventsKey = events.join(',');
 
   useEffect(() => {
     if (!enabled || typeof document === 'undefined') {
       return;
     }
+
+    const currentEvents = eventsRef.current;
 
     const listener = (rawEvent: Event) => {
       const event = rawEvent as ClickOutsideEvent;
@@ -90,16 +93,16 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
       handlerRef.current(event);
     };
 
-    for (const eventName of events) {
+    for (const eventName of currentEvents) {
       document.addEventListener(eventName, listener, { capture });
     }
 
     return () => {
-      for (const eventName of events) {
+      for (const eventName of currentEvents) {
         document.removeEventListener(eventName, listener, { capture });
       }
     };
-  }, [enabled, eventsKey, capture, handlerRef, targetRef]);
+  }, [enabled, eventsKey, eventsRef, capture, handlerRef, targetRef]);
 }
 
 export default useOnClickOutside;

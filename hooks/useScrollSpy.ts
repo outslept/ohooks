@@ -62,6 +62,7 @@ export function useScrollSpy(
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const targetsRef = useLatest(targets);
+  const thresholdRef = useLatest(threshold);
 
   const targetsKey = targets
     .map((t, index) => {
@@ -134,7 +135,7 @@ export function useScrollSpy(
       {
         root: rootElement,
         rootMargin,
-        threshold,
+        threshold: thresholdRef.current,
       }
     );
 
@@ -145,7 +146,15 @@ export function useScrollSpy(
     return () => {
       observer.disconnect();
     };
-  }, [targetsKey, root, rootMargin, thresholdKey, offset]);
+  }, [
+    targetsKey,
+    targetsRef,
+    root,
+    rootMargin,
+    thresholdKey,
+    thresholdRef,
+    offset,
+  ]);
 
   return activeId;
 }

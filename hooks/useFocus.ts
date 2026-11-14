@@ -23,6 +23,27 @@ export interface UseFocusReturn {
   blur: () => void;
 }
 
+function checkIsTargetFocused<T extends HTMLElement>(
+  target: EventListenerTarget<T>,
+  focusVisible: boolean
+): boolean {
+  if (typeof document === 'undefined') {
+    return false;
+  }
+  const element = resolveTargetElement(target);
+  if (!element || document.activeElement !== element) {
+    return false;
+  }
+  if (focusVisible) {
+    try {
+      return element.matches(':focus-visible');
+    } catch {
+      return true;
+    }
+  }
+  return true;
+}
+
 /**
  * Tracks and controls the focus state of a target DOM element, with optional `:focus-visible` filtering.
  *
@@ -41,7 +62,21 @@ export function useFocus<T extends HTMLElement = HTMLElement>(
   options: UseFocusOptions = {}
 ): UseFocusReturn {
   const { focusVisible = false, onFocus, onBlur } = options;
-  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [isFocused, setIsFocused] = useState<boolean>(() =>
+    checkIsTargetFocused(target, focusVisible)
+  );
+  const [prevTarget, setPrevTarget] = useState<EventListenerTarget<T>>(target);
+  const [prevFocusVisible, setPrevFocusVisible] =
+    useState<boolean>(focusVisible);
+
+  if (prevTarget !== target || prevFocusVisible !== focusVisible) {
+    setPrevTarget(target);
+    setPrevFocusVisible(focusVisible);
+    const nextFocused = checkIsTargetFocused(target, focusVisible);
+    if (isFocused !== nextFocused) {
+      setIsFocused(nextFocused);
+    }
+  }
 
   const onFocusRef = useLatest(onFocus);
   const onBlurRef = useLatest(onBlur);
@@ -66,25 +101,8 @@ export function useFocus<T extends HTMLElement = HTMLElement>(
 
     const element = resolveTargetElement(target);
     if (!element) {
-      setIsFocused(false);
       return;
     }
-
-    const checkIsCurrentlyFocused = (): boolean => {
-      if (document.activeElement !== element) {
-        return false;
-      }
-      if (focusVisible) {
-        try {
-          return element.matches(':focus-visible');
-        } catch {
-          return true;
-        }
-      }
-      return true;
-    };
-
-    setIsFocused(checkIsCurrentlyFocused());
 
     const handleFocus = (event: FocusEvent) => {
       if (focusVisible) {
@@ -93,7 +111,6 @@ export function useFocus<T extends HTMLElement = HTMLElement>(
             return;
           }
         } catch {
-          // ignore if :focus-visible selector is unsupported
         }
       }
       setIsFocused(true);

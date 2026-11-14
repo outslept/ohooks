@@ -1,5 +1,4 @@
-import { useRef } from 'react';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { useState } from 'react';
 
 /** Comparator function used to determine if two values are equal. */
 export type EqualityComparator<T> = (prev: T, next: T) => boolean;
@@ -21,20 +20,13 @@ export function usePreviousDistinct<T>(
   value: T,
   isEqual: EqualityComparator<T> = Object.is,
 ): T | undefined {
-  const committedCurrentRef = useRef<T>(value);
-  const committedPrevRef = useRef<T | undefined>(undefined);
+  const [current, setCurrent] = useState<T>(value);
+  const [prev, setPrev] = useState<T | undefined>(undefined);
 
-  const hasChanged = !isEqual(committedCurrentRef.current, value);
-  const previousDistinct = hasChanged
-    ? committedCurrentRef.current
-    : committedPrevRef.current;
+  if (!isEqual(current, value)) {
+    setPrev(current);
+    setCurrent(value);
+  }
 
-  useIsomorphicLayoutEffect(() => {
-    if (!isEqual(committedCurrentRef.current, value)) {
-      committedPrevRef.current = committedCurrentRef.current;
-      committedCurrentRef.current = value;
-    }
-  });
-
-  return previousDistinct;
+  return prev;
 }

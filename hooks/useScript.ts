@@ -47,6 +47,30 @@ function findExistingScript(src: string): HTMLScriptElement | null {
   return null;
 }
 
+function resolveScriptStatus(
+  src: string | null,
+  shouldPreventLoad: boolean
+): ScriptStatus {
+  if (!src || shouldPreventLoad) {
+    return 'idle';
+  }
+  if (typeof document === 'undefined') {
+    return 'loading';
+  }
+  const cached = scriptStatusCache.get(src);
+  if (cached) {
+    return cached;
+  }
+  const existing = findExistingScript(src);
+  if (existing) {
+    const attrStatus = existing.getAttribute(
+      'data-status'
+    ) as ScriptStatus | null;
+    return attrStatus ?? 'ready';
+  }
+  return 'loading';
+}
+
 /**
  * Dynamically loads an external `<script>` tag, deduplicating across components and tracking its status.
  *
@@ -77,30 +101,20 @@ export function useScript(
     referrerPolicy,
   } = options;
 
-  const [status, setStatus] = useState<ScriptStatus>(() => {
-    if (!src || shouldPreventLoad) {
-      return 'idle';
-    }
-    if (typeof document === 'undefined') {
-      return 'loading';
-    }
-    const cached = scriptStatusCache.get(src);
-    if (cached) {
-      return cached;
-    }
-    const existing = findExistingScript(src);
-    if (existing) {
-      const attrStatus = existing.getAttribute(
-        'data-status'
-      ) as ScriptStatus | null;
-      return attrStatus ?? 'ready';
-    }
-    return 'loading';
-  });
+  const [status, setStatus] = useState<ScriptStatus>(() =>
+    resolveScriptStatus(src, shouldPreventLoad)
+  );
+
+  const [prevSrc, setPrevSrc] = useState(src);
+  const [prevPreventLoad, setPrevPreventLoad] = useState(shouldPreventLoad);
+  if (prevSrc !== src || prevPreventLoad !== shouldPreventLoad) {
+    setPrevSrc(src);
+    setPrevPreventLoad(shouldPreventLoad);
+    setStatus(resolveScriptStatus(src, shouldPreventLoad));
+  }
 
   useEffect(() => {
     if (!src || shouldPreventLoad || typeof document === 'undefined') {
-      setStatus('idle');
       return;
     }
 
@@ -132,7 +146,6 @@ export function useScript(
         existingAttrStatus ?? scriptStatusCache.get(src) ?? 'ready';
       script.setAttribute('data-status', resolvedStatus);
       scriptStatusCache.set(src, resolvedStatus);
-      setStatus(resolvedStatus);
     }
 
     const handleScriptLoad = () => {

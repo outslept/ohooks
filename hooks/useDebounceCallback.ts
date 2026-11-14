@@ -21,6 +21,10 @@ export interface DebouncedFunction<T extends (...args: never[]) => unknown> {
   isPending: () => boolean;
 }
 
+function getNow(): number {
+  return Date.now();
+}
+
 /**
  * Creates a debounced version of a callback function with `leading`, `trailing`, `maxWait`, `cancel`, and `flush` support.
  *
@@ -112,7 +116,7 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
     };
 
     const timerExpired = (): void => {
-      const time = Date.now();
+      const time = getNow();
       if (shouldInvoke(time)) {
         trailingEdge(time);
         return;
@@ -142,7 +146,7 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
       }
       clearTimeout(timerIdRef.current);
       timerIdRef.current = null;
-      return trailingEdge(Date.now());
+      return trailingEdge(getNow());
     };
 
     const isPending = (): boolean => {
@@ -150,7 +154,7 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
     };
 
     const debouncedFn = (...args: Parameters<T>): ReturnType<T> | undefined => {
-      const time = Date.now();
+      const time = getNow();
       const isInvoking = shouldInvoke(time);
 
       lastArgsRef.current = args;

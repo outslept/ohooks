@@ -93,14 +93,32 @@ export function useWebStorage<T>(
   }, [getStorage, key, initialValueRef, deserializerRef, onErrorRef]);
 
   const [storedValue, setStoredValue] = useState<T>(() => {
+    const fallback = resolveInitial(initialValue);
     if (!initializeWithValue || typeof window === 'undefined') {
-      return resolveInitial(initialValue);
+      return fallback;
     }
-    return readValue();
+
+    try {
+      const storage = window[storageType];
+      if (!storage) {
+        return fallback;
+      }
+      const raw = storage.getItem(key);
+      if (raw === null) {
+        return fallback;
+      }
+      return deserializer(raw);
+    } catch (error) {
+      onError?.(error);
+      return fallback;
+    }
   });
 
   useEffect(() => {
-    setStoredValue(readValue());
+    const syncStoredValue = () => {
+      setStoredValue(readValue());
+    };
+    syncStoredValue();
   }, [key, readValue]);
 
   const setValue: Dispatch<SetStateAction<T>> = useEventCallback(

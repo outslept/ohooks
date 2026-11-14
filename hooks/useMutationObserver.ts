@@ -48,6 +48,7 @@ export function useMutationObserver(
   } = options;
 
   const callbackRef = useLatest(callback);
+  const attributeFilterRef = useLatest(attributeFilter);
   const attributeFilterKey = attributeFilter ? attributeFilter.join(',') : '';
 
   useEffect(() => {
@@ -60,8 +61,10 @@ export function useMutationObserver(
       return;
     }
 
+    const currentAttributeFilter = attributeFilterRef.current;
+
     const hasImplicitAttributes =
-      attributeFilter !== undefined || attributeOldValue === true;
+      currentAttributeFilter !== undefined || attributeOldValue === true;
     const hasImplicitCharacterData = characterDataOldValue === true;
 
     const resolvedAttributes =
@@ -85,7 +88,9 @@ export function useMutationObserver(
       ...(resolvedAttributes !== undefined
         ? { attributes: resolvedAttributes }
         : {}),
-      ...(attributeFilter !== undefined ? { attributeFilter } : {}),
+      ...(currentAttributeFilter !== undefined
+        ? { attributeFilter: currentAttributeFilter }
+        : {}),
       ...(attributeOldValue !== undefined ? { attributeOldValue } : {}),
       ...(resolvedCharacterData !== undefined
         ? { characterData: resolvedCharacterData }
@@ -107,6 +112,7 @@ export function useMutationObserver(
     enabled,
     attributes,
     attributeFilterKey,
+    attributeFilterRef,
     attributeOldValue,
     characterData,
     characterDataOldValue,

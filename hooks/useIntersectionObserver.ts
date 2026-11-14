@@ -49,6 +49,7 @@ export function useIntersectionObserver(
 
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
   const onChangeRef = useLatest(onChange);
+  const thresholdRef = useLatest(threshold);
 
   const frozen = Boolean(entry?.isIntersecting && freezeOnceVisible);
   const thresholdKey = Array.isArray(threshold)
@@ -83,7 +84,7 @@ export function useIntersectionObserver(
       {
         root: rootNode,
         rootMargin,
-        threshold,
+        threshold: thresholdRef.current,
       }
     );
 
@@ -97,6 +98,7 @@ export function useIntersectionObserver(
     root,
     rootMargin,
     thresholdKey,
+    thresholdRef,
     frozen,
     enabled,
     onChangeRef,

@@ -21,6 +21,10 @@ export interface ThrottledFunction<T extends (...args: never[]) => unknown> {
   isPending: () => boolean;
 }
 
+function getNow(): number {
+  return Date.now();
+}
+
 /**
  * Creates a throttled version of a callback that executes at most once every `wait` milliseconds.
  *
@@ -88,7 +92,7 @@ export function useThrottleCallback<T extends (...args: never[]) => unknown>(
       }
       clearTimeout(timerIdRef.current);
       timerIdRef.current = null;
-      return trailingEdge(Date.now());
+      return trailingEdge(getNow());
     };
 
     const isPending = (): boolean => {
@@ -96,7 +100,7 @@ export function useThrottleCallback<T extends (...args: never[]) => unknown>(
     };
 
     const throttledFn = (...args: Parameters<T>): ReturnType<T> | undefined => {
-      const now = Date.now();
+      const now = getNow();
 
       if (lastInvokeTimeRef.current === 0 && !leading) {
         lastInvokeTimeRef.current = now;
@@ -115,7 +119,7 @@ export function useThrottleCallback<T extends (...args: never[]) => unknown>(
 
       if (timerIdRef.current === null && trailing) {
         timerIdRef.current = setTimeout(() => {
-          trailingEdge(Date.now());
+          trailingEdge(getNow());
         }, remaining);
       }
 

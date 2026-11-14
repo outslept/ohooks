@@ -1,172 +1,163 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { useFileDialog } from '@/hooks/useFileDialog';
+import { useState } from "react"
+import { FolderOpenIcon, RotateCcwIcon } from "lucide-react"
+import { cn } from "cn"
+
+import { useFileDialog } from "@/hooks/useFileDialog"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 
 const PRESET_OPTIONS = [
-  { label: '* (multi)', accept: '*', multiple: true },
-  { label: 'image/*', accept: 'image/*', multiple: true },
-  { label: 'single', accept: '*', multiple: false },
-] as const;
+  { label: "* (multi)", accept: "*", multiple: true },
+  { label: "image/*", accept: "image/*", multiple: true },
+  { label: "single", accept: "*", multiple: false },
+] as const
 
 function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
 }
 
 export default function UseFileDialogDemo() {
-  const [presetIdx, setPresetIdx] = useState<number>(0);
-  const [lastEvent, setLastEvent] = useState<'idle' | 'selected' | 'canceled'>(
-    'idle',
-  );
+  const [presetIdx, setPresetIdx] = useState<number>(0)
+  const [lastEvent, setLastEvent] = useState<"idle" | "selected" | "canceled">(
+    "idle"
+  )
 
-  const preset = PRESET_OPTIONS[presetIdx];
+  const preset = PRESET_OPTIONS[presetIdx]
 
   const { files, open, reset } = useFileDialog({
     accept: preset.accept,
     multiple: preset.multiple,
     onChange: (list) => {
-      setLastEvent(list && list.length > 0 ? 'selected' : 'idle');
+      setLastEvent(list && list.length > 0 ? "selected" : "idle")
     },
     onCancel: () => {
-      setLastEvent('canceled');
+      setLastEvent("canceled")
     },
-  });
+  })
 
-  const fileArray = files ? Array.from(files) : [];
-  const hasFiles = fileArray.length > 0;
-  const totalBytes = fileArray.reduce((sum, f) => sum + f.size, 0);
+  const fileArray = files ? Array.from(files) : []
+  const hasFiles = fileArray.length > 0
+  const totalBytes = fileArray.reduce((sum, f) => sum + f.size, 0)
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30 p-3">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
 
-        <div className="relative z-10 flex h-full w-full max-w-md flex-col border border-fd-primary/25 bg-fd-card/85 shadow-2xs backdrop-blur-[2px]">
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-px -left-px z-20 size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: hasFiles ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-px -right-px z-20 size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: hasFiles ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-px -left-px z-20 size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: hasFiles ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-px -bottom-px z-20 size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: hasFiles ? 1 : 0.45 }}
-          />
+        <div className="flex items-center justify-between gap-2">
 
-          <div className="flex items-center justify-between border-b border-fd-border/60 px-3 py-1.5 font-mono text-[10px] tabular-nums">
-            <span className="font-semibold tracking-wider text-fd-muted-foreground uppercase">
-              {lastEvent === 'canceled'
-                ? 'dialog canceled'
-                : `files (${fileArray.length})`}
-            </span>
-            <span className="text-fd-muted-foreground">
-              {hasFiles ? formatBytes(totalBytes) : `accept: ${preset.accept}`}
-            </span>
-          </div>
-
-          {hasFiles ? (
-            <ul className="flex-1 space-y-1.5 overflow-y-auto p-2.5">
-              {fileArray.map((file, idx) => (
-                <li
-                  key={`${file.name}-${file.lastModified}-${idx}`}
-                  className="flex items-center justify-between gap-2 rounded-md border bg-fd-muted/35 px-2.5 py-1.5 font-mono text-[11px] tabular-nums animate-in fade-in zoom-in-95 duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:animate-none"
+          <div
+            role="group"
+            aria-label="File dialog preset options"
+            className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {PRESET_OPTIONS.map((option, idx) => {
+              const active = presetIdx === idx
+              return (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => setPresetIdx(idx)}
+                  className={cn(
+                    "rounded-[3px] px-1.5 py-0.5 font-mono text-3xs font-medium transition-all",
+                    active
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
                 >
-                  <span className="truncate font-medium text-fd-card-foreground">
-                    {file.name}
-                  </span>
-                  <span className="shrink-0 text-[10px] text-fd-muted-foreground">
-                    {formatBytes(file.size)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <button
-              type="button"
-              onClick={() => open()}
-              className="flex flex-1 flex-col items-center justify-center gap-1 font-mono text-xs text-fd-muted-foreground transition-[color,transform] duration-150 ease-out active:scale-[0.99] [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground motion-reduce:transition-none"
-            >
-              <span className="font-medium text-fd-card-foreground">
-                files: null
-              </span>
-              <span className="text-[10px]">click to open native picker</span>
-            </button>
-          )}
+                  {option.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
-      </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5">
+
+        {hasFiles ? (
+          <ul className="flex max-h-28 flex-col gap-1.5 overflow-y-auto rounded-md border border-border-subtle bg-subtle/35 p-2">
+            {fileArray.map((file, idx) => (
+              <li
+                key={`${file.name}-${file.lastModified}-${idx}`}
+                className="flex items-center justify-between gap-2 rounded-sm border border-border-subtle bg-card px-2.5 py-1.5 font-mono text-2xs tabular-nums"
+              >
+                <span className="truncate font-medium text-foreground">
+                  {file.name}
+                </span>
+                <Badge variant="code" size="compact" className="shrink-0">
+                  {formatBytes(file.size)}
+                </Badge>
+              </li>
+            ))}
+          </ul>
+        ) : (
           <button
             type="button"
             onClick={() => open()}
-            className="rounded-lg bg-fd-primary/10 px-2.5 py-1 text-[11px] font-semibold text-fd-primary transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/15 motion-reduce:transition-none"
+            className="flex min-h-24 flex-col items-center justify-center gap-1.5 rounded-md border border-dashed border-border bg-subtle/35 px-3.5 py-4 text-center transition-colors hover:border-border-hover hover:bg-subtle/55"
           >
-            open()
+            <div className="flex items-center gap-1.5">
+              <span className="font-mono text-xs font-semibold text-foreground">
+                files: null
+              </span>
+              <Badge variant="code" size="compact">
+                {preset.accept}
+              </Badge>
+            </div>
+            <span className="font-mono text-2xs text-muted-foreground">
+              Click to open native file picker
+            </span>
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              reset();
-              setLastEvent('idle');
-            }}
-            disabled={!hasFiles}
-            className="rounded-lg border bg-fd-muted/40 px-2.5 py-1 text-[11px] font-medium text-fd-card-foreground transition-[background-color,transform,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 motion-reduce:transition-none"
-          >
-            reset()
-          </button>
-        </div>
+        )}
+      </CardContent>
 
-        <div
-          role="group"
-          aria-label="File dialog preset options"
-          className="relative grid grid-cols-3 rounded-lg border bg-fd-muted/40 p-0.5"
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/3)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${presetIdx * 100}%, 0, 0)`,
-            }}
-          />
-          {PRESET_OPTIONS.map((option, idx) => {
-            const active = presetIdx === idx;
-            return (
-              <button
-                key={option.label}
-                type="button"
-                onClick={() => setPresetIdx(idx)}
-                className={`relative z-10 rounded-md px-2 py-1 font-mono text-[11px] font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-card-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground'
-                }`}
-              >
-                {option.label}
-              </button>
-            );
-          })}
+
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Selected Files
+          </span>
+          <span className="font-mono text-xs font-semibold text-foreground tabular-nums">
+            {fileArray.length}
+          </span>
+        </div>
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Total Size
+          </span>
+          <span className="font-mono text-xs font-semibold text-primary tabular-nums">
+            {hasFiles ? formatBytes(totalBytes) : "0 B"}
+          </span>
         </div>
       </div>
-    </div>
-  );
+
+      <CardFooter className="border-t">
+        <Button
+          variant="primary"
+          size="compact"
+          onClick={() => open()}
+          className="flex-1 font-mono"
+        >
+          <FolderOpenIcon />
+          open()
+        </Button>
+        <Button
+          variant="tertiary"
+          size="compact"
+          onClick={() => {
+            reset()
+            setLastEvent("idle")
+          }}
+          disabled={!hasFiles && lastEvent === "idle"}
+          className="font-mono"
+        >
+          <RotateCcwIcon />
+          reset()
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }

@@ -19,5 +19,7 @@ export function usePrevious<T>(value: T): T | undefined {
     ref.current = value;
   }, [value]);
 
+  // oxlint-disable-next-line react/refs
+  // eslint-disable-next-line react/refs, react-hooks/refs
   return ref.current;
 }

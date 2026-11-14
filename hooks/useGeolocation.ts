@@ -75,13 +75,23 @@ export function useGeolocation(
     loading: Boolean(enabled && isSupported),
   });
 
+  const watchKey = `${isSupported}:${enabled}:${enableHighAccuracy}:${maximumAge}:${timeout}`;
+  const [prevWatchKey, setPrevWatchKey] = useState(watchKey);
+  if (prevWatchKey !== watchKey) {
+    setPrevWatchKey(watchKey);
+    if (!isSupported || !enabled) {
+      if (state.loading) {
+        setState((prev) => ({ ...prev, loading: false }));
+      }
+    } else {
+      setState((prev) => ({ ...prev, loading: true, error: null }));
+    }
+  }
+
   useEffect(() => {
     if (!isSupported || !enabled) {
-      setState((prev) => (prev.loading ? { ...prev, loading: false } : prev));
       return;
     }
-
-    setState((prev) => ({ ...prev, loading: true, error: null }));
 
     const onSuccess = (position: GeolocationPosition): void => {
       const { coords, timestamp } = position;

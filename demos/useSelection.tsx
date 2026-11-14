@@ -1,29 +1,27 @@
-'use client';
+"use client"
 
-import {
-  Check,
-  CheckSquare,
-  Minus,
-  RotateCcw,
-  Square,
-} from 'lucide-react';
-import { useState } from 'react';
-import { useSelection } from '@/hooks/useSelection';
+import { useState } from "react"
+import { cn } from "cn"
+import { Check, CheckSquare, Minus, RotateCcw, Square } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useSelection } from "@/hooks/useSelection"
 
 const FILES = [
-  'useSelection.ts',
-  'useBoolean.ts',
-  'useStorage.ts',
-  'useMedia.ts',
-] as const;
+  "useSelection.ts",
+  "useBoolean.ts",
+  "useStorage.ts",
+  "useMedia.ts",
+] as const
 
-type FileItem = (typeof FILES)[number];
-const MODES = ['multi', 'single'] as const;
-type SelectionMode = (typeof MODES)[number];
+type FileItem = (typeof FILES)[number]
+const MODES = ["multi", "single"] as const
+type SelectionMode = (typeof MODES)[number]
 
 export default function UseSelectionDemo() {
-  const [mode, setMode] = useState<SelectionMode>('multi');
-  const multiple = mode === 'multi';
+  const [mode, setMode] = useState<SelectionMode>("multi")
+  const multiple = mode === "multi"
 
   const {
     selectedKeys,
@@ -37,177 +35,127 @@ export default function UseSelectionDemo() {
     clear,
     setSelectedKeys,
   } = useSelection<FileItem>(FILES, {
-    defaultValue: ['useSelection.ts'],
+    defaultValue: ["useSelection.ts"],
     multiple,
-  });
-
-  const statusLabel = isAllSelected
-    ? 'all selected'
-    : isPartiallySelected
-      ? 'indeterminate'
-      : 'none selected';
-
-  const modeIndex = MODES.indexOf(mode);
+  })
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
+        <div className="flex items-center justify-between">
 
-        <div className="relative flex w-80 max-w-[calc(100%-1.5rem)] flex-col gap-2.5 border border-fd-primary/25 bg-fd-card/70 p-3.5 shadow-2xs backdrop-blur-[2px]">
-          <span
-            className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: !isNoneSelected ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: !isNoneSelected ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: !isNoneSelected ? 1 : 0.45 }}
-          />
-          <span
-            className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: !isNoneSelected ? 1 : 0.45 }}
-          />
-
-          <div className="flex items-center justify-between">
-            <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold tracking-wider uppercase text-fd-muted-foreground">
-              <span
-                className={`size-1.5 rounded-full transition-colors duration-150 ease-out ${
-                  !isNoneSelected
-                    ? 'bg-fd-primary'
-                    : 'bg-fd-muted-foreground/40'
-                }`}
-              />
-              {statusLabel}
-            </span>
-            <span className="font-mono text-[10px] tabular-nums text-fd-muted-foreground">
-              <strong className="text-fd-card-foreground">
-                {selectedKeys.length}
-              </strong>
-              /{FILES.length} selected
-            </span>
+          <div
+            role="group"
+            aria-label="Selection mode"
+            className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {MODES.map((m) => {
+              const active = mode === m
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => {
+                    setMode(m)
+                    if (m === "single" && selectedKeys.length > 1) {
+                      setSelectedKeys([selectedKeys[0]])
+                    }
+                  }}
+                  className={cn(
+                    "rounded-[3px] px-2 py-0.5 font-mono text-2xs font-medium capitalize transition-all",
+                    active
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {m}
+                </button>
+              )
+            })}
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-1.5 border-y border-fd-border/60 py-2">
+        <div className="flex flex-col gap-2 rounded-md border border-border-subtle bg-subtle/35 p-2.5">
+          <div className="grid grid-cols-2 gap-1.5">
             {FILES.map((file) => {
-              const checked = isSelected(file);
+              const checked = isSelected(file)
               return (
                 <button
                   key={file}
                   type="button"
                   onClick={() => toggle(file)}
-                  className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1.5 font-mono text-[11px] font-medium transition-[transform,color,background-color,border-color] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-sm border px-2 py-1.5 font-mono text-2xs font-medium transition-all active:scale-[0.98]",
                     checked
-                      ? 'border-fd-primary/40 bg-fd-primary/15 text-fd-primary'
-                      : 'border-fd-border/70 bg-fd-background/60 text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground'
-                  }`}
+                      ? "border-primary/40 bg-primary/10 text-primary shadow-control"
+                      : "border-border-subtle bg-card/80 text-muted-foreground hover:bg-control hover:text-foreground"
+                  )}
                 >
                   <span
-                    className={`flex size-3.5 shrink-0 items-center justify-center rounded-xs border transition-colors duration-150 ease-out ${
+                    className={cn(
+                      "flex size-3.5 shrink-0 items-center justify-center rounded-[3px] border transition-colors",
                       checked
-                        ? 'border-fd-primary bg-fd-primary text-fd-primary-foreground'
-                        : 'border-fd-muted-foreground/40 bg-fd-background'
-                    }`}
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-subtle/60"
+                    )}
                   >
                     {checked && <Check className="size-2.5" />}
                   </span>
                   <span className="truncate">{file}</span>
                 </button>
-              );
+              )
             })}
           </div>
 
-          <div className="truncate font-mono text-[10px] tabular-nums text-fd-muted-foreground">
-            {selectedKeys.length > 0
-              ? `selectedKeys: [ ${selectedKeys.map((k) => `"${k}"`).join(', ')} ]`
-              : 'selectedKeys: []'}
+          <div className="flex items-center justify-between border-t border-border-subtle pt-2 font-mono text-3xs tabular-nums text-muted-foreground">
+            <span className="truncate">
+              {selectedKeys.length > 0
+                ? `[ ${selectedKeys.map((k) => `"${k}"`).join(", ")} ]`
+                : "[]"}
+            </span>
+            <span className="shrink-0 pl-2">
+              <strong className="text-foreground">{selectedKeys.length}</strong>
+              /{FILES.length}
+            </span>
           </div>
         </div>
-      </div>
+      </CardContent>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={toggleAll}
-            disabled={!multiple}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-fd-primary/10 px-2.5 py-1 text-[11px] font-semibold text-fd-primary transition-[transform,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/15"
-          >
-            {isAllSelected ? (
-              <CheckSquare className="size-3" />
-            ) : isPartiallySelected ? (
-              <Minus className="size-3" />
-            ) : (
-              <Square className="size-3" />
-            )}
-            Toggle All
-          </button>
-
-          <button
-            type="button"
-            onClick={() => selectRange(FILES[0], FILES[2])}
-            disabled={!multiple}
-            className="rounded-lg border bg-fd-muted/40 px-2.5 py-1 text-[11px] font-medium text-fd-card-foreground transition-[transform,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted"
-          >
-            Range 1–3
-          </button>
-
-          <button
-            type="button"
-            onClick={clear}
-            disabled={isNoneSelected}
-            aria-label="Clear selection"
-            className="inline-flex size-6 items-center justify-center rounded-lg border bg-fd-muted/40 text-fd-muted-foreground transition-[transform,color,background-color,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground"
-          >
-            <RotateCcw className="size-3" />
-          </button>
-        </div>
-
-        <div
-          role="group"
-          aria-label="Selection mode"
-          className="relative grid grid-cols-2 rounded-lg border bg-fd-muted/50 p-0.5"
+      <CardFooter className="border-t">
+        <Button
+          variant="primary"
+          size="compact"
+          leadingIcon={
+            isAllSelected
+              ? CheckSquare
+              : isPartiallySelected
+                ? Minus
+                : Square
+          }
+          onClick={toggleAll}
+          disabled={!multiple}
+          className="flex-1"
         >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/2)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${modeIndex * 100}%, 0, 0)`,
-            }}
-          />
-          {MODES.map((m) => {
-            const active = mode === m;
-            return (
-              <button
-                key={m}
-                type="button"
-                onClick={() => {
-                  setMode(m);
-                  if (m === 'single' && selectedKeys.length > 1) {
-                    setSelectedKeys([selectedKeys[0]]);
-                  }
-                }}
-                className={`relative z-10 rounded-md px-2.5 py-0.5 font-mono text-[11px] font-medium capitalize transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-card-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground'
-                }`}
-              >
-                {m}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
+          Toggle All
+        </Button>
+        <Button
+          variant="secondary"
+          size="compact"
+          onClick={() => selectRange(FILES[0], FILES[2])}
+          disabled={!multiple}
+        >
+          Range 1–3
+        </Button>
+        <Button
+          variant="tertiary"
+          size="icon-compact"
+          onClick={clear}
+          disabled={isNoneSelected}
+          aria-label="Clear selection"
+        >
+          <RotateCcw />
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }

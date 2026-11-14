@@ -21,7 +21,7 @@ export function useEventCallback<T extends (...args: never[]) => unknown>(
   const fnRef = useLatest(fn);
 
   return useCallback(
-    ((...args: never[]) => fnRef.current(...args)) as T,
+    (...args: Parameters<T>) => fnRef.current(...args),
     [fnRef],
-  );
+  ) as T;
 }

@@ -1,130 +1,138 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { useElementRef } from '@/hooks/useElementRef';
+import { useState } from "react"
+import { PowerIcon, PowerOffIcon } from "lucide-react"
+import { cn } from "cn"
 
-type TagOption = 'div' | 'section' | 'article';
+import { useElementRef } from "@/hooks/useElementRef"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 
-const TAGS: TagOption[] = ['div', 'section', 'article'];
+type TagOption = "div" | "section" | "article"
+
+const TAGS: TagOption[] = ["div", "section", "article"]
 
 export default function UseElementRefDemo() {
-  const [mounted, setMounted] = useState(true);
-  const [tag, setTag] = useState<TagOption>('div');
-  const [ref, element] = useElementRef<HTMLElement>();
+  const [mounted, setMounted] = useState(true)
+  const [tag, setTag] = useState<TagOption>("div")
+  const [ref, element] = useElementRef<HTMLElement>()
 
-  const Tag = tag;
-  const activeTagIdx = TAGS.indexOf(tag);
+  const Tag = tag
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
+
+        <div className="flex items-center justify-between gap-2">
+
+          <div
+            role="group"
+            aria-label="HTML tag"
+            className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {TAGS.map((option) => {
+              const active = tag === option
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => {
+                    setTag(option)
+                    if (!mounted) setMounted(true)
+                  }}
+                  className={cn(
+                    "rounded-[3px] px-1.5 py-0.5 font-mono text-3xs font-medium transition-all",
+                    active
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {`<${option}>`}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
 
         {mounted ? (
           <Tag
             key={tag}
             ref={ref}
-            className="relative flex w-56 flex-col items-center justify-center gap-1.5 border border-fd-primary/30 bg-fd-card/85 px-4 py-3.5 shadow-2xs backdrop-blur-[2px] animate-in fade-in zoom-in-95 duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:animate-none"
+            className="flex flex-col gap-2 rounded-md border border-border-subtle bg-subtle/35 px-3.5 py-3 transition-all"
           >
-            <span className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary" />
-            <span className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary" />
-            <span className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary" />
-            <span className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary" />
-
-            <div className="flex items-center gap-2">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
-              <span className="font-mono text-sm font-semibold text-fd-foreground">
-                {element ? `<${element.tagName.toLowerCase()}>` : 'mounting'}
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-mono text-sm font-semibold text-foreground">
+                {element ? `<${element.tagName.toLowerCase()}>` : "mounting..."}
               </span>
+              <Badge variant="accent" size="compact">
+                HTML{tag.charAt(0).toUpperCase() + tag.slice(1)}Element
+              </Badge>
             </div>
-
-            <div className="flex items-center gap-2 font-mono text-[11px] tabular-nums text-fd-muted-foreground">
-              <span>
-                {element
-                  ? `${element.clientWidth}×${element.clientHeight}px`
-                  : '0×0px'}
-              </span>
-              <span>·</span>
-              <span>
-                connected: {element?.isConnected ? 'true' : 'false'}
-              </span>
-            </div>
+            <span className="font-mono text-2xs text-muted-foreground">
+              Reactive callback ref synced on mount & tag swap.
+            </span>
           </Tag>
         ) : (
-          <div className="relative flex w-56 flex-col items-center justify-center gap-1.5 border border-dashed border-fd-border bg-fd-card/40 px-4 py-3.5">
-            <span className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary/35" />
-            <span className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary/35" />
-            <span className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary/35" />
-            <span className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary/35" />
-
-            <div className="flex items-center gap-2">
-              <span className="size-1.5 rounded-full bg-fd-muted-foreground/40" />
-              <span className="font-mono text-sm font-semibold text-fd-muted-foreground">
-                {element === null ? 'null' : `<${element.tagName.toLowerCase()}>`}
+          <div className="flex flex-col gap-2 rounded-md border border-dashed border-border bg-subtle/15 px-3.5 py-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-mono text-sm font-semibold text-muted-foreground">
+                {element === null ? "null" : `<${element.tagName.toLowerCase()}>`}
               </span>
+              <Badge variant="secondary" size="compact">
+                Unmounted
+              </Badge>
             </div>
-
-            <span className="font-mono text-[11px] text-fd-muted-foreground/70">
-              detached from DOM
+            <span className="font-mono text-2xs text-muted-foreground">
+              Node detached from DOM tree; ref state is null.
             </span>
           </div>
         )}
-      </div>
+      </CardContent>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <button
-          type="button"
-          onClick={() => setMounted((prev) => !prev)}
-          className={`rounded-lg px-2.5 py-1 font-mono text-[11px] font-semibold transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-            mounted
-              ? 'border bg-fd-muted/40 text-fd-card-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70'
-              : 'bg-fd-primary/10 text-fd-primary [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/20'
-          }`}
-        >
-          {mounted ? 'Unmount' : 'Mount'}
-        </button>
 
-        <div
-          role="group"
-          aria-label="HTML tag"
-          className="relative grid grid-cols-3 rounded-lg border bg-fd-muted/40 p-0.5"
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/3)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${activeTagIdx * 100}%, 0, 0)`,
-            }}
-          />
-          {TAGS.map((option) => {
-            const active = tag === option;
-            return (
-              <button
-                key={option}
-                type="button"
-                onClick={() => {
-                  setTag(option);
-                  if (!mounted) setMounted(true);
-                }}
-                className={`relative z-10 rounded-md px-2 py-0.5 font-mono text-[11px] font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-foreground'
-                }`}
-              >
-                {`<${option}>`}
-              </button>
-            );
-          })}
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Dimensions
+          </span>
+          <span className="font-mono text-xs font-medium text-foreground tabular-nums">
+            {element
+              ? `${element.clientWidth}×${element.clientHeight}px`
+              : "0×0px"}
+          </span>
+        </div>
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            isConnected
+          </span>
+          <span className="font-mono text-xs font-medium text-foreground tabular-nums">
+            {String(Boolean(element?.isConnected))}
+          </span>
         </div>
       </div>
-    </div>
-  );
+
+      <CardFooter className="border-t">
+        <Button
+          variant={mounted ? "secondary" : "primary"}
+          size="compact"
+          onClick={() => setMounted((prev) => !prev)}
+          className="w-full"
+        >
+          {mounted ? (
+            <>
+              <PowerOffIcon />
+              Unmount Element
+            </>
+          ) : (
+            <>
+              <PowerIcon />
+              Mount Element
+            </>
+          )}
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }

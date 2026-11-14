@@ -1,4 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
+
+const getServerSnapshot = (): string | null => null;
+
+function createObjectUrlStore(source: Blob | MediaSource | null | undefined) {
+  let currentUrl: string | null = null;
+
+  return {
+    getSnapshot: (): string | null => currentUrl,
+    subscribe: (notify: () => void): (() => void) => {
+      if (
+        !source ||
+        typeof URL === 'undefined' ||
+        typeof URL.createObjectURL !== 'function'
+      ) {
+        currentUrl = null;
+        return () => {};
+      }
+
+      const url = URL.createObjectURL(source);
+      currentUrl = url;
+      notify();
+
+      return () => {
+        currentUrl = null;
+        if (typeof URL.revokeObjectURL === 'function') {
+          URL.revokeObjectURL(url);
+        }
+      };
+    },
+  };
+}
 
 /**
  * Creates a temporary object URL (`URL.createObjectURL`) for a `Blob`, `File`, or `MediaSource` and automatically revokes it on change or unmount.
@@ -16,27 +47,11 @@ import { useEffect, useState } from 'react';
 export function useObjectUrl(
   source: Blob | MediaSource | null | undefined,
 ): string | null {
-  const [objectUrl, setObjectUrl] = useState<string | null>(null);
+  const store = useMemo(() => createObjectUrlStore(source), [source]);
 
-  useEffect(() => {
-    if (
-      !source ||
-      typeof URL === 'undefined' ||
-      typeof URL.createObjectURL !== 'function'
-    ) {
-      setObjectUrl(null);
-      return;
-    }
-
-    const url = URL.createObjectURL(source);
-    setObjectUrl(url);
-
-    return () => {
-      if (typeof URL.revokeObjectURL === 'function') {
-        URL.revokeObjectURL(url);
-      }
-    };
-  }, [source]);
-
-  return objectUrl;
+  return useSyncExternalStore(
+    store.subscribe,
+    store.getSnapshot,
+    getServerSnapshot,
+  );
 }

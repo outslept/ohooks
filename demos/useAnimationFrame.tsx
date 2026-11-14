@@ -1,186 +1,227 @@
-'use client';
+"use client";
 
-import { useRef, useState } from 'react';
-import { Pause, Play, RotateCcw } from 'lucide-react';
-import { useAnimationFrame } from '@/hooks/useAnimationFrame';
+import * as React from "react";
+import { Pause, Play, RotateCcw } from "lucide-react";
+import { useAnimationFrame } from "@/hooks/useAnimationFrame";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { cn } from "cn";
 
-const FPS_OPTIONS = [
-  { label: 'Max', value: undefined },
-  { label: '30', value: 30 },
-  { label: '15', value: 15 },
-] as const;
+const TICKS = Array.from({ length: 60 }, (_, i) => i);
+const FPS_OPTIONS: Array<{ label: string; value: number | undefined }> = [
+  { label: "MAX", value: undefined },
+  { label: "60", value: 60 },
+  { label: "30", value: 30 },
+  { label: "15", value: 15 },
+];
 
-export default function UseAnimationFrameDemo() {
-  const [fpsIdx, setFpsIdx] = useState(0);
-  const fpsLimit = FPS_OPTIONS[fpsIdx].value;
-
-  const [elapsed, setElapsed] = useState(0);
-  const [delta, setDelta] = useState(0);
-  const smoothDeltaRef = useRef(0);
+export function UseAnimationFrameDemo() {
+  const [fpsLimit, setFpsLimit] = React.useState<number | undefined>(undefined);
+  const [time, setTime] = React.useState(0);
+  const [deltaTime, setDeltaTime] = React.useState(0);
+  const [frames, setFrames] = React.useState(0);
 
   const { isActive, toggle, stop } = useAnimationFrame(
-    ({ deltaTime }) => {
-      if (deltaTime <= 0) return;
-
-      setElapsed((prev) => prev + deltaTime);
-
-      const nextDelta =
-        smoothDeltaRef.current === 0
-          ? deltaTime
-          : smoothDeltaRef.current * 0.8 + deltaTime * 0.2;
-
-      smoothDeltaRef.current = nextDelta;
-      setDelta(nextDelta);
+    ({ deltaTime: dt }) => {
+      setTime((prev) => prev + dt);
+      setDeltaTime(dt);
+      setFrames((prev) => prev + 1);
     },
-    { fpsLimit },
+    { immediate: true, fpsLimit }
   );
 
   const handleReset = () => {
     stop();
-    smoothDeltaRef.current = 0;
-    setElapsed(0);
-    setDelta(0);
+    setTime(0);
+    setDeltaTime(0);
+    setFrames(0);
   };
 
-  const handleFpsChange = (idx: number) => {
-    smoothDeltaRef.current = 0;
-    setFpsIdx(idx);
-  };
+  const totalSeconds = time / 1000;
+  const wholeSeconds = Math.floor(totalSeconds)
+    .toString()
+    .padStart(2, "0");
+  const centiseconds = Math.floor((time % 1000) / 10)
+    .toString()
+    .padStart(2, "0");
 
-  const fps = delta > 0 ? Math.min(240, Math.round(1000 / delta)) : 0;
-  const angle = (elapsed * 0.09) % 360;
-  const canReset = elapsed > 0 || delta > 0;
+  const progressAngle = ((time % 6000) / 6000) * 360;
+  const activeTickIndex = Math.floor(((time % 6000) / 6000) * 60);
+  const fps = deltaTime > 0 ? Math.min(240, Math.round(1000 / deltaTime)) : 0;
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage:
-              'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
-
-        <div className="relative flex size-32 items-center justify-center rounded-full border border-fd-primary/25 bg-fd-card/70 shadow-2xs backdrop-blur-[2px]">
-          <span
-            aria-hidden="true"
-            className="absolute -top-px left-1/2 h-1.5 w-0.5 -translate-x-1/2 bg-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isActive ? 0.9 : 0.35 }}
-          />
-          <span
-            aria-hidden="true"
-            className="absolute -bottom-px left-1/2 h-1.5 w-0.5 -translate-x-1/2 bg-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isActive ? 0.9 : 0.35 }}
-          />
-          <span
-            aria-hidden="true"
-            className="absolute top-1/2 -left-px h-0.5 w-1.5 -translate-y-1/2 bg-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isActive ? 0.9 : 0.35 }}
-          />
-          <span
-            aria-hidden="true"
-            className="absolute top-1/2 -right-px h-0.5 w-1.5 -translate-y-1/2 bg-fd-primary transition-opacity duration-150 ease-out"
-            style={{ opacity: isActive ? 0.9 : 0.35 }}
-          />
-
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 will-change-transform motion-reduce:hidden"
-            style={{
-              transform: `rotate3d(0, 0, 1, ${angle.toFixed(2)}deg)`,
-            }}
-          >
-            <span className="absolute top-0 left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-fd-primary shadow-2xs" />
-          </div>
-
-          <div className="flex flex-col items-center gap-0.5 font-mono tabular-nums">
-            <div className="flex items-baseline gap-0.5">
-              <span className="text-xl font-semibold tracking-tight text-fd-card-foreground">
-                {(elapsed / 1000).toFixed(2)}
-              </span>
-              <span className="text-xs text-fd-muted-foreground">s</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-fd-muted-foreground">
-              <span>{isActive ? fps : 0} fps</span>
-              <span aria-hidden="true" className="text-fd-border">
-                ·
-              </span>
-              <span>{isActive && delta > 0 ? `${delta.toFixed(1)}ms` : '0.0ms'}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5 font-mono tabular-nums">
-          <button
-            type="button"
-            onClick={toggle}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-fd-primary/10 px-3 py-1 text-[11px] font-semibold text-fd-primary transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/15"
-          >
-            {isActive ? (
-              <>
-                <Pause className="size-3" />
-                Pause
-              </>
-            ) : (
-              <>
-                <Play className="size-3" />
-                Start
-              </>
-            )}
-          </button>
-          <button
-            type="button"
-            disabled={!canReset}
-            onClick={handleReset}
-            aria-label="Reset"
-            className="inline-flex items-center gap-1 rounded-lg border bg-fd-muted/40 px-2.5 py-1 text-[11px] font-medium text-fd-card-foreground transition-[transform,opacity,background-color] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted"
-          >
-            <RotateCcw className="size-3" />
-            Reset
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[11px] text-fd-muted-foreground">
-            fpsLimit
-          </span>
+    <Card className="w-full max-w-80">
+      <CardHeader className="border-b border-border-subtle py-3">
+        <CardAction>
           <div
             role="group"
             aria-label="FPS limit"
-            className="relative grid grid-cols-3 rounded-lg border bg-fd-muted/50 p-0.5 font-mono text-[11px] tabular-nums"
+            className="inline-flex items-center gap-0.5 rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/3)] rounded-[6px] bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-              style={{
-                transform: `translate3d(${fpsIdx * 100}%, 0, 0)`,
-              }}
-            />
-            {FPS_OPTIONS.map((opt, idx) => {
-              const active = idx === fpsIdx;
+            {FPS_OPTIONS.map((option) => {
+              const selected = fpsLimit === option.value;
               return (
                 <button
-                  key={opt.label}
+                  key={option.label}
                   type="button"
-                  onClick={() => handleFpsChange(idx)}
-                  className={`relative z-10 rounded-[6px] px-2.5 py-1 text-center font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                    active
-                      ? 'text-fd-card-foreground'
-                      : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground'
-                  }`}
+                  onClick={() => setFpsLimit(option.value)}
+                  className={cn(
+                    "rounded-2xs px-1.5 py-0.5 font-mono text-3xs font-medium tabular-nums outline-none select-none",
+                    "transition-colors duration-150 ease-out",
+                    selected
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground pointer-hover:hover:text-foreground",
+                    "focus-visible:ring-1 focus-visible:ring-ring"
+                  )}
                 >
-                  {opt.label}
+                  {option.label}
                 </button>
               );
             })}
           </div>
+        </CardAction>
+      </CardHeader>
+
+      <CardContent className="flex flex-col items-center justify-center py-6">
+        <div className="relative flex size-36 items-center justify-center">
+          <svg
+            viewBox="0 0 144 144"
+            className="size-full overflow-visible"
+            aria-hidden="true"
+          >
+            {TICKS.map((tick) => {
+              const angle = tick * 6;
+              const isMajor = tick % 5 === 0;
+              const isPassed = tick <= activeTickIndex && time > 0;
+
+              return (
+                <line
+                  key={tick}
+                  x1="72"
+                  y1={isMajor ? "6" : "8"}
+                  x2="72"
+                  y2={isMajor ? "13" : "12"}
+                  transform={`rotate(${angle} 72 72)`}
+                  strokeWidth={isMajor ? "1.25" : "1"}
+                  strokeLinecap="round"
+                  className={cn(
+                    "transition-colors duration-75",
+                    isPassed
+                      ? "stroke-foreground"
+                      : isMajor
+                        ? "stroke-border-hover"
+                        : "stroke-border"
+                  )}
+                />
+              );
+            })}
+
+            <circle
+              cx="72"
+              cy="72"
+              r="52"
+              fill="none"
+              strokeWidth="1"
+              className="stroke-border-subtle"
+            />
+
+            <g transform={`rotate(${progressAngle} 72 72)`}>
+              <circle
+                cx="72"
+                cy="20"
+                r="2.5"
+                className={cn(
+                  "transition-colors duration-150",
+                  isActive ? "fill-foreground" : "fill-muted-foreground"
+                )}
+              />
+            </g>
+          </svg>
+
+          <div className="absolute inset-0 flex flex-col items-center justify-center select-none">
+            <div className="flex items-baseline font-mono tracking-tight tabular-nums">
+              <span className="text-2xl font-semibold text-foreground">
+                {wholeSeconds}
+              </span>
+              <span className="text-sm font-medium text-muted-foreground">
+                .{centiseconds}s
+              </span>
+            </div>
+            <span className="mt-0.5 font-mono text-3xs tracking-widest text-muted-foreground uppercase">
+              {isActive && fps > 0 ? `${fps} FPS` : "PAUSED"}
+            </span>
+          </div>
+        </div>
+      </CardContent>
+
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col items-center py-2.5">
+          <span className="text-3xs font-medium tracking-wider text-muted-foreground uppercase">
+            Delta Time
+          </span>
+          <span className="mt-0.5 font-mono text-xs font-medium text-foreground tabular-nums">
+            {deltaTime.toFixed(1)}
+            <span className="ml-0.5 text-2xs text-muted-foreground">ms</span>
+          </span>
+        </div>
+        <div className="flex flex-col items-center py-2.5">
+          <span className="text-3xs font-medium tracking-wider text-muted-foreground uppercase">
+            Frames
+          </span>
+          <span className="mt-0.5 font-mono text-xs font-medium text-foreground tabular-nums">
+            {frames.toLocaleString()}
+          </span>
         </div>
       </div>
-    </div>
+
+      <CardFooter className="border-t">
+        <button
+          type="button"
+          onClick={toggle}
+          className={cn(
+            "inline-flex h-7 flex-1 items-center justify-center gap-1.5 rounded-md border border-border-subtle bg-control px-3 text-xs font-medium text-foreground shadow-control outline-none select-none",
+            "transition-[color,border-color,transform] duration-150 ease-out",
+            "pointer-hover:hover:border-border-hover",
+            "active:scale-[0.99]",
+            "focus-visible:border-border-focus focus-visible:ring-2 focus-visible:ring-ring"
+          )}
+        >
+          {isActive ? (
+            <>
+              <Pause className="size-3 text-muted-foreground" />
+              <span>Pause</span>
+            </>
+          ) : (
+            <>
+              <Play className="size-3 text-muted-foreground" />
+              <span>Start</span>
+            </>
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleReset}
+          aria-label="Reset timer"
+          className={cn(
+            "inline-flex h-7 items-center justify-center gap-1.5 rounded-md border border-border-subtle bg-control px-2.5 text-xs font-medium text-muted-foreground shadow-control outline-none select-none",
+            "transition-[color,border-color,transform] duration-150 ease-out",
+            "pointer-hover:hover:border-border-hover pointer-hover:hover:text-foreground",
+            "active:scale-[0.99]",
+            "focus-visible:border-border-focus focus-visible:ring-2 focus-visible:ring-ring"
+          )}
+        >
+          <RotateCcw className="size-3" />
+          <span>Reset</span>
+        </button>
+      </CardFooter>
+    </Card>
   );
 }
+
+export default UseAnimationFrameDemo;

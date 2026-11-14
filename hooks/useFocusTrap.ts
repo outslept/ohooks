@@ -173,7 +173,6 @@ export function useFocusTrap(
         try {
           previousActiveElementRef.current.focus();
         } catch {
-          // ignore if previous element was detached from DOM
         }
       }
     };

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useBoolean } from './useBoolean';
 import { useEventCallback } from './useEventCallback';
+import { useLatest } from './useLatest';
 import { useThrottleCallback } from './useThrottleCallback';
 
 export interface UseIdleOptions {
@@ -46,6 +47,7 @@ export function useIdle(
 
   const { value: isIdle, setTrue, setFalse } = useBoolean(initialState);
   const timerIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const eventsRef = useLatest(events);
 
   const resetTimer = useEventCallback(() => {
     if (isIdle) {
@@ -70,6 +72,8 @@ export function useIdle(
       return;
     }
 
+    const currentEvents = eventsRef.current;
+
     timerIdRef.current = setTimeout(() => {
       setTrue();
     }, Math.max(0, timeout));
@@ -88,7 +92,7 @@ export function useIdle(
       }
     };
 
-    for (const eventName of events) {
+    for (const eventName of currentEvents) {
       window.addEventListener(eventName, listener, { passive: true });
     }
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -99,12 +103,20 @@ export function useIdle(
         timerIdRef.current = null;
       }
       handleActivity.cancel();
-      for (const eventName of events) {
+      for (const eventName of currentEvents) {
         window.removeEventListener(eventName, listener);
       }
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [timeout, throttleMs, eventsKey, handleActivity, resetTimer, setTrue]);
+  }, [
+    timeout,
+    throttleMs,
+    eventsKey,
+    eventsRef,
+    handleActivity,
+    resetTimer,
+    setTrue,
+  ]);
 
   return isIdle;
 }

@@ -216,6 +216,11 @@ export function useDropZone(
 
   const dragCounterRef: { current: number } = useRef(0);
 
+  if (disabled && (isOver || isInvalid)) {
+    setIsOver(false);
+    setIsInvalid(false);
+  }
+
   const clearFiles = useCallback(() => {
     setFiles([]);
   }, []);
@@ -326,8 +331,6 @@ export function useDropZone(
   useEffect(() => {
     if (disabled) {
       dragCounterRef.current = 0;
-      setIsOver(false);
-      setIsInvalid(false);
       return;
     }
 

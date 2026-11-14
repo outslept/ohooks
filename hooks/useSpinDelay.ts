@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHydrated } from './useHydrated';
 
 /** Configuration options for `useSpinDelay`. */
@@ -33,69 +33,54 @@ export function useSpinDelay(
   const { delay = 500, minDuration = 200, ssr = true } = options;
   const isHydrated = useHydrated();
 
+  const safeDelay = Math.max(0, delay);
+  const safeMinDuration = Math.max(0, minDuration);
+
   const [state, setState] = useState<SpinState>(() => {
-    if (ssr && loading) {
+    if (!loading) {
+      return 'IDLE';
+    }
+    if (ssr || safeDelay === 0) {
       return 'DISPLAY';
     }
-    return loading ? 'DELAY' : 'IDLE';
+    return 'DELAY';
   });
 
-  const timeoutRef: { current: ReturnType<typeof setTimeout> | null } =
-    useRef(null);
-
-  const clearTimer = () => {
-    if (timeoutRef.current !== null) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  };
+  if (loading && state === 'IDLE') {
+    setState(safeDelay === 0 ? 'DISPLAY' : 'DELAY');
+  } else if (loading && state === 'DELAY' && safeDelay === 0) {
+    setState('DISPLAY');
+  } else if (!loading && state === 'DELAY') {
+    setState('IDLE');
+  } else if (!loading && state === 'DISPLAY') {
+    setState(safeMinDuration === 0 ? 'IDLE' : 'EXPIRE');
+  } else if (!loading && state === 'EXPIRE' && safeMinDuration === 0) {
+    setState('IDLE');
+  } else if (loading && state === 'EXPIRE') {
+    setState('DISPLAY');
+  }
 
   useEffect(() => {
-    if (loading && state === 'IDLE') {
-      clearTimer();
-      const safeDelay = Math.max(0, delay);
-      if (safeDelay === 0) {
+    if (state === 'DELAY') {
+      const id = setTimeout(() => {
         setState('DISPLAY');
-      } else {
-        setState('DELAY');
-        timeoutRef.current = setTimeout(() => {
-          setState('DISPLAY');
-        }, safeDelay);
-      }
-    } else if (loading && state === 'DELAY' && timeoutRef.current === null) {
-      const safeDelay = Math.max(0, delay);
-      if (safeDelay === 0) {
-        setState('DISPLAY');
-      } else {
-        timeoutRef.current = setTimeout(() => {
-          setState('DISPLAY');
-        }, safeDelay);
-      }
-    } else if (!loading && state === 'DELAY') {
-      clearTimer();
-      setState('IDLE');
-    } else if (!loading && state === 'DISPLAY') {
-      clearTimer();
-      const safeMinDuration = Math.max(0, minDuration);
-      if (safeMinDuration === 0) {
+      }, safeDelay);
+      return () => {
+        clearTimeout(id);
+      };
+    }
+
+    if (state === 'EXPIRE') {
+      const id = setTimeout(() => {
         setState('IDLE');
-      } else {
-        setState('EXPIRE');
-        timeoutRef.current = setTimeout(() => {
-          setState('IDLE');
-        }, safeMinDuration);
-      }
-    } else if (loading && state === 'EXPIRE') {
-      clearTimer();
-      setState('DISPLAY');
+      }, safeMinDuration);
+      return () => {
+        clearTimeout(id);
+      };
     }
-  }, [loading, state, delay, minDuration]);
 
-  useEffect(() => {
-    return () => {
-      clearTimer();
-    };
-  }, []);
+    return undefined;
+  }, [state, safeDelay, safeMinDuration]);
 
   if (!isHydrated && ssr) {
     return loading;

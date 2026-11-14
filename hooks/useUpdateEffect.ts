@@ -27,5 +27,7 @@ export function useUpdateEffect(
     }
 
     return effect();
-  }, deps);
-}
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, deps);
+  }

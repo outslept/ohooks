@@ -66,7 +66,7 @@ export function useAnimationFrame(
   }, []);
 
   const step = useCallback(
-    (timestamp: DOMHighResTimeStamp) => {
+    function stepFrame(timestamp: DOMHighResTimeStamp) {
       if (!isActiveRef.current) return;
 
       if (startTimeRef.current === null) {
@@ -87,7 +87,7 @@ export function useAnimationFrame(
         if (currentFpsLimit !== undefined && currentFpsLimit > 0) {
           const minFrameInterval = 1000 / currentFpsLimit;
           if (deltaTime < minFrameInterval) {
-            rafIdRef.current = window.requestAnimationFrame(step);
+            rafIdRef.current = window.requestAnimationFrame(stepFrame);
             return;
           }
           previousTimeRef.current =
@@ -105,7 +105,7 @@ export function useAnimationFrame(
       }
 
       if (isActiveRef.current && typeof window !== 'undefined') {
-        rafIdRef.current = window.requestAnimationFrame(step);
+        rafIdRef.current = window.requestAnimationFrame(stepFrame);
       }
     },
     [callbackRef, fpsLimitRef]

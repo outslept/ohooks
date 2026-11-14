@@ -58,6 +58,7 @@ export function useInfiniteScroll(
   const isLoadingRef: { current: boolean } = useRef(false);
   const isMountedRef: { current: boolean } = useRef(true);
   const onLoadMoreRef = useLatest(onLoadMore);
+  const thresholdRef = useLatest(threshold);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -115,7 +116,7 @@ export function useInfiniteScroll(
       {
         root: rootElement,
         rootMargin,
-        threshold,
+        threshold: thresholdRef.current,
       }
     );
 
@@ -129,6 +130,7 @@ export function useInfiniteScroll(
     root,
     rootMargin,
     thresholdKey,
+    thresholdRef,
     hasMore,
     enabled,
     loadMore,

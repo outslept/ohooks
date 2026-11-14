@@ -1,173 +1,167 @@
-'use client';
+"use client"
 
-import { memo, useRef, useState } from 'react';
-import { useEventCallback } from '@/hooks/useEventCallback';
+import { memo, useEffect, useRef, useState } from "react"
+import { PlayIcon, RefreshCwIcon } from "lucide-react"
+import { cn } from "cn"
+
+import { useEventCallback } from "@/hooks/useEventCallback"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 
 const MODE_OPTIONS = [
-  { label: 'useEventCallback', stable: true },
-  { label: 'inline () =>', stable: false },
-] as const;
+  { label: "stable", stable: true },
+  { label: "inline", stable: false },
+] as const
 
 const MemoizedChild = memo(function MemoizedChild({
   onAction,
 }: {
-  onAction: () => void;
+  onAction: () => void
 }) {
-  const rendersRef = useRef(1);
-  const lastActionRef = useRef(onAction);
+  const rendersRef = useRef(1)
+  const lastActionRef = useRef(onAction)
+  const countNodeRef = useRef<HTMLSpanElement>(null)
 
-  if (lastActionRef.current !== onAction) {
-    lastActionRef.current = onAction;
-    rendersRef.current += 1;
+  useEffect(() => {
+    if (lastActionRef.current !== onAction) {
+      lastActionRef.current = onAction
+      rendersRef.current += 1
+      if (countNodeRef.current) {
+        countNodeRef.current.textContent = String(rendersRef.current)
+      }
+    }
+  }, [onAction])
+
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-md border border-border-subtle bg-subtle/35 px-3 py-2">
+      <div className="flex items-center gap-2">
+        <span className="font-mono text-2xs text-muted-foreground">
+          memo child renders:
+        </span>
+        <Badge variant="code" size="compact" className="tabular-nums">
+          <span ref={countNodeRef}>1</span>
+        </Badge>
+      </div>
+      <Button
+        variant="secondary"
+        size="compact"
+        onClick={onAction}
+        className="font-mono"
+      >
+        fn()
+      </Button>
+    </div>
+  )
+})
+
+export default function UseEventCallbackDemo() {
+  const [text, setText] = useState("Payload v1")
+  const [parentEdits, setParentEdits] = useState(1)
+  const [useStable, setUseStable] = useState(true)
+  const [lastLogged, setLastLogged] = useState<string>("Payload v1")
+  const [invocations, setInvocations] = useState(0)
+
+  const stableAction = useEventCallback(() => {
+    setLastLogged(text)
+    setInvocations((c) => c + 1)
+  })
+
+  const inlineAction = () => {
+    setLastLogged(text)
+    setInvocations((c) => c + 1)
+  }
+
+  const activeCallback = useStable ? stableAction : inlineAction
+
+  const updateText = (next: string) => {
+    setText(next)
+    setParentEdits((c) => c + 1)
   }
 
   return (
-    <div className="flex items-center justify-between gap-2 rounded-md border bg-fd-muted/35 px-2.5 py-1.5 font-mono text-[11px] tabular-nums">
-      <span className="text-fd-muted-foreground">
-        memo child renders:{' '}
-        <strong className="text-fd-card-foreground">{rendersRef.current}</strong>
-      </span>
-      <button
-        type="button"
-        onClick={onAction}
-        className="rounded bg-fd-primary/10 px-2 py-0.5 text-[11px] font-semibold text-fd-primary transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/15 motion-reduce:transition-none"
-      >
-        Invoke fn()
-      </button>
-    </div>
-  );
-});
+    <Card className="w-full max-w-80">
+      <CardContent className="flex flex-col gap-3 pt-4 pb-4">
+        <div className="flex items-center justify-between gap-2">
+          <div
+            role="group"
+            aria-label="Callback reference stability mode"
+            className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
+          >
+            {MODE_OPTIONS.map((option) => {
+              const active = useStable === option.stable
+              return (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => setUseStable(option.stable)}
+                  className={cn(
+                    "rounded-[3px] px-1.5 py-0.5 font-mono text-3xs font-medium transition-all",
+                    active
+                      ? "bg-control text-foreground shadow-control"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {option.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
-export default function UseEventCallbackDemo() {
-  const [text, setText] = useState('Payload v1');
-  const [parentEdits, setParentEdits] = useState(1);
-  const [useStable, setUseStable] = useState(true);
-  const [lastLogged, setLastLogged] = useState<string>('Payload v1');
-  const [invocations, setInvocations] = useState(0);
-
-  const stableAction = useEventCallback(() => {
-    setLastLogged(text);
-    setInvocations((c) => c + 1);
-  });
-
-  const inlineAction = () => {
-    setLastLogged(text);
-    setInvocations((c) => c + 1);
-  };
-
-  const activeCallback = useStable ? stableAction : inlineAction;
-  const activeModeIdx = useStable ? 0 : 1;
-
-  const updateText = (next: string) => {
-    setText(next);
-    setParentEdits((c) => c + 1);
-  };
-
-  return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border bg-fd-card p-4 text-fd-card-foreground shadow-xs">
-      <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-lg border bg-fd-muted/30 px-4">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-35"
-          style={{
-            backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
+        <Input
+          size="compact"
+          type="text"
+          value={text}
+          onChange={(e) => updateText(e.target.value)}
+          placeholder="Type to update parent state..."
+          aria-label="Parent state text"
+          className="font-mono"
         />
 
-        <div className="relative z-10 flex w-full max-w-md flex-col gap-2.5 border border-fd-primary/25 bg-fd-card/85 p-3.5 shadow-2xs backdrop-blur-[2px]">
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-px -left-px size-2 border-t-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: useStable ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-px -right-px size-2 border-t-2 border-r-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: useStable ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-px -left-px size-2 border-b-2 border-l-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: useStable ? 1 : 0.45 }}
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-px -bottom-px size-2 border-r-2 border-b-2 border-fd-primary transition-opacity duration-150 ease-out motion-reduce:transition-none"
-            style={{ opacity: useStable ? 1 : 0.45 }}
-          />
+        <MemoizedChild onAction={activeCallback} />
+      </CardContent>
 
-          <div className="flex items-center justify-between gap-2 font-mono text-[10px] tabular-nums">
-            <span className="font-semibold tracking-wider text-fd-muted-foreground uppercase">
-              parent renders: <strong className="text-fd-card-foreground">{parentEdits}</strong>
-            </span>
-            <span className="truncate text-fd-muted-foreground">
-              read (#{invocations}): <strong className="text-fd-primary">&quot;{lastLogged}&quot;</strong>
-            </span>
-          </div>
-
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => updateText(e.target.value)}
-            placeholder="Type to update parent state..."
-            aria-label="Parent state text"
-            className="h-8 w-full rounded-md border bg-fd-background px-2.5 text-xs text-fd-card-foreground placeholder:text-fd-muted-foreground focus:border-fd-primary focus:outline-none"
-          />
-
-          <MemoizedChild onAction={activeCallback} />
+      <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Parent Renders
+          </span>
+          <span className="font-mono text-xs font-semibold text-foreground tabular-nums">
+            {parentEdits}
+          </span>
+        </div>
+        <div className="flex flex-col gap-0.5 px-3 py-2">
+          <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
+            Read (#{invocations})
+          </span>
+          <span className="truncate font-mono text-xs font-semibold text-primary">
+            &quot;{lastLogged}&quot;
+          </span>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-xs">
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => updateText(`Payload v${parentEdits + 1}`)}
-            className="rounded-lg bg-fd-primary/10 px-2.5 py-1 text-[11px] font-semibold text-fd-primary transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-primary/15 motion-reduce:transition-none"
-          >
-            Mutate parent
-          </button>
-          <button
-            type="button"
-            onClick={activeCallback}
-            className="rounded-lg border bg-fd-muted/40 px-2.5 py-1 text-[11px] font-medium text-fd-card-foreground transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-fd-muted/70 motion-reduce:transition-none"
-          >
-            Read latest
-          </button>
-        </div>
-
-        <div
-          role="group"
-          aria-label="Callback reference stability mode"
-          className="relative grid grid-cols-2 rounded-lg border bg-fd-muted/40 p-0.5"
+      <CardFooter className="border-t">
+        <Button
+          variant="primary"
+          size="compact"
+          onClick={() => updateText(`Payload v${parentEdits + 1}`)}
+          className="flex-1"
         >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc((100%-4px)/2)] rounded-md bg-fd-card shadow-2xs transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-            style={{
-              transform: `translate3d(${activeModeIdx * 100}%, 0, 0)`,
-            }}
-          />
-          {MODE_OPTIONS.map((option) => {
-            const active = useStable === option.stable;
-            return (
-              <button
-                key={option.label}
-                type="button"
-                onClick={() => setUseStable(option.stable)}
-                className={`relative z-10 rounded-md px-2.5 py-1 font-mono text-[11px] font-medium transition-[color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none ${
-                  active
-                    ? 'text-fd-card-foreground'
-                    : 'text-fd-muted-foreground [@media(hover:hover)_and_(pointer:fine)]:hover:text-fd-card-foreground'
-                }`}
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
+          <RefreshCwIcon />
+          Mutate Parent
+        </Button>
+        <Button
+          variant="secondary"
+          size="compact"
+          onClick={activeCallback}
+          className="flex-1"
+        >
+          <PlayIcon />
+          Read Latest
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }
