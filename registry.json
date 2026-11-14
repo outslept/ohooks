@@ -1,0 +1,2175 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "ohook",
+  "homepage": "https://hooks.outslept.com",
+  "items": [
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "title": "DOM Target Utilities",
+      "description": "Utilities (resolveTargetElement, isRefObject) for resolving DOM elements and React refs.",
+      "registryDependencies": [
+        "useEventListener"
+      ],
+      "files": [
+        {
+          "path": "lib/utils.ts",
+          "type": "registry:lib",
+          "target": "@lib/utils.ts"
+        }
+      ]
+    },
+    {
+      "name": "useAnimationFrame",
+      "type": "registry:hook",
+      "title": "useAnimationFrame",
+      "description": "Runs a callback on every `requestAnimationFrame` tick with delta time tracking, FPS limiting, and playback controls.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useAnimationFrame.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useAnimationFrame.ts"
+        }
+      ]
+    },
+    {
+      "name": "useAsyncTask",
+      "type": "registry:hook",
+      "title": "useAsyncTask",
+      "description": "Manages the manual execution, cancellation, and state of an asynchronous task with `AbortSignal` support.",
+      "categories": [
+        "async"
+      ],
+      "registryDependencies": [
+        "useEventCallback",
+        "useLatest",
+        "useUnmount",
+        "useUnmountedRef"
+      ],
+      "files": [
+        {
+          "path": "hooks/useAsyncTask.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useAsyncTask.ts"
+        }
+      ]
+    },
+    {
+      "name": "useBeforeUnload",
+      "type": "registry:hook",
+      "title": "useBeforeUnload",
+      "description": "Prompts the user with a confirmation dialog before leaving or reloading the page.",
+      "categories": [
+        "browser"
+      ],
+      "registryDependencies": [
+        "useEventListener"
+      ],
+      "files": [
+        {
+          "path": "hooks/useBeforeUnload.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useBeforeUnload.ts"
+        }
+      ]
+    },
+    {
+      "name": "useBoolean",
+      "type": "registry:hook",
+      "title": "useBoolean",
+      "description": "Manages a boolean state with helper functions to set, reset, and toggle the value.",
+      "categories": [
+        "state"
+      ],
+      "files": [
+        {
+          "path": "hooks/useBoolean.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useBoolean.ts"
+        }
+      ]
+    },
+    {
+      "name": "useBroadcastChannel",
+      "type": "registry:hook",
+      "title": "useBroadcastChannel",
+      "description": "Communicates between browser tabs, windows, or iframes of the same origin using the `BroadcastChannel` API.",
+      "categories": [
+        "browser"
+      ],
+      "registryDependencies": [
+        "useEventCallback",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useBroadcastChannel.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useBroadcastChannel.ts"
+        }
+      ]
+    },
+    {
+      "name": "useControllableState",
+      "type": "registry:hook",
+      "title": "useControllableState",
+      "description": "Manages state that can be either controlled externally or uncontrolled with an internal fallback.",
+      "categories": [
+        "state"
+      ],
+      "registryDependencies": [
+        "useIsomorphicLayoutEffect",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useControllableState.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useControllableState.ts"
+        }
+      ]
+    },
+    {
+      "name": "useCookie",
+      "type": "registry:hook",
+      "title": "useCookie",
+      "description": "Reads, writes, and deletes a browser cookie reactively using `useSyncExternalStore`.",
+      "categories": [
+        "storage"
+      ],
+      "registryDependencies": [
+        "useEventCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useCookie.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useCookie.ts"
+        }
+      ]
+    },
+    {
+      "name": "useCopyToClipboard",
+      "type": "registry:hook",
+      "title": "useCopyToClipboard",
+      "description": "Copies text to the system clipboard and tracks the copied state with an optional auto-reset timer.",
+      "categories": [
+        "browser"
+      ],
+      "registryDependencies": [
+        "useBoolean",
+        "useEventCallback",
+        "useTimeout"
+      ],
+      "files": [
+        {
+          "path": "hooks/useCopyToClipboard.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useCopyToClipboard.ts"
+        }
+      ]
+    },
+    {
+      "name": "useCountdown",
+      "type": "registry:hook",
+      "title": "useCountdown",
+      "description": "Manages a configurable countdown (or count-up) timer with start, pause, and reset controls.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useBoolean",
+        "useEventCallback",
+        "useInterval",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useCountdown.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useCountdown.ts"
+        }
+      ]
+    },
+    {
+      "name": "useCounter",
+      "type": "registry:hook",
+      "title": "useCounter",
+      "description": "Manages a numeric counter state with optional min/max clamping and helper methods.",
+      "categories": [
+        "state"
+      ],
+      "registryDependencies": [
+        "useEventCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useCounter.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useCounter.ts"
+        }
+      ]
+    },
+    {
+      "name": "useDarkMode",
+      "type": "registry:hook",
+      "title": "useDarkMode",
+      "description": "Manages dark mode state with system preference detection, `localStorage` persistence, and automatic DOM class toggling.",
+      "categories": [
+        "browser"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useHydrated",
+        "useIsomorphicLayoutEffect",
+        "useLocalStorage",
+        "useMediaQuery"
+      ],
+      "files": [
+        {
+          "path": "hooks/useDarkMode.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDarkMode.ts"
+        }
+      ]
+    },
+    {
+      "name": "useDebounceCallback",
+      "type": "registry:hook",
+      "title": "useDebounceCallback",
+      "description": "Creates a debounced version of a callback function with `leading`, `trailing`, `maxWait`, `cancel`, and `flush` support.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useDebounceCallback.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDebounceCallback.ts"
+        }
+      ]
+    },
+    {
+      "name": "useDebounceValue",
+      "type": "registry:hook",
+      "title": "useDebounceValue",
+      "description": "Debounces a reactive value and provides a debounced setter with `.cancel()`, `.flush()`, and `.isPending()` controls.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useDebounceCallback",
+        "useUpdateEffect"
+      ],
+      "files": [
+        {
+          "path": "hooks/useDebounceValue.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDebounceValue.ts"
+        }
+      ]
+    },
+    {
+      "name": "useDevicePixelRatio",
+      "type": "registry:hook",
+      "title": "useDevicePixelRatio",
+      "description": "Tracks the current `window.devicePixelRatio` reactively across screen changes and browser zoom levels.",
+      "categories": [
+        "sensors"
+      ],
+      "files": [
+        {
+          "path": "hooks/useDevicePixelRatio.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDevicePixelRatio.ts"
+        }
+      ]
+    },
+    {
+      "name": "useDocumentTitle",
+      "type": "registry:hook",
+      "title": "useDocumentTitle",
+      "description": "Updates `document.title` reactively and optionally restores the original title on unmount.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "useIsomorphicLayoutEffect",
+        "useUnmount"
+      ],
+      "files": [
+        {
+          "path": "hooks/useDocumentTitle.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDocumentTitle.ts"
+        }
+      ]
+    },
+    {
+      "name": "useDocumentVisibility",
+      "type": "registry:hook",
+      "title": "useDocumentVisibility",
+      "description": "Tracks the current `document.visibilityState` (`'visible'` or `'hidden'`) using `useSyncExternalStore`.",
+      "categories": [
+        "sensors"
+      ],
+      "files": [
+        {
+          "path": "hooks/useDocumentVisibility.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDocumentVisibility.ts"
+        }
+      ]
+    },
+    {
+      "name": "useDropZone",
+      "type": "registry:hook",
+      "title": "useDropZone",
+      "description": "Handles file drag-and-drop interactions with MIME/extension filtering via a target ref or `getRootProps`.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventCallback",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useDropZone.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDropZone.ts"
+        }
+      ]
+    },
+    {
+      "name": "useElementRef",
+      "type": "registry:hook",
+      "title": "useElementRef",
+      "description": "Provides a callback ref and reactive state for the mounted DOM element so effects re-run when the node attaches or detaches.",
+      "categories": [
+        "dom"
+      ],
+      "files": [
+        {
+          "path": "hooks/useElementRef.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useElementRef.ts"
+        }
+      ]
+    },
+    {
+      "name": "useElementScroll",
+      "type": "registry:hook",
+      "title": "useElementScroll",
+      "description": "Tracks a scrollable element's scroll position, active scrolling state, movement directions, and edge arrival flags.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventCallback",
+        "useEventListener",
+        "useIsomorphicLayoutEffect",
+        "useThrottleCallback",
+        "useUnmount"
+      ],
+      "files": [
+        {
+          "path": "hooks/useElementScroll.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useElementScroll.ts"
+        }
+      ]
+    },
+    {
+      "name": "useElementSize",
+      "type": "registry:hook",
+      "title": "useElementSize",
+      "description": "Tracks the width and height of a DOM element reactively using `ResizeObserver`.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useIsomorphicLayoutEffect",
+        "useResizeObserver"
+      ],
+      "files": [
+        {
+          "path": "hooks/useElementSize.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useElementSize.ts"
+        }
+      ]
+    },
+    {
+      "name": "useEventCallback",
+      "type": "registry:hook",
+      "title": "useEventCallback",
+      "description": "Returns a referentially stable callback that always invokes the latest version of `fn`.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useEventCallback.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useEventCallback.ts"
+        }
+      ]
+    },
+    {
+      "name": "useEventListener",
+      "type": "registry:hook",
+      "title": "useEventListener",
+      "description": "Attaches a type-safe event listener to `Window`, `Document`, `HTMLElement`, `SVGElement`, `MediaQueryList`, or custom `EventTarget` with automatic cleanup.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useEventListener.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useEventListener.ts"
+        }
+      ]
+    },
+    {
+      "name": "useFileDialog",
+      "type": "registry:hook",
+      "title": "useFileDialog",
+      "description": "Opens the native file selection dialog programmatically without rendering a visible `<input type=\"file\">` element.",
+      "categories": [
+        "browser"
+      ],
+      "registryDependencies": [
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useFileDialog.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useFileDialog.ts"
+        }
+      ]
+    },
+    {
+      "name": "useFirstMountState",
+      "type": "registry:hook",
+      "title": "useFirstMountState",
+      "description": "Returns `true` during the initial render of a component and `false` on all subsequent renders.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useIsomorphicLayoutEffect"
+      ],
+      "files": [
+        {
+          "path": "hooks/useFirstMountState.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useFirstMountState.ts"
+        }
+      ]
+    },
+    {
+      "name": "useFocus",
+      "type": "registry:hook",
+      "title": "useFocus",
+      "description": "Tracks and controls the focus state of a target DOM element, with optional `:focus-visible` filtering.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useFocus.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useFocus.ts"
+        }
+      ]
+    },
+    {
+      "name": "useFocusTrap",
+      "type": "registry:hook",
+      "title": "useFocusTrap",
+      "description": "Traps keyboard `Tab` / `Shift+Tab` focus within a container element and optionally restores focus on unmount.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useFocusTrap.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useFocusTrap.ts"
+        }
+      ]
+    },
+    {
+      "name": "useFullscreen",
+      "type": "registry:hook",
+      "title": "useFullscreen",
+      "description": "Manages fullscreen state for a target DOM element (or `document.documentElement`) with vendor prefix support.",
+      "categories": [
+        "browser"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useFullscreen.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useFullscreen.ts"
+        }
+      ]
+    },
+    {
+      "name": "useGeolocation",
+      "type": "registry:hook",
+      "title": "useGeolocation",
+      "description": "Watches the user's geographic location reactively using `navigator.geolocation.watchPosition`.",
+      "categories": [
+        "sensors"
+      ],
+      "files": [
+        {
+          "path": "hooks/useGeolocation.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useGeolocation.ts"
+        }
+      ]
+    },
+    {
+      "name": "useHash",
+      "type": "registry:hook",
+      "title": "useHash",
+      "description": "Reads and updates `window.location.hash` reactively using `useSyncExternalStore`.",
+      "categories": [
+        "storage"
+      ],
+      "registryDependencies": [
+        "useEventCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useHash.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useHash.ts"
+        }
+      ]
+    },
+    {
+      "name": "useHistoryState",
+      "type": "registry:hook",
+      "title": "useHistoryState",
+      "description": "Manages state with undo/redo history tracking and configurable history capacity.",
+      "categories": [
+        "state"
+      ],
+      "files": [
+        {
+          "path": "hooks/useHistoryState.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useHistoryState.ts"
+        }
+      ]
+    },
+    {
+      "name": "useHotkeys",
+      "type": "registry:hook",
+      "title": "useHotkeys",
+      "description": "Listens for keyboard shortcut combinations (including cross-platform `mod` support) and invokes a callback when matched.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useHotkeys.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useHotkeys.ts"
+        }
+      ]
+    },
+    {
+      "name": "useHover",
+      "type": "registry:hook",
+      "title": "useHover",
+      "description": "Tracks whether the pointer is hovering over a target DOM element, with optional enter and leave delays.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useHover.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useHover.ts"
+        }
+      ]
+    },
+    {
+      "name": "useHydrated",
+      "type": "registry:hook",
+      "title": "useHydrated",
+      "description": "Returns `false` during server-side rendering and initial hydration, and `true` once hydrated on the client.",
+      "categories": [
+        "effects"
+      ],
+      "files": [
+        {
+          "path": "hooks/useHydrated.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useHydrated.ts"
+        }
+      ]
+    },
+    {
+      "name": "useIdle",
+      "type": "registry:hook",
+      "title": "useIdle",
+      "description": "Tracks whether the user has been inactive for a given duration by listening to window interaction events.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "useBoolean",
+        "useEventCallback",
+        "useLatest",
+        "useThrottleCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useIdle.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useIdle.ts"
+        }
+      ]
+    },
+    {
+      "name": "useInert",
+      "type": "registry:hook",
+      "title": "useInert",
+      "description": "Manages the `inert` and `aria-hidden` attributes on a target element (or its document-level siblings) with reference counting.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useIsomorphicLayoutEffect"
+      ],
+      "files": [
+        {
+          "path": "hooks/useInert.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useInert.ts"
+        }
+      ]
+    },
+    {
+      "name": "useInfiniteScroll",
+      "type": "registry:hook",
+      "title": "useInfiniteScroll",
+      "description": "Triggers an asynchronous `onLoadMore` callback when a sentinel element scrolls into view using `IntersectionObserver`.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useInfiniteScroll.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useInfiniteScroll.ts"
+        }
+      ]
+    },
+    {
+      "name": "useIntersectionObserver",
+      "type": "registry:hook",
+      "title": "useIntersectionObserver",
+      "description": "Observes changes in the intersection of a target DOM element with an ancestor element or the viewport.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useIntersectionObserver.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useIntersectionObserver.ts"
+        }
+      ]
+    },
+    {
+      "name": "useInterval",
+      "type": "registry:hook",
+      "title": "useInterval",
+      "description": "Runs a callback repeatedly at a specified millisecond interval, pausing when `delay` is `null`.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useInterval.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useInterval.ts"
+        }
+      ]
+    },
+    {
+      "name": "useIsomorphicLayoutEffect",
+      "type": "registry:hook",
+      "title": "useIsomorphicLayoutEffect",
+      "description": "Uses `useLayoutEffect` in browser environments and falls back to `useEffect` during server-side rendering to avoid React SSR warnings.",
+      "categories": [
+        "effects"
+      ],
+      "files": [
+        {
+          "path": "hooks/useIsomorphicLayoutEffect.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useIsomorphicLayoutEffect.ts"
+        }
+      ]
+    },
+    {
+      "name": "useKeyPress",
+      "type": "registry:hook",
+      "title": "useKeyPress",
+      "description": "Tracks whether a specific key, hotkey combination, or custom key predicate is currently held down.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "useBoolean",
+        "useEventListener",
+        "useHotkeys"
+      ],
+      "files": [
+        {
+          "path": "hooks/useKeyPress.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useKeyPress.ts"
+        }
+      ]
+    },
+    {
+      "name": "useLatest",
+      "type": "registry:hook",
+      "title": "useLatest",
+      "description": "Returns a ref object whose `.current` property is synchronously updated to the latest value after every render.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useIsomorphicLayoutEffect"
+      ],
+      "files": [
+        {
+          "path": "hooks/useLatest.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useLatest.ts"
+        }
+      ]
+    },
+    {
+      "name": "useList",
+      "type": "registry:hook",
+      "title": "useList",
+      "description": "Manages an array state with immutable helper methods for pushing, inserting, updating, removing, filtering, and sorting items.",
+      "categories": [
+        "state"
+      ],
+      "registryDependencies": [
+        "useEventCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useList.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useList.ts"
+        }
+      ]
+    },
+    {
+      "name": "useLocalStorage",
+      "type": "registry:hook",
+      "title": "useLocalStorage",
+      "description": "Persists and synchronizes state with `window.localStorage` across components and browser tabs.",
+      "categories": [
+        "storage"
+      ],
+      "registryDependencies": [
+        "useEventCallback",
+        "useHydrated",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useLocalStorage.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useLocalStorage.ts"
+        }
+      ]
+    },
+    {
+      "name": "useLockBodyScroll",
+      "type": "registry:hook",
+      "title": "useLockBodyScroll",
+      "description": "Locks scrolling on `document.body` (or a target element) with scrollbar gap compensation and reference counting across multiple active locks.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useIsomorphicLayoutEffect"
+      ],
+      "files": [
+        {
+          "path": "hooks/useLockBodyScroll.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useLockBodyScroll.ts"
+        }
+      ]
+    },
+    {
+      "name": "useLongPress",
+      "type": "registry:hook",
+      "title": "useLongPress",
+      "description": "Detects long-press pointer gestures with movement threshold cancellation and click suppression.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "useEventCallback",
+        "useUnmount"
+      ],
+      "files": [
+        {
+          "path": "hooks/useLongPress.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useLongPress.ts"
+        }
+      ]
+    },
+    {
+      "name": "useMap",
+      "type": "registry:hook",
+      "title": "useMap",
+      "description": "Manages a reactive `Map` state with immutable helper actions for setting, deleting, clearing, and querying entries.",
+      "categories": [
+        "state"
+      ],
+      "registryDependencies": [
+        "useEventCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useMap.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMap.ts"
+        }
+      ]
+    },
+    {
+      "name": "useMeasure",
+      "type": "registry:hook",
+      "title": "useMeasure",
+      "description": "Measures the dimensions and box insets of a DOM element via a callback ref and `ResizeObserver`.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "useIsomorphicLayoutEffect"
+      ],
+      "files": [
+        {
+          "path": "hooks/useMeasure.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMeasure.ts"
+        }
+      ]
+    },
+    {
+      "name": "useMediaQuery",
+      "type": "registry:hook",
+      "title": "useMediaQuery",
+      "description": "Evaluates a CSS media query string and subscribes to changes reactively using `useSyncExternalStore`.",
+      "categories": [
+        "sensors"
+      ],
+      "files": [
+        {
+          "path": "hooks/useMediaQuery.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMediaQuery.ts"
+        }
+      ]
+    },
+    {
+      "name": "useMergeRefs",
+      "type": "registry:hook",
+      "title": "useMergeRefs",
+      "description": "Combines multiple React refs (callback refs, `RefObject`s, or `null`/`undefined`) into a single stable callback ref with React 19 cleanup support.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "useIsomorphicLayoutEffect"
+      ],
+      "files": [
+        {
+          "path": "hooks/useMergeRefs.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMergeRefs.ts"
+        }
+      ]
+    },
+    {
+      "name": "useMouse",
+      "type": "registry:hook",
+      "title": "useMouse",
+      "description": "Tracks mouse cursor coordinates across the document, viewport, screen, and an optional target element using `requestAnimationFrame`.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener"
+      ],
+      "files": [
+        {
+          "path": "hooks/useMouse.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMouse.ts"
+        }
+      ]
+    },
+    {
+      "name": "useMutationObserver",
+      "type": "registry:hook",
+      "title": "useMutationObserver",
+      "description": "Observes DOM tree, attribute, or character data mutations on a target node using `MutationObserver`.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useMutationObserver.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMutationObserver.ts"
+        }
+      ]
+    },
+    {
+      "name": "useNetworkInformation",
+      "type": "registry:hook",
+      "title": "useNetworkInformation",
+      "description": "Tracks network connectivity status and connection quality metrics (`effectiveType`, `downlink`, `rtt`, `saveData`) via the Network Information API.",
+      "categories": [
+        "sensors"
+      ],
+      "files": [
+        {
+          "path": "hooks/useNetworkInformation.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useNetworkInformation.ts"
+        }
+      ]
+    },
+    {
+      "name": "useObjectUrl",
+      "type": "registry:hook",
+      "title": "useObjectUrl",
+      "description": "Creates a temporary object URL (`URL.createObjectURL`) for a `Blob`, `File`, or `MediaSource` and automatically revokes it on change or unmount.",
+      "categories": [
+        "browser"
+      ],
+      "files": [
+        {
+          "path": "hooks/useObjectUrl.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useObjectUrl.ts"
+        }
+      ]
+    },
+    {
+      "name": "useOnClickOutside",
+      "type": "registry:hook",
+      "title": "useOnClickOutside",
+      "description": "Invokes a handler when a pointer, mouse, or touch interaction occurs outside one or more target elements (with Shadow DOM `composedPath` support).",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useOnClickOutside.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useOnClickOutside.ts"
+        }
+      ]
+    },
+    {
+      "name": "useOnline",
+      "type": "registry:hook",
+      "title": "useOnline",
+      "description": "Tracks whether the browser is currently connected to the network (`navigator.onLine`) using `useSyncExternalStore`.",
+      "categories": [
+        "sensors"
+      ],
+      "files": [
+        {
+          "path": "hooks/useOnline.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useOnline.ts"
+        }
+      ]
+    },
+    {
+      "name": "usePagination",
+      "type": "registry:hook",
+      "title": "usePagination",
+      "description": "Computes pagination state, page ranges with ellipsis markers, data slice indices, and navigation helpers.",
+      "categories": [
+        "state"
+      ],
+      "registryDependencies": [
+        "useControllableState",
+        "useEventCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/usePagination.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePagination.ts"
+        }
+      ]
+    },
+    {
+      "name": "usePermission",
+      "type": "registry:hook",
+      "title": "usePermission",
+      "description": "Queries and subscribes to browser permission status changes via `navigator.permissions.query`.",
+      "categories": [
+        "browser"
+      ],
+      "registryDependencies": [
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/usePermission.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePermission.ts"
+        }
+      ]
+    },
+    {
+      "name": "usePointerDrag",
+      "type": "registry:hook",
+      "title": "usePointerDrag",
+      "description": "Tracks pointer drag gestures on a target element with axis locking and movement thresholds.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/usePointerDrag.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePointerDrag.ts"
+        }
+      ]
+    },
+    {
+      "name": "usePreferredLanguage",
+      "type": "registry:hook",
+      "title": "usePreferredLanguage",
+      "description": "Tracks the user's preferred browser language (`navigator.language`) and updates on changes.",
+      "categories": [
+        "sensors"
+      ],
+      "files": [
+        {
+          "path": "hooks/usePreferredLanguage.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePreferredLanguage.ts"
+        }
+      ]
+    },
+    {
+      "name": "usePrevious",
+      "type": "registry:hook",
+      "title": "usePrevious",
+      "description": "Returns the value passed on the previous render.",
+      "categories": [
+        "state"
+      ],
+      "files": [
+        {
+          "path": "hooks/usePrevious.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePrevious.ts"
+        }
+      ]
+    },
+    {
+      "name": "usePreviousDistinct",
+      "type": "registry:hook",
+      "title": "usePreviousDistinct",
+      "description": "Returns the most recent distinct value prior to the current value.",
+      "categories": [
+        "state"
+      ],
+      "files": [
+        {
+          "path": "hooks/usePreviousDistinct.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePreviousDistinct.ts"
+        }
+      ]
+    },
+    {
+      "name": "useQueue",
+      "type": "registry:hook",
+      "title": "useQueue",
+      "description": "Manages a reactive FIFO (first-in, first-out) queue in React state.",
+      "categories": [
+        "state"
+      ],
+      "registryDependencies": [
+        "useEventCallback",
+        "useIsomorphicLayoutEffect"
+      ],
+      "files": [
+        {
+          "path": "hooks/useQueue.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useQueue.ts"
+        }
+      ]
+    },
+    {
+      "name": "useRafCallback",
+      "type": "registry:hook",
+      "title": "useRafCallback",
+      "description": "Throttles a callback so it executes at most once per `requestAnimationFrame` with the latest arguments.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useLatest",
+        "useUnmount"
+      ],
+      "files": [
+        {
+          "path": "hooks/useRafCallback.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useRafCallback.ts"
+        }
+      ]
+    },
+    {
+      "name": "useResizeObserver",
+      "type": "registry:hook",
+      "title": "useResizeObserver",
+      "description": "Observes size changes on a target DOM element using the `ResizeObserver` API.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useResizeObserver.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useResizeObserver.ts"
+        }
+      ]
+    },
+    {
+      "name": "useRovingTabIndex",
+      "type": "registry:hook",
+      "title": "useRovingTabIndex",
+      "description": "Implements the WAI-ARIA roving `tabIndex` keyboard navigation pattern for composite widgets.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "useControllableState",
+        "useEventCallback",
+        "useIsomorphicLayoutEffect"
+      ],
+      "files": [
+        {
+          "path": "hooks/useRovingTabIndex.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useRovingTabIndex.ts"
+        }
+      ]
+    },
+    {
+      "name": "useScreenOrientation",
+      "type": "registry:hook",
+      "title": "useScreenOrientation",
+      "description": "Tracks the device screen orientation and provides `lock` and `unlock` controls.",
+      "categories": [
+        "sensors"
+      ],
+      "files": [
+        {
+          "path": "hooks/useScreenOrientation.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useScreenOrientation.ts"
+        }
+      ]
+    },
+    {
+      "name": "useScript",
+      "type": "registry:hook",
+      "title": "useScript",
+      "description": "Dynamically loads an external `<script>` tag, deduplicating across components and tracking its status.",
+      "categories": [
+        "dom"
+      ],
+      "files": [
+        {
+          "path": "hooks/useScript.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useScript.ts"
+        }
+      ]
+    },
+    {
+      "name": "useScrollSpy",
+      "type": "registry:hook",
+      "title": "useScrollSpy",
+      "description": "Observes a list of page sections and returns the `id` of the currently active section in view.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useScrollSpy.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useScrollSpy.ts"
+        }
+      ]
+    },
+    {
+      "name": "useSelection",
+      "type": "registry:hook",
+      "title": "useSelection",
+      "description": "Manages single or multi-item selection state with range selection and bulk toggle helpers.",
+      "categories": [
+        "state"
+      ],
+      "registryDependencies": [
+        "useControllableState",
+        "useEventCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useSelection.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useSelection.ts"
+        }
+      ]
+    },
+    {
+      "name": "useSessionStorage",
+      "type": "registry:hook",
+      "title": "useSessionStorage",
+      "description": "Persists reactive state in `window.sessionStorage` with automatic serialization and synchronization.",
+      "categories": [
+        "storage"
+      ],
+      "registryDependencies": [
+        "useLocalStorage"
+      ],
+      "files": [
+        {
+          "path": "hooks/useSessionStorage.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useSessionStorage.ts"
+        }
+      ]
+    },
+    {
+      "name": "useSet",
+      "type": "registry:hook",
+      "title": "useSet",
+      "description": "Manages a reactive `Set` in React state with immutable update helpers.",
+      "categories": [
+        "state"
+      ],
+      "registryDependencies": [
+        "useEventCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useSet.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useSet.ts"
+        }
+      ]
+    },
+    {
+      "name": "useSpinDelay",
+      "type": "registry:hook",
+      "title": "useSpinDelay",
+      "description": "Prevents loading indicator flashes by delaying appearance and enforcing a minimum display duration.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useHydrated"
+      ],
+      "files": [
+        {
+          "path": "hooks/useSpinDelay.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useSpinDelay.ts"
+        }
+      ]
+    },
+    {
+      "name": "useSwipe",
+      "type": "registry:hook",
+      "title": "useSwipe",
+      "description": "Detects pointer swipe gestures and directions on a target element.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useSwipe.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useSwipe.ts"
+        }
+      ]
+    },
+    {
+      "name": "useTextareaAutosize",
+      "type": "registry:hook",
+      "title": "useTextareaAutosize",
+      "description": "Automatically adjusts the height of a `<textarea>` element to fit its content.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useIsomorphicLayoutEffect",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useTextareaAutosize.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useTextareaAutosize.ts"
+        }
+      ]
+    },
+    {
+      "name": "useTextSelection",
+      "type": "registry:hook",
+      "title": "useTextSelection",
+      "description": "Tracks the user's current text selection, bounding rectangle, and ranges within the document or a target container.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener"
+      ],
+      "files": [
+        {
+          "path": "hooks/useTextSelection.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useTextSelection.ts"
+        }
+      ]
+    },
+    {
+      "name": "useThrottleCallback",
+      "type": "registry:hook",
+      "title": "useThrottleCallback",
+      "description": "Creates a throttled version of a callback that executes at most once every `wait` milliseconds.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useThrottleCallback.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useThrottleCallback.ts"
+        }
+      ]
+    },
+    {
+      "name": "useThrottleValue",
+      "type": "registry:hook",
+      "title": "useThrottleValue",
+      "description": "Throttles state updates to a value so it changes at most once per `wait` milliseconds.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useThrottleCallback",
+        "useUpdateEffect"
+      ],
+      "files": [
+        {
+          "path": "hooks/useThrottleValue.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useThrottleValue.ts"
+        }
+      ]
+    },
+    {
+      "name": "useTimeout",
+      "type": "registry:hook",
+      "title": "useTimeout",
+      "description": "Declarative `setTimeout` hook that invokes a callback after `delay` milliseconds.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useTimeout.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useTimeout.ts"
+        }
+      ]
+    },
+    {
+      "name": "useToggle",
+      "type": "registry:hook",
+      "title": "useToggle",
+      "description": "Manages a boolean state with a `toggle` function that also accepts an explicit boolean or DOM event.",
+      "categories": [
+        "state"
+      ],
+      "files": [
+        {
+          "path": "hooks/useToggle.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useToggle.ts"
+        }
+      ]
+    },
+    {
+      "name": "useUnmount",
+      "type": "registry:hook",
+      "title": "useUnmount",
+      "description": "Executes a cleanup callback when the component unmounts, always using the latest function reference.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useUnmount.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useUnmount.ts"
+        }
+      ]
+    },
+    {
+      "name": "useUnmountedRef",
+      "type": "registry:hook",
+      "title": "useUnmountedRef",
+      "description": "Returns a read-only ref whose `current` value is `true` after the component has unmounted.",
+      "categories": [
+        "effects"
+      ],
+      "files": [
+        {
+          "path": "hooks/useUnmountedRef.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useUnmountedRef.ts"
+        }
+      ]
+    },
+    {
+      "name": "useUpdateEffect",
+      "type": "registry:hook",
+      "title": "useUpdateEffect",
+      "description": "Runs a `useEffect` callback only on dependency updates, skipping the initial mount.",
+      "categories": [
+        "effects"
+      ],
+      "registryDependencies": [
+        "useFirstMountState"
+      ],
+      "files": [
+        {
+          "path": "hooks/useUpdateEffect.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useUpdateEffect.ts"
+        }
+      ]
+    },
+    {
+      "name": "useUrlSearchParams",
+      "type": "registry:hook",
+      "title": "useUrlSearchParams",
+      "description": "Reads and updates `window.location.search` as reactive `URLSearchParams` synchronized with browser history.",
+      "categories": [
+        "storage"
+      ],
+      "registryDependencies": [
+        "useEventCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useUrlSearchParams.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useUrlSearchParams.ts"
+        }
+      ]
+    },
+    {
+      "name": "useVirtualList",
+      "type": "registry:hook",
+      "title": "useVirtualList",
+      "description": "Virtualizes a large list of fixed or variable-height items so only visible rows are rendered.",
+      "categories": [
+        "dom"
+      ],
+      "registryDependencies": [
+        "utils",
+        "useEventListener",
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useVirtualList.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useVirtualList.ts"
+        }
+      ]
+    },
+    {
+      "name": "useVisualViewport",
+      "type": "registry:hook",
+      "title": "useVisualViewport",
+      "description": "Tracks the browser's `VisualViewport` dimensions, offsets, and pinch-zoom scale (useful for virtual keyboards).",
+      "categories": [
+        "dom"
+      ],
+      "files": [
+        {
+          "path": "hooks/useVisualViewport.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useVisualViewport.ts"
+        }
+      ]
+    },
+    {
+      "name": "useWakeLock",
+      "type": "registry:hook",
+      "title": "useWakeLock",
+      "description": "Prevents the device screen from dimming or locking using the Screen Wake Lock API.",
+      "categories": [
+        "browser"
+      ],
+      "registryDependencies": [
+        "useLatest"
+      ],
+      "files": [
+        {
+          "path": "hooks/useWakeLock.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useWakeLock.ts"
+        }
+      ]
+    },
+    {
+      "name": "useWindowScroll",
+      "type": "registry:hook",
+      "title": "useWindowScroll",
+      "description": "Tracks the window scroll position (`x`, `y`) and provides a `scrollTo` helper.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "useEventCallback",
+        "useEventListener",
+        "useIsomorphicLayoutEffect",
+        "useThrottleCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useWindowScroll.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useWindowScroll.ts"
+        }
+      ]
+    },
+    {
+      "name": "useWindowSize",
+      "type": "registry:hook",
+      "title": "useWindowSize",
+      "description": "Tracks the browser window's `innerWidth` and `innerHeight` on resize.",
+      "categories": [
+        "sensors"
+      ],
+      "registryDependencies": [
+        "useEventCallback",
+        "useEventListener",
+        "useIsomorphicLayoutEffect",
+        "useThrottleCallback"
+      ],
+      "files": [
+        {
+          "path": "hooks/useWindowSize.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useWindowSize.ts"
+        }
+      ]
+    },
+    {
+      "name": "all",
+      "type": "registry:hook",
+      "title": "All Hooks",
+      "description": "Complete collection of all ohook React hooks and utilities.",
+      "files": [
+        {
+          "path": "lib/utils.ts",
+          "type": "registry:lib",
+          "target": "@lib/utils.ts"
+        },
+        {
+          "path": "hooks/useAnimationFrame.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useAnimationFrame.ts"
+        },
+        {
+          "path": "hooks/useAsyncTask.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useAsyncTask.ts"
+        },
+        {
+          "path": "hooks/useBeforeUnload.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useBeforeUnload.ts"
+        },
+        {
+          "path": "hooks/useBoolean.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useBoolean.ts"
+        },
+        {
+          "path": "hooks/useBroadcastChannel.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useBroadcastChannel.ts"
+        },
+        {
+          "path": "hooks/useControllableState.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useControllableState.ts"
+        },
+        {
+          "path": "hooks/useCookie.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useCookie.ts"
+        },
+        {
+          "path": "hooks/useCopyToClipboard.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useCopyToClipboard.ts"
+        },
+        {
+          "path": "hooks/useCountdown.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useCountdown.ts"
+        },
+        {
+          "path": "hooks/useCounter.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useCounter.ts"
+        },
+        {
+          "path": "hooks/useDarkMode.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDarkMode.ts"
+        },
+        {
+          "path": "hooks/useDebounceCallback.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDebounceCallback.ts"
+        },
+        {
+          "path": "hooks/useDebounceValue.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDebounceValue.ts"
+        },
+        {
+          "path": "hooks/useDevicePixelRatio.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDevicePixelRatio.ts"
+        },
+        {
+          "path": "hooks/useDocumentTitle.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDocumentTitle.ts"
+        },
+        {
+          "path": "hooks/useDocumentVisibility.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDocumentVisibility.ts"
+        },
+        {
+          "path": "hooks/useDropZone.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useDropZone.ts"
+        },
+        {
+          "path": "hooks/useElementRef.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useElementRef.ts"
+        },
+        {
+          "path": "hooks/useElementScroll.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useElementScroll.ts"
+        },
+        {
+          "path": "hooks/useElementSize.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useElementSize.ts"
+        },
+        {
+          "path": "hooks/useEventCallback.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useEventCallback.ts"
+        },
+        {
+          "path": "hooks/useEventListener.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useEventListener.ts"
+        },
+        {
+          "path": "hooks/useFileDialog.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useFileDialog.ts"
+        },
+        {
+          "path": "hooks/useFirstMountState.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useFirstMountState.ts"
+        },
+        {
+          "path": "hooks/useFocus.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useFocus.ts"
+        },
+        {
+          "path": "hooks/useFocusTrap.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useFocusTrap.ts"
+        },
+        {
+          "path": "hooks/useFullscreen.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useFullscreen.ts"
+        },
+        {
+          "path": "hooks/useGeolocation.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useGeolocation.ts"
+        },
+        {
+          "path": "hooks/useHash.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useHash.ts"
+        },
+        {
+          "path": "hooks/useHistoryState.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useHistoryState.ts"
+        },
+        {
+          "path": "hooks/useHotkeys.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useHotkeys.ts"
+        },
+        {
+          "path": "hooks/useHover.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useHover.ts"
+        },
+        {
+          "path": "hooks/useHydrated.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useHydrated.ts"
+        },
+        {
+          "path": "hooks/useIdle.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useIdle.ts"
+        },
+        {
+          "path": "hooks/useInert.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useInert.ts"
+        },
+        {
+          "path": "hooks/useInfiniteScroll.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useInfiniteScroll.ts"
+        },
+        {
+          "path": "hooks/useIntersectionObserver.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useIntersectionObserver.ts"
+        },
+        {
+          "path": "hooks/useInterval.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useInterval.ts"
+        },
+        {
+          "path": "hooks/useIsomorphicLayoutEffect.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useIsomorphicLayoutEffect.ts"
+        },
+        {
+          "path": "hooks/useKeyPress.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useKeyPress.ts"
+        },
+        {
+          "path": "hooks/useLatest.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useLatest.ts"
+        },
+        {
+          "path": "hooks/useList.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useList.ts"
+        },
+        {
+          "path": "hooks/useLocalStorage.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useLocalStorage.ts"
+        },
+        {
+          "path": "hooks/useLockBodyScroll.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useLockBodyScroll.ts"
+        },
+        {
+          "path": "hooks/useLongPress.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useLongPress.ts"
+        },
+        {
+          "path": "hooks/useMap.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMap.ts"
+        },
+        {
+          "path": "hooks/useMeasure.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMeasure.ts"
+        },
+        {
+          "path": "hooks/useMediaQuery.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMediaQuery.ts"
+        },
+        {
+          "path": "hooks/useMergeRefs.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMergeRefs.ts"
+        },
+        {
+          "path": "hooks/useMouse.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMouse.ts"
+        },
+        {
+          "path": "hooks/useMutationObserver.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useMutationObserver.ts"
+        },
+        {
+          "path": "hooks/useNetworkInformation.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useNetworkInformation.ts"
+        },
+        {
+          "path": "hooks/useObjectUrl.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useObjectUrl.ts"
+        },
+        {
+          "path": "hooks/useOnClickOutside.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useOnClickOutside.ts"
+        },
+        {
+          "path": "hooks/useOnline.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useOnline.ts"
+        },
+        {
+          "path": "hooks/usePagination.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePagination.ts"
+        },
+        {
+          "path": "hooks/usePermission.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePermission.ts"
+        },
+        {
+          "path": "hooks/usePointerDrag.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePointerDrag.ts"
+        },
+        {
+          "path": "hooks/usePreferredLanguage.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePreferredLanguage.ts"
+        },
+        {
+          "path": "hooks/usePrevious.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePrevious.ts"
+        },
+        {
+          "path": "hooks/usePreviousDistinct.ts",
+          "type": "registry:hook",
+          "target": "@hooks/usePreviousDistinct.ts"
+        },
+        {
+          "path": "hooks/useQueue.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useQueue.ts"
+        },
+        {
+          "path": "hooks/useRafCallback.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useRafCallback.ts"
+        },
+        {
+          "path": "hooks/useResizeObserver.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useResizeObserver.ts"
+        },
+        {
+          "path": "hooks/useRovingTabIndex.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useRovingTabIndex.ts"
+        },
+        {
+          "path": "hooks/useScreenOrientation.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useScreenOrientation.ts"
+        },
+        {
+          "path": "hooks/useScript.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useScript.ts"
+        },
+        {
+          "path": "hooks/useScrollSpy.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useScrollSpy.ts"
+        },
+        {
+          "path": "hooks/useSelection.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useSelection.ts"
+        },
+        {
+          "path": "hooks/useSessionStorage.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useSessionStorage.ts"
+        },
+        {
+          "path": "hooks/useSet.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useSet.ts"
+        },
+        {
+          "path": "hooks/useSpinDelay.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useSpinDelay.ts"
+        },
+        {
+          "path": "hooks/useSwipe.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useSwipe.ts"
+        },
+        {
+          "path": "hooks/useTextareaAutosize.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useTextareaAutosize.ts"
+        },
+        {
+          "path": "hooks/useTextSelection.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useTextSelection.ts"
+        },
+        {
+          "path": "hooks/useThrottleCallback.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useThrottleCallback.ts"
+        },
+        {
+          "path": "hooks/useThrottleValue.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useThrottleValue.ts"
+        },
+        {
+          "path": "hooks/useTimeout.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useTimeout.ts"
+        },
+        {
+          "path": "hooks/useToggle.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useToggle.ts"
+        },
+        {
+          "path": "hooks/useUnmount.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useUnmount.ts"
+        },
+        {
+          "path": "hooks/useUnmountedRef.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useUnmountedRef.ts"
+        },
+        {
+          "path": "hooks/useUpdateEffect.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useUpdateEffect.ts"
+        },
+        {
+          "path": "hooks/useUrlSearchParams.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useUrlSearchParams.ts"
+        },
+        {
+          "path": "hooks/useVirtualList.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useVirtualList.ts"
+        },
+        {
+          "path": "hooks/useVisualViewport.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useVisualViewport.ts"
+        },
+        {
+          "path": "hooks/useWakeLock.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useWakeLock.ts"
+        },
+        {
+          "path": "hooks/useWindowScroll.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useWindowScroll.ts"
+        },
+        {
+          "path": "hooks/useWindowSize.ts",
+          "type": "registry:hook",
+          "target": "@hooks/useWindowSize.ts"
+        }
+      ]
+    }
+  ]
+}
