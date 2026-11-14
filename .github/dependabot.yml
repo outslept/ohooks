@@ -1,0 +1,49 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      next:
+        patterns:
+          - "next"
+          - "@next/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      fumadocs:
+        patterns:
+          - "fumadocs-*"
+          - "@fumadocs/*"
+      testing:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+          - "playwright"
+          - "@playwright/*"
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      actions:
+        patterns:
+          - "*"
