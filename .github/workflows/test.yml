@@ -1,10 +1,29 @@
-name: Tests
+name: tests
 
 on:
   push:
     branches: [dev]
+    paths:
+      - "hooks/**"
+      - "tests/**"
+      - "lib/utils.ts"
+      - "vitest.config.*"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/test.yml"
   pull_request:
     branches: [dev]
+    paths:
+      - "hooks/**"
+      - "tests/**"
+      - "lib/utils.ts"
+      - "vitest.config.*"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/test.yml"
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -12,7 +31,7 @@ concurrency:
 
 jobs:
   test:
-    name: Vitest (${{ matrix.browser }})
+    name: vitest (${{ matrix.browser }})
     runs-on: ubuntu-latest
     if: >-
       !contains(github.event.head_commit.message, '[skip ci]') &&
@@ -27,82 +46,117 @@ jobs:
         browser: [chromium, firefox, webkit]
 
     steps:
-      - name: Checkout repository
+      - name: checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
+      - name: setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - name: Setup Node.js
+      - name: setup node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: "pnpm"
 
-      - name: Install dependencies
+      - name: install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Cache Playwright browser (${{ matrix.browser }})
+      - name: cache playwright browser (${{ matrix.browser }})
         id: playwright-cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ matrix.browser }}-${{ hashFiles('pnpm-lock.yaml') }}
 
-      - name: Install Playwright browser & deps (Cache Miss)
+      - name: install playwright browser & deps (cache miss)
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
 
-      - name: Install Playwright OS deps only (Cache Hit)
+      - name: install playwright os deps only (cache hit)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: pnpm exec playwright install-deps ${{ matrix.browser }}
 
-      - name: Run tests (${{ matrix.browser }})
+      - name: run tests (${{ matrix.browser }})
         run: >-
           pnpm test:${{ matrix.browser }}
           --reporter=default
           --reporter=github-actions
           --reporter=json
-          --outputFile.json=test-results.json
+          --outputFile.json=test-results-${{ matrix.browser }}.json
 
-      - name: Generate Job Summary
+      - name: upload test results (${{ matrix.browser }})
         if: always()
-        env:
-          BROWSER: ${{ matrix.browser }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.browser }}
+          path: test-results-${{ matrix.browser }}.json
+          if-no-files-found: ignore
+          retention-days: 1
+
+  summary:
+    name: test summary
+    needs: test
+    runs-on: ubuntu-latest
+    if: always() && needs.test.result != 'skipped'
+    steps:
+      - name: download test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          merge-multiple: true
+
+      - name: generate unified job summary
         run: |
           node -e '
             const fs = require("node:fs");
             const path = require("node:path");
 
             const summaryFile = process.env.GITHUB_STEP_SUMMARY;
-            const browser = process.env.BROWSER;
+            const browsers = ["chromium", "firefox", "webkit"];
 
-            if (!fs.existsSync("test-results.json")) {
-              fs.appendFileSync(summaryFile, `### ⚠️ Vitest (${browser})\n\nNo test results found.\n`);
-              process.exit(0);
-            }
+            let md = `### vitest browser matrix\n\n`;
+            md += `| browser | status | suites | passed | failed | skipped | duration |\n`;
+            md += `| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n`;
 
-            const report = JSON.parse(fs.readFileSync("test-results.json", "utf8"));
-            const status = report.success ? "✅ Passed" : "❌ Failed";
-            const suites = report.testResults || [];
-            const duration = (
-              suites.reduce((acc, s) => acc + Math.max(0, (s.endTime || 0) - (s.startTime || 0)), 0) / 1000
-            ).toFixed(2);
+            const failures = [];
 
-            let md = `### Vitest — \`${browser}\`\n\n`;
-            md += `| Status | Suites | Passed | Failed | Skipped | Duration |\n`;
-            md += `| :--- | :--- | :--- | :--- | :--- | :--- |\n`;
-            md += `| **${status}** | ${report.numPassedTestSuites}/${report.numTotalTestSuites} | ${report.numPassedTests} | ${report.numFailedTests} | ${report.numPendingTests} | ${duration}s |\n\n`;
+            for (const browser of browsers) {
+              const file = `test-results-${browser}.json`;
+              if (!fs.existsSync(file)) {
+                md += `| \`${browser}\` | ⚠️ missing | - | - | - | - | - |\n`;
+                continue;
+              }
 
-            for (const suite of suites) {
-              for (const test of suite.assertionResults || []) {
-                if (test.status === "failed") {
-                  md += `<details open>\n<summary>❌ <strong>${path.basename(suite.name)}</strong> — ${test.fullName || test.title}</summary>\n\n`;
-                  md += "```text\n" + (test.failureMessages || []).join("\n\n").trim() + "\n```\n\n</details>\n\n";
+              const report = JSON.parse(fs.readFileSync(file, "utf8"));
+              const status = report.success ? "✅ passed" : "❌ failed";
+              const suites = report.testResults || [];
+              const duration = (
+                suites.reduce((acc, s) => acc + Math.max(0, (s.endTime || 0) - (s.startTime || 0)), 0) / 1000
+              ).toFixed(2);
+
+              md += `| \`${browser}\` | **${status}** | ${report.numPassedTestSuites}/${report.numTotalTestSuites} | ${report.numPassedTests} | ${report.numFailedTests} | ${report.numPendingTests} | ${duration}s |\n`;
+
+              for (const suite of suites) {
+                for (const test of suite.assertionResults || []) {
+                  if (test.status === "failed") {
+                    failures.push({
+                      browser,
+                      file: path.basename(suite.name),
+                      title: test.fullName || test.title,
+                      messages: (test.failureMessages || []).join("\n\n").trim(),
+                    });
+                  }
                 }
               }
+            }
+
+            md += `\n`;
+
+            for (const fail of failures) {
+              md += `<details open>\n<summary>❌ <strong>[${fail.browser}] ${fail.file}</strong> — ${fail.title}</summary>\n\n`;
+              md += "```text\n" + fail.messages + "\n```\n\n</details>\n\n";
             }
 
             fs.appendFileSync(summaryFile, md);
