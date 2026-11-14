@@ -48,7 +48,7 @@ Add the `@ohook` registry namespace to your project so you can reference hooks w
 Run the `shadcn` CLI command:
 
 ```bash
-npx shadcn@latest registry add @ohook=https://hooks.outslept.com/r/{name}.json
+npx shadcn@latest registry add @ohook=https://ohooks.vercel.app/r/{name}.json
 ```
 
 Or add it manually to your `components.json`:
@@ -64,7 +64,7 @@ Or add it manually to your `components.json`:
     "hooks": "@/hooks"
   },
   "registries": {
-    "@ohook": "https://hooks.outslept.com/r/{name}.json"
+    "@ohook": "https://ohooks.vercel.app/r/{name}.json"
   }
 }
 ```
@@ -86,7 +86,7 @@ npx shadcn@latest add @ohook/all
 
 <Callout>
   **No namespace? No problem.** You can also install any hook directly via its registry URL without modifying `components.json`:
-  `npx shadcn@latest add https://hooks.outslept.com/r/use-local-storage.json`
+  `npx shadcn@latest add https://ohooks.vercel.app/r/use-local-storage.json`
 </Callout>
 
 ### 3. Discover & Inspect from the CLI

@@ -5,7 +5,7 @@ export const appName = 'ohook';
 export const appDescription = 'react hooks by outslept.';
 export const appUrl =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ||
-  'https://hooks.outslept.com';
+  'https://ohooks.vercel.app';
 export const registryBaseUrl = `${appUrl}/r`;
 
 export const docsRoute = '/';

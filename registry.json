@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "ohook",
-  "homepage": "https://hooks.outslept.com",
+  "homepage": "https://ohooks.vercel.app",
   "items": [
     {
       "name": "utils",

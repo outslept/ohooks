@@ -3,14 +3,14 @@
 > A modern, open-code collection of 88 zero-dependency React hooks distributed via the shadcn registry.
 
 <p align="center">
-  <a href="https://hooks.outslept.com/">
+  <a href="https://ohooks.vercel.app/">
     <img width="128" height="128" alt="ohook logo" src="./app/icon1.png">
   </a>
 </p>
 
-- [👉 Check out the docs](https://hooks.outslept.com/)
-- [📦 Registry catalog (`/r/registry.json`)](https://hooks.outslept.com/r/registry.json)
-- [🤖 LLM index (`/llms.txt`)](https://hooks.outslept.com/llms.txt)
+- [👉 Check out the docs](https://ohooks.vercel.app/)
+- [📦 Registry catalog (`/r/registry.json`)](https://ohooks.vercel.app/r/registry.json)
+- [🤖 LLM index (`/llms.txt`)](https://ohooks.vercel.app/llms.txt)
 
 ## Quick start
 
@@ -19,7 +19,7 @@
 Configure the registry in your project with a single CLI command:
 
 ```bash
-npx shadcn@latest registry add @ohook=https://hooks.outslept.com/r/{name}.json
+npx shadcn@latest registry add @ohook=https://ohooks.vercel.app/r/{name}.json
 ```
 
 Or add it to your `components.json` manually:
@@ -27,7 +27,7 @@ Or add it to your `components.json` manually:
 ```json
 {
   "registries": {
-    "@ohook": "https://hooks.outslept.com/r/{name}.json"
+    "@ohook": "https://ohooks.vercel.app/r/{name}.json"
   }
 }
 ```
@@ -47,7 +47,7 @@ npx shadcn@latest add @ohook/all
 
 > [!TIP]
 > Don't want to configure a namespace? You can install any hook directly via its URL:
-> `npx shadcn@latest add https://hooks.outslept.com/r/use-local-storage.json`
+> `npx shadcn@latest add https://ohooks.vercel.app/r/use-local-storage.json`
 
 ## Features
 
