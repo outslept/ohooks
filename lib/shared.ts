@@ -1,29 +1,37 @@
-import { createGetUrl } from 'fumadocs-core/source';
+import type { InferPageType } from 'fumadocs-core/source';
+import { source } from '@/lib/source';
 
-export const appName = 'My App';
-export const docsRoute = '/docs';
+export const appName = 'ohook';
+export const appDescription = 'react hooks by outslept.';
+export const appUrl =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ||
+  'https://hooks.outslept.com';
+export const registryBaseUrl = `${appUrl}/r`;
+
+export const docsRoute = '/';
 export const docsImageRoute = '/og/docs';
 export const docsContentRoute = '/llms.mdx/docs';
 
-// fill this with your actual GitHub info, for example:
 export const gitConfig = {
-  user: 'fuma-nama',
-  repo: 'fumadocs',
+  user: 'outslept',
+  repo: 'ohook',
   branch: 'main',
 };
 
-const getContentUrl = createGetUrl(docsContentRoute);
-
-export function getPageMarkdownUrl(page: { slugs: string[]; locale?: string }) {
-  const segments = [...page.slugs, 'content.md'];
-
-  return { segments, url: getContentUrl(segments, page.locale) };
-}
-
-const getImageUrl = createGetUrl(docsImageRoute);
-
-export function getPageImageUrl(page: { slugs: string[]; locale?: string }) {
+export function getPageImageUrl(page: InferPageType<typeof source>) {
   const segments = [...page.slugs, 'image.png'];
 
-  return { segments, url: getImageUrl(segments, page.locale) };
+  return {
+    segments,
+    url: `${docsImageRoute}/${segments.join('/')}`,
+  };
+}
+
+export function getPageMarkdownUrl(page: InferPageType<typeof source>) {
+  const segments = [...page.slugs, 'content.md'];
+
+  return {
+    segments,
+    url: `${docsContentRoute}/${segments.join('/')}`,
+  };
 }

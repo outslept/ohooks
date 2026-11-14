@@ -7,7 +7,6 @@ import {
   usePermission,
   type ExtendedPermissionName,
 } from "@/hooks/usePermission"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 
@@ -119,14 +118,6 @@ export default function UsePermissionDemo() {
           <span className="font-mono text-base font-semibold tracking-tight text-foreground">
             {selected}
           </span>
-
-          <Badge
-            variant={STATUS_BADGE[status]}
-            size="compact"
-            className="font-mono uppercase"
-          >
-            {status}
-          </Badge>
         </div>
       </CardContent>
 
