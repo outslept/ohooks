@@ -1,11 +1,10 @@
 import { useWindowSize } from '@/hooks/useWindowSize';
-import { act } from 'react';
 import { describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
 describe('useWindowSize', () => {
   it('reads current window dimensions and updates on resize event', async () => {
-    const { result } = await renderHook(() => useWindowSize());
+    const { result, act } = await renderHook(() => useWindowSize());
     expect(result.current.width).toBe(window.innerWidth);
     expect(result.current.height).toBe(window.innerHeight);
 
@@ -16,7 +15,7 @@ describe('useWindowSize', () => {
       value: 1234,
     });
 
-    act(() => {
+    await act(async () => {
       window.dispatchEvent(new Event('resize'));
     });
     expect(result.current.width).toBe(1234);

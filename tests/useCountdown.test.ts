@@ -1,5 +1,4 @@
 import { useCountdown } from '@/hooks/useCountdown';
-import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -15,8 +14,7 @@ describe('useCountdown', () => {
   it('counts down, pauses, resets, and fires onTick and onComplete', async () => {
     const onTick = vi.fn();
     const onComplete = vi.fn();
-
-    const { result } = await renderHook(() =>
+    const { result, act } = await renderHook(() =>
       useCountdown({
         countStart: 3,
         countStop: 1,
@@ -29,40 +27,50 @@ describe('useCountdown', () => {
     expect(result.current.count).toBe(3);
     expect(result.current.isRunning).toBe(false);
 
-    act(() => result.current.start());
+    await act(async () => {
+      result.current.start();
+    });
     expect(result.current.isRunning).toBe(true);
 
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(100);
     });
     expect(result.current.count).toBe(2);
     expect(onTick).toHaveBeenCalledWith(2);
 
-    act(() => result.current.pause());
-    act(() => {
+    await act(async () => {
+      result.current.pause();
+    });
+    await act(async () => {
       vi.advanceTimersByTime(300);
     });
     expect(result.current.count).toBe(2);
 
-    act(() => result.current.start());
-    act(() => {
+    await act(async () => {
+      result.current.start();
+    });
+    await act(async () => {
       vi.advanceTimersByTime(100);
     });
     expect(result.current.count).toBe(1);
     expect(result.current.isRunning).toBe(false);
     expect(onComplete).toHaveBeenCalledOnce();
 
-    act(() => result.current.start());
+    await act(async () => {
+      result.current.start();
+    });
     expect(result.current.isRunning).toBe(false);
 
-    act(() => result.current.reset());
+    await act(async () => {
+      result.current.reset();
+    });
     expect(result.current.count).toBe(3);
     expect(result.current.isRunning).toBe(false);
   });
 
   it('supports autoStart and increment mode', async () => {
     const onComplete = vi.fn();
-    const { result } = await renderHook(() =>
+    const { result, act } = await renderHook(() =>
       useCountdown({
         countStart: 0,
         countStop: 2,
@@ -74,10 +82,11 @@ describe('useCountdown', () => {
     );
 
     expect(result.current.isRunning).toBe(true);
-    act(() => {
+
+    await act(async () => {
       vi.advanceTimersByTime(50);
     });
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(50);
     });
     expect(result.current.count).toBe(2);

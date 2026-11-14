@@ -1,5 +1,4 @@
 import { useUrlSearchParams } from '@/hooks/useUrlSearchParams';
-import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -13,7 +12,7 @@ describe('useUrlSearchParams', () => {
   });
 
   it('initializes from object, updates URL query via object/tuples/updater, and syncs across hooks', async () => {
-    const { result: hookA } = await renderHook(() =>
+    const { result: hookA, act } = await renderHook(() =>
       useUrlSearchParams({ initialValue: { page: 1, filter: 'all' } }),
     );
     const { result: hookB } = await renderHook(() => useUrlSearchParams());
@@ -21,7 +20,7 @@ describe('useUrlSearchParams', () => {
     expect(hookA.current[0].get('page')).toBe('1');
     expect(hookA.current[0].get('filter')).toBe('all');
 
-    act(() => {
+    await act(async () => {
       hookA.current[1](
         (prev) => {
           prev.set('page', '2');
@@ -35,7 +34,7 @@ describe('useUrlSearchParams', () => {
     expect(hookA.current[0].get('page')).toBe('2');
     expect(hookB.current[0].get('page')).toBe('2');
 
-    act(() => {
+    await act(async () => {
       hookA.current[1]([['sort', 'asc']]);
     });
     expect(window.location.search).toBe('?sort=asc');

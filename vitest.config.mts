@@ -8,6 +8,7 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   test: {
+    setupFiles: ['./tests/setup.ts'],
     fileParallelism: false,
     isolate: false,
     coverage: {

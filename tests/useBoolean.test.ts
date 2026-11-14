@@ -1,23 +1,30 @@
 import { useBoolean } from '@/hooks/useBoolean';
-import { act } from 'react';
 import { describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
 describe('useBoolean', () => {
   it('defaults to false and supports setTrue, setFalse, toggle, and setValue', async () => {
-    const { result } = await renderHook(() => useBoolean());
+    const { result, act } = await renderHook(() => useBoolean());
     expect(result.current.value).toBe(false);
 
-    act(() => result.current.setTrue());
+    await act(async () => {
+      result.current.setTrue();
+    });
     expect(result.current.value).toBe(true);
 
-    act(() => result.current.setFalse());
+    await act(async () => {
+      result.current.setFalse();
+    });
     expect(result.current.value).toBe(false);
 
-    act(() => result.current.toggle());
+    await act(async () => {
+      result.current.toggle();
+    });
     expect(result.current.value).toBe(true);
 
-    act(() => result.current.setValue((prev) => !prev));
+    await act(async () => {
+      result.current.setValue((prev) => !prev);
+    });
     expect(result.current.value).toBe(false);
   });
 

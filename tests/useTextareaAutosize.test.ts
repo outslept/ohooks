@@ -1,5 +1,4 @@
 import { useTextareaAutosize } from '@/hooks/useTextareaAutosize';
-import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -21,8 +20,7 @@ describe('useTextareaAutosize', () => {
 
   it('adjusts textarea height within minHeight/maxHeight bounds and fires onResize', async () => {
     const onResize = vi.fn();
-
-    const { result, rerender } = await renderHook(
+    const { result, rerender, act } = await renderHook(
       (val: string = 'short') =>
         useTextareaAutosize(textarea, val, {
           minHeight: 40,
@@ -41,7 +39,7 @@ describe('useTextareaAutosize', () => {
     expect(textarea.style.height).toBe('100px');
     expect(textarea.style.overflowY).toBe('auto');
 
-    act(() => {
+    await act(async () => {
       result.current.resize();
     });
     expect(textarea.style.height).toBe('100px');

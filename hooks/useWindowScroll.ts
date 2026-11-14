@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useEventCallback } from './useEventCallback';
 import { useEventListener } from './useEventListener';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
@@ -59,15 +59,18 @@ export function useWindowScroll(
   const [position, setPosition] = useState<WindowScrollPosition>(() =>
     initializeWithValue ? readPosition() : { x: 0, y: 0 },
   );
+  const lastPositionRef = useRef<WindowScrollPosition>(position);
 
   const updatePosition = useEventCallback(() => {
-    setPosition((prev) => {
-      const next = readPosition();
-      if (prev.x === next.x && prev.y === next.y) {
-        return prev;
-      }
-      return next;
-    });
+    const next = readPosition();
+    if (
+      lastPositionRef.current.x === next.x &&
+      lastPositionRef.current.y === next.y
+    ) {
+      return;
+    }
+    lastPositionRef.current = next;
+    setPosition(next);
   });
 
   const throttledUpdatePosition = useThrottleCallback(

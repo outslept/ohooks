@@ -1,5 +1,4 @@
 import { useThrottleValue } from '@/hooks/useThrottleValue';
-import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -13,9 +12,10 @@ describe('useThrottleValue', () => {
   });
 
   it('throttles rapid value updates across wait window', async () => {
-    const { result, rerender } = await renderHook((val: number = 1) =>
+    const { result, rerender, act } = await renderHook((val: number = 1) =>
       useThrottleValue(val, 100),
     );
+
     expect(result.current[0]).toBe(1);
 
     await rerender(2);
@@ -24,7 +24,7 @@ describe('useThrottleValue', () => {
     await rerender(3);
     expect(result.current[0]).toBe(2);
 
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(100);
     });
     expect(result.current[0]).toBe(3);

@@ -1,5 +1,5 @@
 import { mergeRefs, useMergeRefs } from '@/hooks/useMergeRefs';
-import { act, createRef } from 'react';
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -10,17 +10,17 @@ describe('useMergeRefs', () => {
     const cleanupSpy = vi.fn();
     const cbRefWithCleanup = vi.fn(() => cleanupSpy);
 
-    const { result, rerender } = await renderHook(
+    const { result, rerender, act } = await renderHook(
       (secondRef: typeof objRef1 = objRef1) =>
         useMergeRefs(secondRef, cbRefWithCleanup),
     );
 
     const node = document.createElement('div');
     let unmountCleanup: (() => void) | void;
-
-    act(() => {
+    await act(async () => {
       unmountCleanup = result.current(node);
     });
+
     expect(objRef1.current).toBe(node);
     expect(cbRefWithCleanup).toHaveBeenCalledWith(node);
 
@@ -28,7 +28,7 @@ describe('useMergeRefs', () => {
     expect(objRef1.current).toBeNull();
     expect(objRef2.current).toBe(node);
 
-    act(() => {
+    await act(async () => {
       if (typeof unmountCleanup === 'function') {
         unmountCleanup();
       }

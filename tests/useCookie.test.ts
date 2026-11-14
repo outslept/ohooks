@@ -1,5 +1,4 @@
 import { useCookie } from '@/hooks/useCookie';
-import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -9,7 +8,7 @@ describe('useCookie', () => {
   });
 
   it('reads defaultValue, writes encoded cookie, syncs across hooks, and deletes cookie', async () => {
-    const { result: hookA } = await renderHook(() =>
+    const { result: hookA, act } = await renderHook(() =>
       useCookie('test_cookie', { defaultValue: 'default-val', sameSite: 'lax' }),
     );
     const { result: hookB } = await renderHook(() =>
@@ -18,17 +17,15 @@ describe('useCookie', () => {
 
     expect(hookA.current[0]).toBe('default-val');
 
-    act(() => {
+    await act(async () => {
       hookA.current[1]('hello world', { maxAge: 3600 });
     });
-
     expect(hookA.current[0]).toBe('hello world');
     expect(hookB.current[0]).toBe('hello world');
 
-    act(() => {
+    await act(async () => {
       hookA.current[2]();
     });
-
     expect(hookA.current[0]).toBe('default-val');
     expect(hookB.current[0]).toBe('default-val');
   });

@@ -1,5 +1,4 @@
 import { useAsyncTask } from '@/hooks/useAsyncTask';
-import { act } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -7,8 +6,7 @@ describe('useAsyncTask', () => {
   it('handles success, error normalization, and reset', async () => {
     const onSuccess = vi.fn();
     const onError = vi.fn();
-
-    const { result } = await renderHook(() =>
+    const { result, act } = await renderHook(() =>
       useAsyncTask(
         async (_ctx, value: number) => {
           if (value < 0) {
@@ -39,15 +37,16 @@ describe('useAsyncTask', () => {
     expect(result.current.error?.message).toBe('negative-value');
     expect(onError).toHaveBeenCalledOnce();
 
-    act(() => result.current.reset());
+    await act(async () => {
+      result.current.reset();
+    });
     expect(result.current.isIdle).toBe(true);
     expect(result.current.error).toBeNull();
   });
 
   it('aborts in-flight task manually and when superseded by a new run', async () => {
     const onAbort = vi.fn();
-
-    const { result } = await renderHook(() =>
+    const { result, act } = await renderHook(() =>
       useAsyncTask(
         ({ signal }, delayMs: number, label: string) =>
           new Promise<string>((resolve, reject) => {
@@ -62,7 +61,7 @@ describe('useAsyncTask', () => {
     );
 
     let firstPromise: Promise<string | undefined>;
-    act(() => {
+    await act(async () => {
       firstPromise = result.current.run(50, 'first');
     });
     expect(result.current.isPending).toBe(true);

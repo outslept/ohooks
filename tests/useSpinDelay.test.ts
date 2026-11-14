@@ -1,5 +1,4 @@
 import { useSpinDelay } from '@/hooks/useSpinDelay';
-import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -13,43 +12,44 @@ describe('useSpinDelay', () => {
   });
 
   it('suppresses spinner for fast loads and enforces minDuration once shown', async () => {
-    const { result, rerender } = await renderHook((loading: boolean = false) =>
+    const { result, rerender, act } = await renderHook((loading: boolean = false) =>
       useSpinDelay(loading, { delay: 200, minDuration: 150, ssr: false }),
     );
+
     expect(result.current).toBe(false);
 
     await rerender(true);
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(100);
     });
     expect(result.current).toBe(false);
 
     await rerender(false);
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(200);
     });
     expect(result.current).toBe(false);
 
     await rerender(true);
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(200);
     });
     expect(result.current).toBe(true);
 
     await rerender(false);
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(100);
     });
     expect(result.current).toBe(true);
 
     await rerender(true);
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(100);
     });
     expect(result.current).toBe(true);
 
     await rerender(false);
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(150);
     });
     expect(result.current).toBe(false);

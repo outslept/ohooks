@@ -1,13 +1,13 @@
 import { usePagination } from '@/hooks/usePagination';
-import { act } from 'react';
 import { describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
 describe('usePagination', () => {
   it('computes ranges, ellipses, indices, and navigation actions', async () => {
-    const { result } = await renderHook(() =>
+    const { result, act } = await renderHook(() =>
       usePagination({ totalItems: 95, pageSize: 10, defaultPage: 1 }),
     );
+
     expect(result.current.totalPages).toBe(10);
     expect(result.current.items).toEqual([1, 2, 3, 4, 5, 'ellipsis', 10]);
     expect(result.current.hasPrevPage).toBe(false);
@@ -15,7 +15,9 @@ describe('usePagination', () => {
     expect(result.current.startIndex).toBe(0);
     expect(result.current.endIndex).toBe(10);
 
-    act(() => result.current.setPage(5));
+    await act(async () => {
+      result.current.setPage(5);
+    });
     expect(result.current.items).toEqual([
       1,
       'ellipsis',
@@ -26,19 +28,27 @@ describe('usePagination', () => {
       10,
     ]);
 
-    act(() => result.current.lastPage());
+    await act(async () => {
+      result.current.lastPage();
+    });
     expect(result.current.page).toBe(10);
     expect(result.current.items).toEqual([1, 'ellipsis', 6, 7, 8, 9, 10]);
     expect(result.current.startIndex).toBe(90);
     expect(result.current.endIndex).toBe(95);
 
-    act(() => result.current.prevPage());
+    await act(async () => {
+      result.current.prevPage();
+    });
     expect(result.current.page).toBe(9);
 
-    act(() => result.current.nextPage());
+    await act(async () => {
+      result.current.nextPage();
+    });
     expect(result.current.page).toBe(10);
 
-    act(() => result.current.firstPage());
+    await act(async () => {
+      result.current.firstPage();
+    });
     expect(result.current.page).toBe(1);
   });
 

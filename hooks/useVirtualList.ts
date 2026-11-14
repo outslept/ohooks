@@ -98,15 +98,32 @@ export function useVirtualList<T>(
       return;
     }
 
+    let lastScrollTop = container.scrollTop;
+    let lastViewportHeight = container.clientHeight;
+
+    setScrollTop(lastScrollTop);
+    setViewportHeight(lastViewportHeight);
+
     const syncMetrics = () => {
-      setScrollTop(container.scrollTop);
-      setViewportHeight(container.clientHeight);
+      const nextScrollTop = container.scrollTop;
+      const nextViewportHeight = container.clientHeight;
+
+      if (nextScrollTop !== lastScrollTop) {
+        lastScrollTop = nextScrollTop;
+        setScrollTop(nextScrollTop);
+      }
+      if (nextViewportHeight !== lastViewportHeight) {
+        lastViewportHeight = nextViewportHeight;
+        setViewportHeight(nextViewportHeight);
+      }
     };
 
-    syncMetrics();
-
     const handleScroll = () => {
-      setScrollTop(container.scrollTop);
+      const nextScrollTop = container.scrollTop;
+      if (nextScrollTop !== lastScrollTop) {
+        lastScrollTop = nextScrollTop;
+        setScrollTop(nextScrollTop);
+      }
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
@@ -114,7 +131,11 @@ export function useVirtualList<T>(
     let resizeObserver: ResizeObserver | null = null;
     if (typeof ResizeObserver !== 'undefined') {
       resizeObserver = new ResizeObserver(() => {
-        setViewportHeight(container.clientHeight);
+        const nextViewportHeight = container.clientHeight;
+        if (nextViewportHeight !== lastViewportHeight) {
+          lastViewportHeight = nextViewportHeight;
+          setViewportHeight(nextViewportHeight);
+        }
       });
       resizeObserver.observe(container);
     } else {
@@ -175,7 +196,7 @@ export function useVirtualList<T>(
     const startIndex = Math.max(0, rawStartIndex - overscan);
     const endIndex = Math.min(count - 1, rawEndIndex + overscan);
 
-    const result: VirtualItem<T>[] = [];
+    const result: VirtualItem<T> = [];
     for (let i = startIndex; i <= endIndex; i += 1) {
       result.push({
         index: i,

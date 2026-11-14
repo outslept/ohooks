@@ -1,13 +1,11 @@
 import { useBroadcastChannel } from '@/hooks/useBroadcastChannel';
-import { act } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
 describe('useBroadcastChannel', () => {
   it('delivers messages between channel instances and respects enabled option', async () => {
     const onMessage = vi.fn();
-
-    const { result: sender } = await renderHook(() =>
+    const { result: sender, act } = await renderHook(() =>
       useBroadcastChannel<{ text: string }>('test-bc-channel'),
     );
     const { result: receiver } = await renderHook(() =>
@@ -20,7 +18,7 @@ describe('useBroadcastChannel', () => {
     expect(sender.current.isSupported).toBe(true);
     expect(disabled.current.postMessage('ignored')).toBe(false);
 
-    act(() => {
+    await act(async () => {
       const sent = sender.current.postMessage({ text: 'ping' });
       expect(sent).toBe(true);
     });

@@ -1,41 +1,65 @@
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
-import { act } from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useList } from '@/hooks/useList';
+import { describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
-describe('useInfiniteScroll', () => {
-  let sentinel: HTMLDivElement;
+describe('useList', () => {
+  it('supports push, updateAt, insertAt, removeAt, filter, sort, clear, reset, and negative indices', async () => {
+    const { result, act } = await renderHook(() => useList(() => [3, 1]));
+    expect(result.current[0]).toEqual([3, 1]);
 
-  beforeEach(() => {
-    sentinel = document.createElement('div');
-    sentinel.style.width = '20px';
-    sentinel.style.height = '20px';
-    document.body.appendChild(sentinel);
-  });
-
-  afterEach(() => {
-    sentinel.remove();
-  });
-
-  it('triggers onLoadMore when sentinel intersects and stops when hasMore is false', async () => {
-    const onLoadMore = vi.fn(
-      () => new Promise<void>((resolve) => setTimeout(resolve, 20)),
-    );
-
-    const { result, rerender } = await renderHook(
-      (hasMore: boolean = true) =>
-        useInfiniteScroll(sentinel, onLoadMore, { hasMore }),
-    );
-
-    await vi.waitFor(() => {
-      expect(onLoadMore).toHaveBeenCalledOnce();
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    await rerender(false);
+    const refBeforeNoop = result.current[0];
     await act(async () => {
-      await result.current.loadMore();
+      result.current[1].push();
+      result.current[1].updateAt(99, 0);
+      result.current[1].updateAt(0, 3);
+      result.current[1].removeAt(-99);
     });
-    expect(onLoadMore).toHaveBeenCalledOnce();
+    expect(result.current[0]).toBe(refBeforeNoop);
+
+    await act(async () => {
+      result.current[1].push(2);
+    });
+    expect(result.current[0]).toEqual([3, 1, 2]);
+
+    await act(async () => {
+      result.current[1].updateAt(-1, 4);
+    });
+    expect(result.current[0]).toEqual([3, 1, 4]);
+
+    await act(async () => {
+      result.current[1].insertAt(-1, 9);
+    });
+    expect(result.current[0]).toEqual([3, 1, 9, 4]);
+
+    await act(async () => {
+      result.current[1].removeAt(-2);
+    });
+    expect(result.current[0]).toEqual([3, 1, 4]);
+
+    await act(async () => {
+      result.current[1].sort((a, b) => a - b);
+    });
+    expect(result.current[0]).toEqual([1, 3, 4]);
+
+    await act(async () => {
+      result.current[1].filter((n) => n > 1);
+    });
+    expect(result.current[0]).toEqual([3, 4]);
+
+    await act(async () => {
+      result.current[1].clear();
+    });
+    expect(result.current[0]).toEqual([]);
+
+    const emptyRef = result.current[0];
+    await act(async () => {
+      result.current[1].clear();
+    });
+    expect(result.current[0]).toBe(emptyRef);
+
+    await act(async () => {
+      result.current[1].reset();
+    });
+    expect(result.current[0]).toEqual([3, 1]);
   });
 });

@@ -1,5 +1,4 @@
 import { useWindowScroll } from '@/hooks/useWindowScroll';
-import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -20,11 +19,13 @@ describe('useWindowScroll', () => {
   });
 
   it('tracks window scroll coordinates and scrolls via scrollTo helper', async () => {
-    const { result } = await renderHook(() => useWindowScroll());
+    const { result, act } = await renderHook(() =>
+      useWindowScroll({ throttleMs: 0 }),
+    );
     expect(result.current.x).toBe(0);
     expect(result.current.y).toBe(0);
 
-    act(() => {
+    await act(async () => {
       result.current.scrollTo(40, 120);
       window.dispatchEvent(new Event('scroll'));
     });
@@ -32,7 +33,7 @@ describe('useWindowScroll', () => {
     expect(result.current.x).toBe(40);
     expect(result.current.y).toBe(120);
 
-    act(() => {
+    await act(async () => {
       result.current.scrollTo({ top: 0, left: 0 });
       window.dispatchEvent(new Event('scroll'));
     });

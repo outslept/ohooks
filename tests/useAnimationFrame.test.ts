@@ -1,5 +1,4 @@
 import { useAnimationFrame } from '@/hooks/useAnimationFrame';
-import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -14,12 +13,12 @@ describe('useAnimationFrame', () => {
 
   it('runs animation loop, respects fpsLimit, and supports start/stop/toggle', async () => {
     const cb = vi.fn();
-    const { result } = await renderHook(() =>
+    const { result, act } = await renderHook(() =>
       useAnimationFrame(cb, { immediate: true, fpsLimit: 30 }),
     );
     expect(result.current.isActive).toBe(true);
 
-    act(() => {
+    await act(async () => {
       vi.advanceTimersToNextFrame();
     });
     expect(cb).toHaveBeenCalledTimes(1);
@@ -28,26 +27,30 @@ describe('useAnimationFrame', () => {
       elapsedTime: 0,
     });
 
-    act(() => {
+    await act(async () => {
       vi.advanceTimersToNextFrame();
     });
     expect(cb).toHaveBeenCalledTimes(1);
 
-    act(() => {
+    await act(async () => {
       vi.advanceTimersToNextFrame();
       vi.advanceTimersToNextFrame();
     });
     expect(cb).toHaveBeenCalledTimes(2);
 
-    act(() => result.current.toggle());
+    await act(async () => {
+      result.current.toggle();
+    });
     expect(result.current.isActive).toBe(false);
 
-    act(() => {
+    await act(async () => {
       vi.advanceTimersToNextFrame();
     });
     expect(cb).toHaveBeenCalledTimes(2);
 
-    act(() => result.current.toggle());
+    await act(async () => {
+      result.current.toggle();
+    });
     expect(result.current.isActive).toBe(true);
   });
 });

@@ -1,5 +1,4 @@
 import { useVirtualList } from '@/hooks/useVirtualList';
-import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -23,7 +22,7 @@ describe('useVirtualList', () => {
   });
 
   it('computes visible virtual items, totalHeight, and scrolls to index', async () => {
-    const { result } = await renderHook(() =>
+    const { result, act } = await renderHook(() =>
       useVirtualList(items, {
         containerTarget: container,
         itemHeight: 20,
@@ -36,7 +35,7 @@ describe('useVirtualList', () => {
     expect(result.current.virtualItems[0]?.index).toBe(0);
     expect(result.current.virtualItems.length).toBeLessThan(15);
 
-    act(() => {
+    await act(async () => {
       result.current.scrollToIndex(20);
       container.dispatchEvent(new Event('scroll'));
     });

@@ -138,6 +138,10 @@ export function useElementScroll<T extends HTMLElement = HTMLElement>(
     const prevX = prevScrollRef.current.x;
     const prevY = prevScrollRef.current.y;
 
+    if (fromScrollEvent && x === prevX && y === prevY && state.isScrolling) {
+      return;
+    }
+
     const directions: ScrollDirections = fromScrollEvent
       ? {
           left: x < prevX,

@@ -1,5 +1,4 @@
 import { useMeasure } from '@/hooks/useMeasure';
-import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
@@ -18,10 +17,10 @@ describe('useMeasure', () => {
   });
 
   it('measures attached element via ref callback and tracks resize updates', async () => {
-    const { result } = await renderHook(() => useMeasure<HTMLDivElement>());
+    const { result, act } = await renderHook(() => useMeasure<HTMLDivElement>());
     expect(result.current[1].width).toBe(0);
 
-    act(() => {
+    await act(async () => {
       result.current[0](el);
     });
 
