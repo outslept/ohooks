@@ -25,14 +25,6 @@ const { isActive, start, stop, toggle } = useAnimationFrame(
 )
 ```
 
-## Features
-
-- Automatic `requestAnimationFrame` loop cleanup on unmount
-- Frame timing metadata (`timestamp`, `deltaTime`, and total `elapsedTime`)
-- Optional `fpsLimit` to throttle execution without drift
-- Imperative `start`, `stop`, and `toggle` controls with reactive `isActive` state
-- Always invokes the latest callback without restarting the animation loop
-
 ## Examples
 
 ### FPS Limiting

@@ -1,13 +1,105 @@
 ---
-title: Hello World
-description: Your first document
+title: Introduction
+description: A collection of React hooks distributed as open code via the shadcn CLI.
 ---
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+**This is not a traditional hook library. It is how you build your own hooks collection.**
 
-## What is Next?
+You know how traditional React hook libraries work: you install a package from npm, import a hook from `node_modules`, and hope its implementation matches your app's runtime, bundle budget, and TypeScript strictness.
 
-<Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.dev" />
-</Cards>
+That works until you hit a hydration mismatch in Next.js, need to tweak how an event listener or storage serializer behaves, or want to change a return signature. **Often, you end up wrapping third-party hooks in boilerplate, fighting stale closures, or pulling in dozens of transitive dependencies just to use two utilities.**
+
+**ohook** solves this by adopting the **Open Code** model and distributing every hook through the **`shadcn` Registry** ecosystem:
+
+- **Open Code:** The full TypeScript source of every hook lives directly in your repository. No black boxes.
+- **Zero External Dependencies:** Built exclusively on React primitives and standard Web APIs.
+- **Composable Primitives:** Hooks share a consistent architecture and automatically pull in internal hook dependencies when installed.
+- **Native `shadcn` Distribution:** Install, inspect, and search hooks using the `shadcn` CLI and `@ohook` namespace.
+- **AI-Ready:** In-repo source code paired with `/llms.txt` and Markdown content negotiation for LLMs and coding agents.
+
+## Open Code
+
+**ohook** hands you the actual hook source code instead of hiding it behind a compiled npm package. When you add a hook, it is written directly to your configured `@hooks/` directory.
+
+- **Full Transparency:** Audit every `useEffect`, `useSyncExternalStore` subscription, and cleanup handler yourself.
+- **Effortless Customization:** Need custom event targets, a different storage event name, or a specialized debounce strategy? Edit the file in place.
+- **SSR & Concurrent Safe:** Hooks use `useSyncExternalStore`, `useIsomorphicLayoutEffect`, and stable ref patterns (`useLatest`, `useEventCallback`) to prevent tearing and hydration mismatches out of the box.
+
+_In a traditional library, changing how `useLocalStorage` syncs across tabs requires forking the package. With ohook, you open `hooks/useLocalStorage.ts` and edit it directly._
+
+## Composition & Dependency Resolution
+
+Every hook in **ohook** is designed around small, predictable primitives. Complex hooks compose foundational ones instead of duplicating logic:
+
+- `useDebounceValue` composes `useDebounceCallback` and `useUpdateEffect`.
+- `useDarkMode` composes `useLocalStorage`, `useMediaQuery`, and `useHydrated`.
+- `useCopyToClipboard` composes `useBoolean` and `useTimeout`.
+
+Because **ohook** is powered by the `shadcn` registry specification, each hook declares its `registryDependencies`. When you install a higher-level hook, the CLI automatically resolves the dependency graph, performs topological sorting, deduplicates shared primitives, and writes every required file to your project.
+
+## Distribution (`shadcn` Registry)
+
+**ohook** runs as a standards-compliant `shadcn` code registry (`registry:hook`). Every item uses the `@hooks/` target placeholder, meaning the CLI reads your project's `components.json` and installs hooks into your exact `aliases.hooks` path—whether you use `src/hooks`, `app/hooks`, or a monorepo workspace package.
+
+### 1. Configure the `@ohook` Namespace
+
+Add the `@ohook` registry namespace to your project so you can reference hooks with `@ohook/<hook-name>` instead of full URLs.
+
+Run the `shadcn` CLI command:
+
+```bash
+npx shadcn@latest registry add @ohook=https://hooks.outslept.com/r/{name}.json
+```
+
+Or add it manually to your `components.json`:
+
+```json title="components.json" showLineNumbers
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "registries": {
+    "@ohook": "https://hooks.outslept.com/r/{name}.json"
+  }
+}
+```
+
+### 2. Install Hooks
+
+Once configured, you can install individual hooks, multiple hooks at once, or the entire 88-hook collection:
+
+```bash
+# Install a single hook (automatically installs any required hook dependencies)
+npx shadcn@latest add @ohook/use-local-storage
+
+# Install multiple hooks at once
+npx shadcn@latest add @ohook/use-debounce-value @ohook/use-media-query @ohook/use-hotkeys
+
+# Install all 88 hooks in one command
+npx shadcn@latest add @ohook/all
+```
+
+<Callout>
+  **No namespace? No problem.** You can also install any hook directly via its registry URL without modifying `components.json`:
+  `npx shadcn@latest add https://hooks.outslept.com/r/use-local-storage.json`
+</Callout>
+
+### 3. Discover & Inspect from the CLI
+
+Because **ohook** serves a full registry catalog (`/r/registry.json`) and individual `registry:hook` payloads, all standard `shadcn` discovery commands work out of the box:
+
+```bash
+# List all available hooks in the registry
+npx shadcn@latest list @ohook
+
+# Search hooks by keyword
+npx shadcn@latest search @ohook --query "scroll"
+
+# Inspect a hook's source code, target path, and dependencies before installing
+npx shadcn@latest view @ohook/use-async-task
+```

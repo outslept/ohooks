@@ -41,7 +41,7 @@ useEffect(() => {
 
 return (
   <div ref={listRef} style={{ height: 320, overflowY: "auto" }}>
-    {/* list items */}
+    
   </div>
 )
 ```
@@ -59,7 +59,7 @@ const { y, scrollTo } = useElementScroll(containerRef, {
 return (
   <div>
     <div ref={containerRef} style={{ height: 240, overflowY: "auto" }}>
-      {/* scrollable content */}
+      
     </div>
     {y > 100 && (
       <button onClick={() => scrollTo({ y: 0 })}>Back to top</button>
