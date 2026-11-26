@@ -1,7 +1,37 @@
 {
-  "name": "hooks",
+  "name": "ohooks",
   "version": "0.0.1",
   "private": true,
+  "description": "Production-ready, SSR-safe collection of modern React 19 hooks written in TypeScript.",
+  "keywords": [
+    "react",
+    "react-19",
+    "hooks",
+    "react-hooks",
+    "custom-hooks",
+    "typescript",
+    "ssr",
+    "nextjs"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "outslept",
+    "url": "https://github.com/outslept"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/outslept/ohooks.git"
+  },
+  "homepage": "https://github.com/outslept/ohooks#readme",
+  "bugs": {
+    "url": "https://github.com/outslept/ohooks/issues"
+  },
+  "type": "module",
+  "packageManager": "pnpm@11.29.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=11.29.0"
+  },
   "scripts": {
     "postinstall": "fumadocs-mdx",
     "dev": "next dev",
@@ -41,7 +71,6 @@
     "@vitest/coverage-istanbul": "^5.1.0",
     "class-variance-authority": "^0.7.1",
     "fumadocs-typescript": "^5.6.0",
-    "oxfmt": "^0.80.0",
     "oxlint": "^1.92.0",
     "playwright": "^1.65.0",
     "postcss": "^8.5.32",
