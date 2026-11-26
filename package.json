@@ -7,15 +7,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
+    "typecheck": "fumadocs-mdx && next typegen && tsc --noEmit",
     "lint": "oxlint",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "test": "vitest run --reporter=dot",
     "test:watch": "vitest --project=chromium",
-    "test:chromium": "vitest run --project=chromium",
-    "test:firefox": "vitest run --project=firefox",
-    "test:webkit": "vitest run --project=webkit",
-    "test:silent": "vitest run --reporter=minimal"
+    "test:coverage": "vitest run --reporter=dot --coverage --project=chromium",
+    "test:ui": "vitest --project=chromium --browser.headless=false"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
