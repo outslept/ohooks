@@ -190,13 +190,11 @@ describe("useDropZone", () => {
     const dt = createDataTransfer([new File(["a"], "a.txt", { type: "text/plain" })]);
 
     await act(async () => {
-      result.current
-        .getRootProps()
-        .onDragEnter(
-          new DragEvent("dragenter", {
-            dataTransfer: dt,
-          }) as unknown as React.DragEvent<HTMLElement>,
-        );
+      result.current.getRootProps().onDragEnter(
+        new DragEvent("dragenter", {
+          dataTransfer: dt,
+        }) as unknown as React.DragEvent<HTMLElement>,
+      );
       result.current
         .getRootProps()
         .onDrop(
