@@ -44,7 +44,6 @@ export interface UseVirtualListReturn<T> {
 function findStartIndex(offsets: readonly number[], scrollTop: number): number {
   let low = 0;
   let high = offsets.length - 1;
-
   while (low <= high) {
     const mid = (low + high) >>> 1;
     const midOffset = offsets[mid] ?? 0;
@@ -57,7 +56,6 @@ function findStartIndex(offsets: readonly number[], scrollTop: number): number {
       high = mid - 1;
     }
   }
-
   return Math.max(0, low - 1);
 }
 
@@ -83,7 +81,6 @@ export function useVirtualList<T>(
   options: UseVirtualListOptions
 ): UseVirtualListReturn<T> {
   const { containerTarget, itemHeight, overscan = 5 } = options;
-
   const [scrollTop, setScrollTop] = useState<number>(0);
   const [viewportHeight, setViewportHeight] = useState<number>(0);
   const itemHeightRef = useLatest(itemHeight);
@@ -92,22 +89,18 @@ export function useVirtualList<T>(
     if (typeof window === 'undefined') {
       return;
     }
-
     const container = resolveTargetElement(containerTarget);
     if (!container) {
       return;
     }
-
     let lastScrollTop = container.scrollTop;
     let lastViewportHeight = container.clientHeight;
-
     setScrollTop(lastScrollTop);
     setViewportHeight(lastViewportHeight);
 
     const syncMetrics = () => {
       const nextScrollTop = container.scrollTop;
       const nextViewportHeight = container.clientHeight;
-
       if (nextScrollTop !== lastScrollTop) {
         lastScrollTop = nextScrollTop;
         setScrollTop(nextScrollTop);
@@ -127,7 +120,6 @@ export function useVirtualList<T>(
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
-
     let resizeObserver: ResizeObserver | null = null;
     if (typeof ResizeObserver !== 'undefined') {
       resizeObserver = new ResizeObserver(() => {
@@ -157,7 +149,6 @@ export function useVirtualList<T>(
     const itemOffsets = new Array<number>(count);
     const itemHeights = new Array<number>(count);
     let runningTotal = 0;
-
     for (let i = 0; i < count; i += 1) {
       itemOffsets[i] = runningTotal;
       const h =
@@ -168,7 +159,6 @@ export function useVirtualList<T>(
       itemHeights[i] = safeHeight;
       runningTotal += safeHeight;
     }
-
     return {
       offsets: itemOffsets,
       heights: itemHeights,
@@ -181,10 +171,8 @@ export function useVirtualList<T>(
     if (count === 0) {
       return [];
     }
-
     const rawStartIndex = findStartIndex(offsets, scrollTop);
     const visibleEndScroll = scrollTop + Math.max(viewportHeight, 1);
-
     let rawEndIndex = rawStartIndex;
     while (
       rawEndIndex < count - 1 &&
@@ -192,11 +180,9 @@ export function useVirtualList<T>(
     ) {
       rawEndIndex += 1;
     }
-
     const startIndex = Math.max(0, rawStartIndex - overscan);
     const endIndex = Math.min(count - 1, rawEndIndex + overscan);
-
-    const result: VirtualItem<T> = [];
+    const result: VirtualItem<T>[] = [];
     for (let i = startIndex; i <= endIndex; i += 1) {
       result.push({
         index: i,
@@ -205,7 +191,6 @@ export function useVirtualList<T>(
         height: heights[i] ?? 0,
       });
     }
-
     return result;
   }, [items, offsets, heights, scrollTop, viewportHeight, overscan]);
 
@@ -215,11 +200,9 @@ export function useVirtualList<T>(
       if (!container || items.length === 0) {
         return;
       }
-
       const clampedIndex = Math.max(0, Math.min(index, items.length - 1));
       let targetTop = 0;
       const currentItemHeight = itemHeightRef.current;
-
       if (typeof currentItemHeight === 'number') {
         targetTop = clampedIndex * currentItemHeight;
       } else {
@@ -227,7 +210,6 @@ export function useVirtualList<T>(
           targetTop += Math.max(0, currentItemHeight(i));
         }
       }
-
       container.scrollTo({
         top: targetTop,
         behavior,

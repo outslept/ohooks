@@ -1,62 +1,185 @@
-import type { DragEvent as ReactDragEvent } from 'react';
-import { describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
 import { useDropZone } from '@/hooks/useDropZone';
+import type React from 'react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { renderHook } from 'vitest-browser-react';
 
-function createMockDragEvent(files: File[]) {
-  const dataTransfer = {
-    files,
-    items: files.map((f) => ({ kind: 'file', type: f.type })),
-    dropEffect: 'none',
-  };
-  return {
-    preventDefault: vi.fn(),
-    stopPropagation: vi.fn(),
-    dataTransfer,
-  } as unknown as ReactDragEvent<HTMLElement>;
+(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
+
+function createDataTransfer(files: File[]): DataTransfer {
+  const dt = new DataTransfer();
+  for (const file of files) {
+    dt.items.add(file);
+  }
+  return dt;
 }
 
 describe('useDropZone', () => {
-  it('validates accepted MIME types/extensions, respects multiple=false, and clears files', async () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('handles nested dragenter/dragleave depth and drops valid files on target element', async () => {
+    const dropArea = document.createElement('div');
+    document.body.appendChild(dropArea);
+
+    const onDragEnter = vi.fn();
+    const onDragOver = vi.fn();
+    const onDragLeave = vi.fn();
+    const onDrop = vi.fn();
+
+    const { result, act } = await renderHook(() =>
+      useDropZone(dropArea, {
+        onDragEnter,
+        onDragOver,
+        onDragLeave,
+        onDrop,
+      }),
+    );
+
+    const file = new File(['hello'], 'hello.txt', { type: 'text/plain' });
+    const dt = createDataTransfer([file]);
+
+    await act(async () => {
+      dropArea.dispatchEvent(
+        new DragEvent('dragenter', { bubbles: true, cancelable: true, dataTransfer: dt }),
+      );
+
+      dropArea.dispatchEvent(
+        new DragEvent('dragenter', { bubbles: true, cancelable: true, dataTransfer: dt }),
+      );
+    });
+    expect(result.current.isOver).toBe(true);
+    expect(onDragEnter).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      dropArea.dispatchEvent(
+        new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: dt }),
+      );
+
+      dropArea.dispatchEvent(
+        new DragEvent('dragleave', { bubbles: true, cancelable: true, dataTransfer: dt }),
+      );
+    });
+    expect(onDragOver).toHaveBeenCalledTimes(1);
+    expect(result.current.isOver).toBe(true);
+    expect(onDragLeave).not.toHaveBeenCalled();
+
+    await act(async () => {
+
+      dropArea.dispatchEvent(
+        new DragEvent('dragleave', { bubbles: true, cancelable: true, dataTransfer: dt }),
+      );
+    });
+    expect(result.current.isOver).toBe(false);
+    expect(onDragLeave).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      dropArea.dispatchEvent(
+        new DragEvent('dragenter', { bubbles: true, cancelable: true, dataTransfer: dt }),
+      );
+      dropArea.dispatchEvent(
+        new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dt }),
+      );
+    });
+    expect(result.current.isOver).toBe(false);
+    expect(result.current.files).toEqual([file]);
+    expect(onDrop).toHaveBeenCalledWith([file], expect.any(DragEvent));
+  });
+
+  it('validates accept rules and multiple=false via options-first overload and getRootProps', async () => {
     const onDrop = vi.fn();
     const onDropRejected = vi.fn();
+    const userOnDragEnter = vi.fn();
 
     const { result, act } = await renderHook(() =>
       useDropZone({
         accept: ['image/*', '.pdf'],
         multiple: false,
+        preventDefaultForUnhandled: true,
         onDrop,
         onDropRejected,
-      })
+      }),
     );
 
-    const png1 = new File(['a'], 'one.png', { type: 'image/png' });
-    const png2 = new File(['b'], 'two.png', { type: 'image/png' });
-    const txt = new File(['c'], 'notes.txt', { type: 'text/plain' });
+    const pngFile = new File(['img'], 'photo.png', { type: 'image/png' });
+    const pdfFile = new File(['doc'], 'manual.pdf', { type: 'application/pdf' });
+    const txtFile = new File(['txt'], 'notes.txt', { type: 'text/plain' });
 
+
+    const invalidDt = createDataTransfer([txtFile]);
     await act(async () => {
-      result.current.getRootProps().onDragEnter(createMockDragEvent([txt]));
+      result.current
+        .getRootProps({ onDragEnter: userOnDragEnter })
+        .onDragEnter(
+          new DragEvent('dragenter', {
+            bubbles: true,
+            cancelable: true,
+            dataTransfer: invalidDt,
+          }) as unknown as React.DragEvent<HTMLElement>,
+        );
     });
+    expect(userOnDragEnter).toHaveBeenCalledTimes(1);
     expect(result.current.isOver).toBe(true);
     expect(result.current.isInvalid).toBe(true);
 
     await act(async () => {
-      result.current.getRootProps().onDrop(createMockDragEvent([txt]));
+      result.current.getRootProps().onDrop(
+        new DragEvent('drop', {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer: invalidDt,
+        }) as unknown as React.DragEvent<HTMLElement>,
+      );
     });
-    expect(result.current.isOver).toBe(false);
     expect(result.current.files).toEqual([]);
-    expect(onDropRejected).toHaveBeenCalledWith([txt], expect.anything());
+    expect(onDrop).not.toHaveBeenCalled();
+    expect(onDropRejected).toHaveBeenCalledWith([txtFile], expect.any(DragEvent));
 
-    await act(async () => {
-      result.current.getRootProps().onDrop(createMockDragEvent([png1, png2]));
-    });
-    expect(result.current.files).toEqual([]);
 
+    const multiDt = createDataTransfer([pngFile, pdfFile]);
     await act(async () => {
-      result.current.getRootProps().onDrop(createMockDragEvent([png1]));
+      result.current.getRootProps().onDragOver(
+        new DragEvent('dragover', {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer: multiDt,
+        }) as unknown as React.DragEvent<HTMLElement>,
+      );
     });
-    expect(result.current.files).toEqual([png1]);
-    expect(onDrop).toHaveBeenCalledWith([png1], expect.anything());
+    expect(result.current.isOver).toBe(true);
+    expect(result.current.isInvalid).toBe(true);
+
+
+    const validOverDt = createDataTransfer([pngFile]);
+    await act(async () => {
+      result.current.getRootProps().onDragOver(
+        new DragEvent('dragover', {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer: validOverDt,
+        }) as unknown as React.DragEvent<HTMLElement>,
+      );
+    });
+    expect(result.current.isOver).toBe(true);
+    expect(result.current.isInvalid).toBe(false);
+
+    const validDropDt = createDataTransfer([pdfFile]);
+    await act(async () => {
+      result.current.getRootProps().onDrop(
+        new DragEvent('drop', {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer: validDropDt,
+        }) as unknown as React.DragEvent<HTMLElement>,
+      );
+    });
+    expect(result.current.files).toEqual([pdfFile]);
+    expect(onDrop).toHaveBeenCalledTimes(1);
+
+
+    const unhandledEvent = new DragEvent('dragover', { cancelable: true });
+    window.dispatchEvent(unhandledEvent);
+    expect(unhandledEvent.defaultPrevented).toBe(true);
 
     await act(async () => {
       result.current.clearFiles();
@@ -64,28 +187,28 @@ describe('useDropZone', () => {
     expect(result.current.files).toEqual([]);
   });
 
-  it('supports target element overload with native DOM DragEvents', async () => {
-    const zone = document.createElement('div');
+  it('ignores all drag events when disabled is true', async () => {
+    const onDragEnter = vi.fn();
     const onDrop = vi.fn();
-
     const { result, act } = await renderHook(() =>
-      useDropZone(zone, { accept: '.csv', onDrop })
+      useDropZone({ disabled: true, onDragEnter, onDrop }),
     );
 
-    const csv = new File(['1,2'], 'data.csv', { type: 'text/csv' });
-    const dt = new DataTransfer();
-    dt.items.add(csv);
+    const dt = createDataTransfer([
+      new File(['a'], 'a.txt', { type: 'text/plain' }),
+    ]);
 
     await act(async () => {
-      zone.dispatchEvent(new DragEvent('dragenter', { dataTransfer: dt, bubbles: true }));
+      result.current.getRootProps().onDragEnter(
+        new DragEvent('dragenter', { dataTransfer: dt }) as unknown as React.DragEvent<HTMLElement>,
+      );
+      result.current.getRootProps().onDrop(
+        new DragEvent('drop', { dataTransfer: dt }) as unknown as React.DragEvent<HTMLElement>,
+      );
     });
-    expect(result.current.isOver).toBe(true);
 
-    await act(async () => {
-      zone.dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true }));
-    });
     expect(result.current.isOver).toBe(false);
-    expect(result.current.files).toEqual([csv]);
-    expect(onDrop).toHaveBeenCalledTimes(1);
+    expect(onDragEnter).not.toHaveBeenCalled();
+    expect(onDrop).not.toHaveBeenCalled();
   });
 });

@@ -1,67 +1,81 @@
+import { useFileDialog } from '@/hooks/useFileDialog';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
-import { useFileDialog } from '@/hooks/useFileDialog';
+
+(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('useFileDialog', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('creates file input, opens dialog with local overrides, handles change/cancel, and resets', async () => {
-    let createdInput: HTMLInputElement | null = null;
-    const origCreateElement = document.createElement.bind(document);
-
-    vi.spyOn(document, 'createElement').mockImplementation(((tagName: string) => {
-      const el = origCreateElement(tagName);
-      if (tagName === 'input') {
-        createdInput = el as HTMLInputElement;
-        vi.spyOn(createdInput, 'click').mockImplementation(() => {});
-      }
-      return el;
-    }) as typeof document.createElement);
-
-    const onChange = vi.fn();
-    const onCancel = vi.fn();
+  it('configures file input attributes, invokes both local and global callbacks, and supports reset on open', async () => {
+    const clickSpy = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const globalOnChange = vi.fn();
+    const globalOnCancel = vi.fn();
+    const localOnChange = vi.fn();
+    const localOnCancel = vi.fn();
 
     const { result, act } = await renderHook(() =>
       useFileDialog({
-        accept: 'image/*',
-        multiple: false,
-        onChange,
-        onCancel,
-      })
+        accept: 'text/plain',
+        multiple: true,
+        onChange: globalOnChange,
+        onCancel: globalOnCancel,
+      }),
     );
 
+    expect(result.current.files).toBeNull();
+
+
     await act(async () => {
-      result.current.open({ accept: '.pdf', multiple: true, directory: true });
+      result.current.open({
+        accept: 'image/*',
+        multiple: false,
+        capture: 'user',
+        onChange: localOnChange,
+      });
     });
 
-    expect(createdInput).not.toBeNull();
-    expect(createdInput!.accept).toBe('.pdf');
-    expect(createdInput!.multiple).toBe(true);
-    expect(createdInput!.webkitdirectory).toBe(true);
-    expect(createdInput!.click).toHaveBeenCalledTimes(1);
+    const input1 = clickSpy.mock.instances.at(-1) as HTMLInputElement;
+    expect(input1.type).toBe('file');
+    expect(input1.accept).toBe('image/*');
+    expect(input1.multiple).toBe(false);
+    expect(input1.getAttribute('capture')).toBe('user');
 
-    const file = new File(['pdf'], 'doc.pdf', { type: 'application/pdf' });
+    const file = new File(['avatar'], 'avatar.png', { type: 'image/png' });
     const dt = new DataTransfer();
     dt.items.add(file);
 
     await act(async () => {
-      Object.defineProperty(createdInput!, 'files', {
+      Object.defineProperty(input1, 'files', {
         value: dt.files,
         configurable: true,
       });
-      createdInput!.dispatchEvent(new Event('change'));
+      input1.dispatchEvent(new Event('change'));
     });
 
-    expect(result.current.files).toHaveLength(1);
-    expect(result.current.files?.[0]).toBe(file);
-    expect(onChange).toHaveBeenCalledWith(dt.files);
+    expect(result.current.files?.length).toBe(1);
+    expect(result.current.files?.[0]?.name).toBe('avatar.png');
+    expect(localOnChange).toHaveBeenCalledOnce();
+    expect(globalOnChange).toHaveBeenCalledOnce();
+
 
     await act(async () => {
-      createdInput!.dispatchEvent(new Event('cancel'));
+      result.current.open({ reset: true });
     });
-    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(result.current.files).toBeNull();
+
+
+    expect(localOnCancel).not.toHaveBeenCalled();
+    await act(async () => {
+      result.current.open({ onCancel: localOnCancel });
+      const input3 = clickSpy.mock.instances.at(-1) as HTMLInputElement;
+      input3.dispatchEvent(new Event('cancel'));
+    });
+    expect(localOnCancel).toHaveBeenCalled();
+    expect(globalOnCancel).toHaveBeenCalled();
+
 
     await act(async () => {
       result.current.reset();

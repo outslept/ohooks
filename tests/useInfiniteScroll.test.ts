@@ -1,65 +1,124 @@
-import { useList } from '@/hooks/useList';
-import { describe, expect, it } from 'vitest';
+import {
+  useInfiniteScroll,
+  type UseInfiniteScrollOptions,
+} from '@/hooks/useInfiniteScroll';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
-describe('useList', () => {
-  it('supports push, updateAt, insertAt, removeAt, filter, sort, clear, reset, and negative indices', async () => {
-    const { result, act } = await renderHook(() => useList(() => [3, 1]));
-    expect(result.current[0]).toEqual([3, 1]);
+(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-    const refBeforeNoop = result.current[0];
-    await act(async () => {
-      result.current[1].push();
-      result.current[1].updateAt(99, 0);
-      result.current[1].updateAt(0, 3);
-      result.current[1].removeAt(-99);
-    });
-    expect(result.current[0]).toBe(refBeforeNoop);
+describe('useInfiniteScroll', () => {
+  let sentinel: HTMLDivElement;
 
-    await act(async () => {
-      result.current[1].push(2);
-    });
-    expect(result.current[0]).toEqual([3, 1, 2]);
+  beforeEach(() => {
+    sentinel = document.createElement('div');
+    sentinel.style.width = '50px';
+    sentinel.style.height = '50px';
+    document.body.appendChild(sentinel);
+  });
 
-    await act(async () => {
-      result.current[1].updateAt(-1, 4);
-    });
-    expect(result.current[0]).toEqual([3, 1, 4]);
+  afterEach(() => {
+    sentinel.remove();
+  });
 
-    await act(async () => {
-      result.current[1].insertAt(-1, 9);
+  it('triggers onLoadMore when sentinel intersects, tracks isLoading, and ignores concurrent calls', async () => {
+    let resolveLoad!: () => void;
+    let notifyStarted!: () => void;
+    const started = new Promise<void>((r) => {
+      notifyStarted = r;
     });
-    expect(result.current[0]).toEqual([3, 1, 9, 4]);
+    const loadGate = new Promise<void>((r) => {
+      resolveLoad = r;
+    });
+    let callCount = 0;
 
-    await act(async () => {
-      result.current[1].removeAt(-2);
-    });
-    expect(result.current[0]).toEqual([3, 1, 4]);
-
-    await act(async () => {
-      result.current[1].sort((a, b) => a - b);
-    });
-    expect(result.current[0]).toEqual([1, 3, 4]);
-
-    await act(async () => {
-      result.current[1].filter((n) => n > 1);
-    });
-    expect(result.current[0]).toEqual([3, 4]);
+    const { result, act, unmount } = await renderHook(() =>
+      useInfiniteScroll(
+        sentinel,
+        () => {
+          callCount += 1;
+          notifyStarted();
+          return loadGate;
+        },
+        { threshold: [0, 0.5] },
+      ),
+    );
 
     await act(async () => {
-      result.current[1].clear();
+      await started;
     });
-    expect(result.current[0]).toEqual([]);
-
-    const emptyRef = result.current[0];
-    await act(async () => {
-      result.current[1].clear();
-    });
-    expect(result.current[0]).toBe(emptyRef);
+    expect(result.current.isLoading).toBe(true);
+    expect(callCount).toBe(1);
 
     await act(async () => {
-      result.current[1].reset();
+      await result.current.loadMore();
     });
-    expect(result.current[0]).toEqual([3, 1]);
+    expect(callCount).toBe(1);
+
+    await act(async () => {
+      resolveLoad();
+      await loadGate;
+    });
+    expect(result.current.isLoading).toBe(false);
+
+    await unmount();
+  });
+
+  it('does not load when hasMore is false, enabled is false, or sentinel is null', async () => {
+    let callCount = 0;
+
+    const { result, rerender, act } = await renderHook(
+      (props?: UseInfiniteScrollOptions & { target?: HTMLElement | null }) =>
+        useInfiniteScroll(
+          props && 'target' in props ? (props.target ?? null) : sentinel,
+          () => {
+            callCount += 1;
+          },
+          props ?? { hasMore: false, enabled: true },
+        ),
+    );
+
+    await act(async () => {
+      await result.current.loadMore();
+    });
+    expect(callCount).toBe(0);
+
+    await rerender({ hasMore: true, enabled: false });
+    await act(async () => {
+      await result.current.loadMore();
+    });
+    expect(callCount).toBe(0);
+
+    await rerender({ hasMore: true, enabled: true, target: null });
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('avoids state updates if unmounted while onLoadMore is still pending', async () => {
+    let resolveLoad!: () => void;
+    let notifyStarted!: () => void;
+    const started = new Promise<void>((r) => {
+      notifyStarted = r;
+    });
+    const loadGate = new Promise<void>((r) => {
+      resolveLoad = r;
+    });
+
+    const { result, act, unmount } = await renderHook(() =>
+      useInfiniteScroll(sentinel, () => {
+        notifyStarted();
+        return loadGate;
+      }),
+    );
+
+    await act(async () => {
+      await started;
+    });
+    expect(result.current.isLoading).toBe(true);
+
+    await unmount();
+    await act(async () => {
+      resolveLoad();
+      await loadGate;
+    });
   });
 });

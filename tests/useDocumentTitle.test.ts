@@ -7,15 +7,33 @@ describe('useDocumentTitle', () => {
     document.title = 'Original Title';
   });
 
-  it('sets document.title and optionally restores original title on unmount', async () => {
+  it('updates document.title on mount and rerender and keeps it on unmount by default', async () => {
     const { rerender, unmount } = await renderHook(
-      (title: string = 'Page 1') =>
-        useDocumentTitle(title, { restoreOnUnmount: true }),
+      (props?: { title: string }) =>
+        useDocumentTitle(props?.title ?? 'Page 1'),
+      { initialProps: { title: 'Page 1' } },
     );
+
     expect(document.title).toBe('Page 1');
 
-    await rerender('Page 2');
+    await rerender({ title: 'Page 2' });
     expect(document.title).toBe('Page 2');
+
+    await unmount();
+    expect(document.title).toBe('Page 2');
+  });
+
+  it('restores the initial document.title on unmount when restoreOnUnmount is true', async () => {
+    const { rerender, unmount } = await renderHook(
+      (props?: { title: string }) =>
+        useDocumentTitle(props?.title ?? 'Step 1', { restoreOnUnmount: true }),
+      { initialProps: { title: 'Step 1' } },
+    );
+
+    expect(document.title).toBe('Step 1');
+
+    await rerender({ title: 'Step 2' });
+    expect(document.title).toBe('Step 2');
 
     await unmount();
     expect(document.title).toBe('Original Title');

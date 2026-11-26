@@ -1,42 +1,44 @@
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { createElement } from 'react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+
+(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('useMediaQuery', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('evaluates media query and updates when change event fires', async () => {
-    let matches = false;
-    let listener: (() => void) | null = null;
+  it('evaluates real media queries, updates when query changes, and cleans up listener on unmount', async () => {
+    const addSpy = vi.spyOn(MediaQueryList.prototype, 'addEventListener');
+    const removeSpy = vi.spyOn(MediaQueryList.prototype, 'removeEventListener');
 
-    vi.spyOn(window, 'matchMedia').mockImplementation(((query: string) => ({
-      get matches() {
-        return matches;
-      },
-      media: query,
-      onchange: null,
-      addEventListener: (_type: string, cb: () => void) => {
-        listener = cb;
-      },
-      removeEventListener: vi.fn(),
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })) as unknown as typeof window.matchMedia);
-
-    const { result, act } = await renderHook(() =>
-      useMediaQuery('(min-width: 800px)')
+    const { result, rerender, unmount } = await renderHook(
+      (props?: { query: string }) =>
+        useMediaQuery(props?.query ?? '(min-width: 999999px)'),
+      { initialProps: { query: '(min-width: 999999px)' } }
     );
 
     expect(result.current).toBe(false);
+    expect(addSpy).toHaveBeenCalledWith('change', expect.any(Function));
 
-    await act(async () => {
-      matches = true;
-      listener?.();
-    });
-
+    await rerender({ query: '(min-width: 1px)' });
     expect(result.current).toBe(true);
+
+    await unmount();
+    expect(removeSpy).toHaveBeenCalledWith('change', expect.any(Function));
+  });
+
+  it('returns defaultValue during SSR', () => {
+    const Probe = () =>
+      createElement(
+        'span',
+        null,
+        String(useMediaQuery('(min-width: 800px)', { defaultValue: true }))
+      );
+
+    expect(renderToString(createElement(Probe))).toBe('<span>true</span>');
   });
 });

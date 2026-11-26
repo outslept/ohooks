@@ -1,9 +1,18 @@
+import {
+  usePermission,
+  type ExtendedPermissionDescriptor,
+  type ExtendedPermissionName,
+} from '@/hooks/usePermission';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
-import { usePermission } from '@/hooks/usePermission';
+
+(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('usePermission', () => {
-  const originalPermissions = Object.getOwnPropertyDescriptor(navigator, 'permissions');
+  const originalPermissions = Object.getOwnPropertyDescriptor(
+    navigator,
+    'permissions'
+  );
 
   afterEach(() => {
     if (originalPermissions) {
@@ -12,41 +21,60 @@ describe('usePermission', () => {
     vi.restoreAllMocks();
   });
 
-  it('queries permission status and updates on change event', async () => {
-    const statusTarget = Object.assign(new EventTarget(), {
-      state: 'prompt' as PermissionState,
-    });
-    const query = vi.fn().mockResolvedValue(statusTarget);
+  it('queries real PermissionStatus, reacts to change events, resets on descriptor change, and cleans up on unmount', async () => {
+    const querySpy = vi.spyOn(navigator.permissions, 'query');
 
-    Object.defineProperty(navigator, 'permissions', {
-      value: { query },
-      configurable: true,
-    });
+    const { result, rerender, act, unmount } = await renderHook(
+      (
+        props?: {
+          perm: ExtendedPermissionName | ExtendedPermissionDescriptor;
+        }
+      ) => usePermission(props?.perm ?? 'notifications'),
+      {
+        initialProps: {
+          perm: 'notifications' as
+            | ExtendedPermissionName
+            | ExtendedPermissionDescriptor,
+        },
+      }
+    );
 
-    const { result, act } = await renderHook(() => usePermission('notifications'));
+    await expect
+      .poll(() => result.current)
+      .toSatisfy((s) => s === 'prompt' || s === 'denied' || s === 'granted');
 
-    await vi.waitFor(() => {
-      expect(result.current).toBe('prompt');
-    });
+    const status = (await querySpy.mock.results[0]?.value) as PermissionStatus;
+    const removeListenerSpy = vi.spyOn(status, 'removeEventListener');
 
     await act(async () => {
-      statusTarget.state = 'granted';
-      statusTarget.dispatchEvent(new Event('change'));
+      Object.defineProperty(status, 'state', {
+        value: 'granted',
+        configurable: true,
+      });
+      status.dispatchEvent(new Event('change'));
     });
-
     expect(result.current).toBe('granted');
+
+
+    await rerender({
+      perm: { name: 'invalid-permission-name' as ExtendedPermissionName },
+    });
+    await expect.poll(() => result.current).toBe('unsupported');
+    expect(removeListenerSpy).toHaveBeenCalledWith(
+      'change',
+      expect.any(Function)
+    );
+
+    await unmount();
   });
 
-  it('returns unsupported when navigator.permissions.query rejects', async () => {
+  it('returns unsupported immediately when navigator.permissions is unavailable', async () => {
     Object.defineProperty(navigator, 'permissions', {
-      value: { query: vi.fn().mockRejectedValue(new TypeError('Unsupported')) },
+      value: undefined,
       configurable: true,
     });
 
     const { result } = await renderHook(() => usePermission('camera'));
-
-    await vi.waitFor(() => {
-      expect(result.current).toBe('unsupported');
-    });
+    expect(result.current).toBe('unsupported');
   });
 });

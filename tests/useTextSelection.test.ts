@@ -1,6 +1,8 @@
+import { useTextSelection } from '@/hooks/useTextSelection';
 import { afterEach, describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
-import { useTextSelection } from '@/hooks/useTextSelection';
+
+(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('useTextSelection', () => {
   afterEach(() => {
@@ -8,12 +10,12 @@ describe('useTextSelection', () => {
     document.body.innerHTML = '';
   });
 
-  it('tracks document text selection and resets when cleared', async () => {
+  it('tracks document text selection, deduplicates identical events, and resets when cleared', async () => {
     const p = document.createElement('p');
     p.textContent = 'Hello selectable world';
     document.body.appendChild(p);
 
-    const { result, act } = await renderHook(() => useTextSelection());
+    const { result, unmount, act } = await renderHook(() => useTextSelection());
 
     expect(result.current.text).toBe('');
     expect(result.current.ranges).toHaveLength(0);
@@ -27,9 +29,17 @@ describe('useTextSelection', () => {
       document.dispatchEvent(new Event('selectionchange'));
     });
 
-    expect(result.current.text).toBe('Hello selectable world');
-    expect(result.current.ranges).toHaveLength(1);
-    expect(result.current.rect).not.toBeNull();
+    const snapshot = result.current;
+    expect(snapshot.text).toBe('Hello selectable world');
+    expect(snapshot.ranges).toHaveLength(1);
+    expect(snapshot.rect).not.toBeNull();
+
+
+    await act(async () => {
+      window.dispatchEvent(new MouseEvent('mouseup'));
+      window.dispatchEvent(new KeyboardEvent('keyup'));
+    });
+    expect(result.current).toBe(snapshot);
 
     await act(async () => {
       window.getSelection()?.removeAllRanges();
@@ -38,6 +48,17 @@ describe('useTextSelection', () => {
 
     expect(result.current.text).toBe('');
     expect(result.current.rect).toBeNull();
+
+    await unmount();
+
+    await act(async () => {
+      const range = document.createRange();
+      range.selectNodeContents(p);
+      const sel = window.getSelection()!;
+      sel.addRange(range);
+      document.dispatchEvent(new Event('selectionchange'));
+    });
+    expect(result.current.text).toBe('');
   });
 
   it('scopes selection to target container when provided', async () => {
@@ -57,7 +78,6 @@ describe('useTextSelection', () => {
       sel.addRange(range);
       document.dispatchEvent(new Event('selectionchange'));
     });
-
     expect(result.current.text).toBe('');
 
     await act(async () => {
@@ -68,7 +88,6 @@ describe('useTextSelection', () => {
       sel.addRange(range);
       document.dispatchEvent(new Event('selectionchange'));
     });
-
     expect(result.current.text).toBe('Inside container');
   });
 });

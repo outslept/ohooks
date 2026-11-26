@@ -1,54 +1,77 @@
-import { mergeRefs, useMergeRefs } from '@/hooks/useMergeRefs';
+import {
+  mergeRefs,
+  useMergeRefs,
+  type PossibleRef,
+} from '@/hooks/useMergeRefs';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
+(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
+
 describe('useMergeRefs', () => {
-  it('attaches node to object and callback refs, swaps refs dynamically, and runs React 19 cleanups', async () => {
+  it('attaches node to object and callback refs, detaches removed refs on rerender, and runs React 19 cleanups', async () => {
     const objRef1 = createRef<HTMLDivElement>();
     const objRef2 = createRef<HTMLDivElement>();
+    const plainCbRef = vi.fn();
     const cleanupSpy = vi.fn();
     const cbRefWithCleanup = vi.fn(() => cleanupSpy);
 
     const { result, rerender, act } = await renderHook(
-      (secondRef: typeof objRef1 = objRef1) =>
-        useMergeRefs(secondRef, cbRefWithCleanup),
+      (props?: { dynamicRef: PossibleRef<HTMLDivElement> }) =>
+        useMergeRefs(
+          props ? props.dynamicRef : objRef1,
+          plainCbRef,
+          cbRefWithCleanup,
+        ),
     );
 
     const node = document.createElement('div');
-    let unmountCleanup: (() => void) | void;
+    let unmountCleanup: (() => void) | void = undefined;
+
     await act(async () => {
       unmountCleanup = result.current(node);
     });
 
     expect(objRef1.current).toBe(node);
+    expect(plainCbRef).toHaveBeenCalledWith(node);
     expect(cbRefWithCleanup).toHaveBeenCalledWith(node);
 
-    await rerender(objRef2);
+    await rerender({ dynamicRef: objRef2 });
     expect(objRef1.current).toBeNull();
     expect(objRef2.current).toBe(node);
 
+    expect(unmountCleanup).toBeTypeOf('function');
     await act(async () => {
-      if (typeof unmountCleanup === 'function') {
-        unmountCleanup();
-      }
+      (unmountCleanup as () => void)();
     });
+
     expect(objRef2.current).toBeNull();
-    expect(cleanupSpy).toHaveBeenCalledOnce();
+    expect(plainCbRef).toHaveBeenLastCalledWith(null);
+    expect(cleanupSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('mergeRefs utility handles null node and callback cleanups', () => {
+  it('mergeRefs utility handles null nodes, standard refs, and explicit React 19 cleanup functions', () => {
     const objRef = createRef<HTMLSpanElement>();
-    const cbRef = vi.fn();
-    const merged = mergeRefs(objRef, cbRef, null, undefined);
+    const plainCb = vi.fn();
+    const mergedStandard = mergeRefs(objRef, plainCb, null, undefined);
 
     const span = document.createElement('span');
-    merged(span);
+    expect(mergedStandard(span)).toBeUndefined();
     expect(objRef.current).toBe(span);
-    expect(cbRef).toHaveBeenCalledWith(span);
+    expect(plainCb).toHaveBeenCalledWith(span);
 
-    merged(null);
+    mergedStandard(null);
     expect(objRef.current).toBeNull();
-    expect(cbRef).toHaveBeenLastCalledWith(null);
+    expect(plainCb).toHaveBeenLastCalledWith(null);
+
+    const explicitCleanup = vi.fn();
+    const mergedWithCleanup = mergeRefs(objRef, () => explicitCleanup);
+    const cleanupFn = mergedWithCleanup(span);
+    expect(cleanupFn).toBeTypeOf('function');
+
+    (cleanupFn as () => void)();
+    expect(objRef.current).toBeNull();
+    expect(explicitCleanup).toHaveBeenCalledTimes(1);
   });
 });

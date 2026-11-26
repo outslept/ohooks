@@ -1,6 +1,11 @@
-import { useResizeObserver } from '@/hooks/useResizeObserver';
+import {
+  useResizeObserver,
+  type UseResizeObserverOptions,
+} from '@/hooks/useResizeObserver';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
+
+(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('useResizeObserver', () => {
   let el: HTMLDivElement;
@@ -14,32 +19,41 @@ describe('useResizeObserver', () => {
 
   afterEach(() => {
     el.remove();
+    vi.restoreAllMocks();
   });
 
-  it('observes element size changes and respects enabled option', async () => {
+  it('observes element size changes, passes box option, and disconnects when disabled or unmounted', async () => {
+    const observeSpy = vi.spyOn(ResizeObserver.prototype, 'observe');
+    const disconnectSpy = vi.spyOn(ResizeObserver.prototype, 'disconnect');
     const callback = vi.fn();
 
-    const { rerender } = await renderHook(
-      (enabled: boolean = true) =>
-        useResizeObserver(el, callback, { enabled }),
+    const { rerender, unmount } = await renderHook(
+      (props?: UseResizeObserverOptions & { target?: HTMLElement | null }) =>
+        useResizeObserver(
+          props && 'target' in props ? (props.target ?? null) : el,
+          callback,
+          props
+        ),
+      { initialProps: { enabled: true, box: 'border-box' } }
     );
 
-    await vi.waitFor(() => {
-      expect(callback).toHaveBeenCalled();
-    });
+    expect(observeSpy).toHaveBeenCalledWith(el, { box: 'border-box' });
+    await expect.poll(() => callback.mock.calls.length).toBeGreaterThan(0);
 
     const countBeforeResize = callback.mock.calls.length;
     el.style.width = '180px';
+    await expect
+      .poll(() => callback.mock.calls.length)
+      .toBeGreaterThan(countBeforeResize);
 
-    await vi.waitFor(() => {
-      expect(callback.mock.calls.length).toBeGreaterThan(countBeforeResize);
-    });
 
-    await rerender(false);
-    const countAfterDisable = callback.mock.calls.length;
-    el.style.width = '220px';
+    await rerender({ enabled: false });
+    expect(disconnectSpy).toHaveBeenCalledTimes(1);
 
-    await new Promise((r) => setTimeout(r, 50));
-    expect(callback.mock.calls.length).toBe(countAfterDisable);
+
+    await rerender({ enabled: true, target: null });
+    expect(observeSpy).toHaveBeenCalledTimes(1);
+
+    await unmount();
   });
 });

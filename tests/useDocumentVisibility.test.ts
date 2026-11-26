@@ -1,28 +1,40 @@
+import { useDocumentVisibility } from '@/hooks/useDocumentVisibility';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
-import { useDocumentVisibility } from '@/hooks/useDocumentVisibility';
 
 describe('useDocumentVisibility', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('reads document.visibilityState and updates on visibilitychange', async () => {
-    const spy = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible');
+  it('reads initial document.visibilityState, updates on visibilitychange, and cleans up listener on unmount', async () => {
+    const visibilitySpy = vi
+      .spyOn(document, 'visibilityState', 'get')
+      .mockReturnValue('hidden');
+    const removeListenerSpy = vi.spyOn(document, 'removeEventListener');
 
-    const { result, act } = await renderHook(() => useDocumentVisibility());
+    const { result, unmount, act } = await renderHook(() =>
+      useDocumentVisibility(),
+    );
+
+    expect(result.current).toBe('hidden');
+
+    await act(async () => {
+      visibilitySpy.mockReturnValue('visible');
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
     expect(result.current).toBe('visible');
 
     await act(async () => {
-      spy.mockReturnValue('hidden');
+      visibilitySpy.mockReturnValue('hidden');
       document.dispatchEvent(new Event('visibilitychange'));
     });
     expect(result.current).toBe('hidden');
 
-    await act(async () => {
-      spy.mockReturnValue('visible');
-      document.dispatchEvent(new Event('visibilitychange'));
-    });
-    expect(result.current).toBe('visible');
+    await unmount();
+    expect(removeListenerSpy).toHaveBeenCalledWith(
+      'visibilitychange',
+      expect.any(Function),
+    );
   });
 });

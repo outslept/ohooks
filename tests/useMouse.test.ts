@@ -1,83 +1,66 @@
+import { useMouse } from '@/hooks/useMouse';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
-import { useMouse } from '@/hooks/useMouse';
+
+(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('useMouse', () => {
   afterEach(() => {
-    vi.restoreAllMocks();
     document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
-  it('tracks viewport, page, screen, and target-relative coordinates via rAF', async () => {
-    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
-      cb(0);
-      return 1;
-    });
-    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+  it('tracks viewport, page, screen, and target-relative coordinates via real rAF and cancels superseded frames', async () => {
+    const cancelSpy = vi.spyOn(window, 'cancelAnimationFrame');
 
     const box = document.createElement('div');
-    document.body.appendChild(box);
-    vi.spyOn(box, 'getBoundingClientRect').mockReturnValue({
-      left: 50,
-      top: 100,
-      width: 200,
-      height: 100,
-      right: 250,
-      bottom: 200,
-      x: 50,
-      y: 100,
-      toJSON: () => ({}),
+    Object.assign(box.style, {
+      position: 'fixed',
+      left: '50px',
+      top: '60px',
+      width: '200px',
+      height: '120px',
     });
+    document.body.appendChild(box);
 
-    const { result, act, unmount } = await renderHook(() => useMouse(box));
+    const { result, unmount, act } = await renderHook(() => useMouse(box));
+
+    expect(result.current.clientX).toBe(0);
+    expect(result.current.elementX).toBe(0);
 
     await act(async () => {
+
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { clientX: 10, clientY: 20 }),
+      );
       window.dispatchEvent(
         new MouseEvent('mousemove', {
-          clientX: 120,
-          clientY: 180,
+          clientX: 150,
+          clientY: 260,
           screenX: 300,
           screenY: 400,
-        })
+        }),
       );
     });
 
-    expect(result.current.clientX).toBe(120);
-    expect(result.current.clientY).toBe(180);
+    expect(cancelSpy).toHaveBeenCalledTimes(1);
+
+    await expect.poll(() => result.current.clientX).toBe(150);
+    expect(result.current.clientY).toBe(260);
     expect(result.current.screenX).toBe(300);
     expect(result.current.screenY).toBe(400);
     expect(result.current.elementPositionX).toBe(50);
-    expect(result.current.elementPositionY).toBe(100);
-    expect(result.current.elementX).toBe(70);
-    expect(result.current.elementY).toBe(80);
+    expect(result.current.elementPositionY).toBe(60);
+    expect(result.current.elementX).toBe(100);
+    expect(result.current.elementY).toBe(200);
 
+
+    window.dispatchEvent(
+      new MouseEvent('mousemove', { clientX: 80, clientY: 90 }),
+    );
     await unmount();
-  });
 
-  it('cancels previous pending rAF when mousemove fires rapidly', async () => {
-    let savedCallback: FrameRequestCallback | null = null;
-    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
-      savedCallback = cb;
-      return 42;
-    });
-    const cancelSpy = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
-
-    const { result, act, unmount } = await renderHook(() => useMouse());
-
-    await act(async () => {
-      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 10, clientY: 20 }));
-      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 30, clientY: 40 }));
-    });
-
-    expect(cancelSpy).toHaveBeenCalledWith(42);
-
-    await act(async () => {
-      savedCallback?.(0);
-    });
-
-    expect(result.current.clientX).toBe(30);
-    expect(result.current.clientY).toBe(40);
-
-    await unmount();
+    expect(cancelSpy).toHaveBeenCalledTimes(2);
+    expect(result.current.clientX).toBe(150);
   });
 });

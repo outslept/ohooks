@@ -1,6 +1,11 @@
-import { useMutationObserver } from '@/hooks/useMutationObserver';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  useMutationObserver,
+  type UseMutationObserverOptions,
+} from '@/hooks/useMutationObserver';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
+
+(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('useMutationObserver', () => {
   let el: HTMLDivElement;
@@ -14,17 +19,43 @@ describe('useMutationObserver', () => {
     el.remove();
   });
 
-  it('triggers callback on DOM attribute and childList mutations', async () => {
-    const callback = vi.fn();
-    await renderHook(() =>
-      useMutationObserver(el, callback, { attributes: true, childList: true }),
+  it('observes mutations, infers attributes from attributeFilter, respects enabled, and disconnects on unmount', async () => {
+    let callCount = 0;
+    let lastAttributeName: string | null = null;
+
+    const { rerender, unmount } = await renderHook(
+      (props?: UseMutationObserverOptions) =>
+        useMutationObserver(
+          el,
+          (records) => {
+            callCount += 1;
+            lastAttributeName = records[0]?.attributeName ?? null;
+          },
+          props ?? {
+            attributeFilter: ['data-tracked'],
+            attributeOldValue: true,
+          },
+        ),
     );
 
-    el.setAttribute('data-test', 'active');
-    el.appendChild(document.createElement('span'));
+    el.setAttribute('data-ignored', '1');
+    el.setAttribute('data-tracked', 'active');
 
-    await vi.waitFor(() => {
-      expect(callback).toHaveBeenCalled();
+    await expect.poll(() => callCount).toBe(1);
+    expect(lastAttributeName).toBe('data-tracked');
+
+    await rerender({ enabled: false });
+    el.setAttribute('data-tracked', 'updated');
+
+    await rerender({
+      enabled: true,
+      attributes: false,
+      childList: false,
+      characterData: false,
     });
+    el.setAttribute('data-tracked', 'updated-again');
+    expect(callCount).toBe(1);
+
+    await unmount();
   });
 });
