@@ -39,7 +39,8 @@
     "test": "vitest run --reporter=dot",
     "test:watch": "vitest --project=chromium",
     "test:coverage": "vitest run --reporter=dot --coverage --project=chromium",
-    "test:ui": "vitest --project=chromium --browser.headless=false"
+    "test:ui": "vitest --project=chromium --browser.headless=false",
+    "verify": "node scripts/verify-registry.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

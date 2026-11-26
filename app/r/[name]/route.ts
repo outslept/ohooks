@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAllRegistryItems, getRegistryItemByName, toKebabCase } from "@/lib/registry";
+import { getAllRegistryItems, getRegistryItemByName, toKebabCase } from "@/scripts/registry";
 
 export const revalidate = false;
 

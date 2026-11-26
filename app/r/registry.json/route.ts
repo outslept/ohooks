@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRegistryCatalog } from "@/lib/registry";
+import { getRegistryCatalog } from "@/scripts/registry";
 
 export const revalidate = false;
 

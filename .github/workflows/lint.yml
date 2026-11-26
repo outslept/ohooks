@@ -38,3 +38,5 @@ jobs:
         run: pnpm lint
       - name: run typecheck
         run: pnpm typecheck
+      - name: verify registry invariants
+        run: pnpm verify
