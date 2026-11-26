@@ -1,7 +1,7 @@
 import type { InferPageType } from "fumadocs-core/source";
 import { source } from "@/lib/source";
 
-export const appName = "ohook";
+export const appName = "ohooks";
 export const appDescription = "react hooks by outslept.";
 export const appUrl =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://ohooks.vercel.app";
@@ -13,7 +13,7 @@ export const docsContentRoute = "/llms.mdx/docs";
 
 export const gitConfig = {
   user: "outslept",
-  repo: "ohook",
+  repo: "ohooks",
   branch: "main",
 };
 

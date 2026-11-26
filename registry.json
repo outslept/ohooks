@@ -1,6 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "ohook",
+  "name": "ohooks",
   "homepage": "https://ohooks.vercel.app",
   "items": [
     {
@@ -1364,7 +1364,7 @@
       "name": "all",
       "type": "registry:hook",
       "title": "All Hooks",
-      "description": "Complete collection of all ohook React hooks and utilities.",
+      "description": "Complete collection of all ohooks React hooks and utilities.",
       "files": [
         {
           "path": "lib/utils.ts",

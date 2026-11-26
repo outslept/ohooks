@@ -174,7 +174,7 @@ export function getAllRegistryItems(): RegistryItem[] {
     name: "all",
     type: "registry:hook",
     title: "All Hooks",
-    description: "Complete collection of all ohook React hooks and utilities.",
+    description: "Complete collection of all ohooks React hooks and utilities.",
     files: [...(utilsItem ? utilsItem.files : []), ...hookItems.flatMap((item) => item.files)],
   };
 

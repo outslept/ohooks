@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 // The registry IS the product: consumers install hooks with
-//   npx shadcn add @ohook/useIdle
-// A desynchronised registry breaks other people's projects, not this one.
-// Tests cannot see this class of bug. This script can.
+//   npx shadcn add @ohooks/useIdle
 //
 // Checks 7 invariants:
 //   1. every hooks/*.ts has tests/{name}.test.ts

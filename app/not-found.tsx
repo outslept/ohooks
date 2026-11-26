@@ -26,7 +26,7 @@ export default function NotFound() {
           <div className="space-y-1.5 p-3.5 leading-relaxed">
             <div className="text-muted-foreground">
               <span className="select-none text-secondary">$ </span>
-              npx shadcn@latest list @ohook
+              npx shadcn@latest list @ohooks
             </div>
             <div className="text-destructive">
               Error: The requested resource could not be resolved in registry.

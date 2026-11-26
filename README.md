@@ -1,10 +1,10 @@
-# ohook
+# ohooks
 
 > A modern, open-code collection of 88 zero-dependency React hooks distributed via the shadcn registry.
 
 <p align="center">
   <a href="https://ohooks.vercel.app/">
-    <img width="128" height="128" alt="ohook logo" src="./app/icon1.png">
+    <img width="128" height="128" alt="ohooks logo" src="./app/icon1.png">
   </a>
 </p>
 
@@ -14,12 +14,12 @@
 
 ## Quick start
 
-### 1. Add the `@ohook` namespace
+### 1. Add the `@ohooks` namespace
 
 Configure the registry in your project with a single CLI command:
 
 ```bash
-npx shadcn@latest registry add @ohook=https://ohooks.vercel.app/r/{name}.json
+npx shadcn@latest registry add @ohooks=https://ohooks.vercel.app/r/{name}.json
 ```
 
 Or add it to your `components.json` manually:
@@ -27,7 +27,7 @@ Or add it to your `components.json` manually:
 ```json
 {
   "registries": {
-    "@ohook": "https://ohooks.vercel.app/r/{name}.json"
+    "@ohooks": "https://ohooks.vercel.app/r/{name}.json"
   }
 }
 ```
@@ -36,13 +36,13 @@ Or add it to your `components.json` manually:
 
 ```bash
 # Install a single hook (automatically resolves internal hook dependencies)
-npx shadcn@latest add @ohook/use-local-storage
+npx shadcn@latest add @ohooks/use-local-storage
 
 # Install multiple hooks at once
-npx shadcn@latest add @ohook/use-debounce-value @ohook/use-media-query @ohook/use-hotkeys
+npx shadcn@latest add @ohooks/use-debounce-value @ohooks/use-media-query @ohooks/use-hotkeys
 
 # Install all 88 hooks in one command
-npx shadcn@latest add @ohook/all
+npx shadcn@latest add @ohooks/all
 ```
 
 > [!TIP]
@@ -56,8 +56,8 @@ npx shadcn@latest add @ohook/all
 - **Automatic dependency graph resolution** - installing `useDarkMode` automatically pulls in `useLocalStorage`, `useMediaQuery`, and `useHydrated`
 - **Multi-package-manager support** - copy-ready CLI commands for `pnpm`, `npm`, `yarn`, `bun`, `deno`, `ni`, `vlt`, `vp`, `nub`, and `upm`
 - **Dual naming convention** - every registry endpoint supports both `kebab-case` (`use-local-storage.json`) and `camelCase` (`useLocalStorage.json`)
-- **CLI discovery & search** - list and search all 88 hooks from your terminal via `npx shadcn@latest search @ohook`
-- **Pre-install inspection** - preview exact file contents and dependencies before installing with `npx shadcn@latest view @ohook/<hook>`
+- **CLI discovery & search** - list and search all 88 hooks from your terminal via `npx shadcn@latest search @ohooks`
+- **Pre-install inspection** - preview exact file contents and dependencies before installing with `npx shadcn@latest view @ohooks/<hook>`
 - **HTTP content negotiation** - requests from the `shadcn` CLI or AI agents automatically receive JSON registry payloads or clean Markdown
 
 ### Documentation & DX
@@ -181,7 +181,7 @@ npx shadcn@latest add @ohook/all
 
 ### Registry & LLM endpoints
 
-ohook serves human-readable docs, machine-readable Markdown, and `shadcn` JSON payloads from a unified URL structure:
+ohooks serves human-readable docs, machine-readable Markdown, and `shadcn` JSON payloads from a unified URL structure:
 
 | Pattern            | Description                                                            |
 | ------------------ | ---------------------------------------------------------------------- |
