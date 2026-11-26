@@ -1,13 +1,7 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
-import { useEventCallback } from './useEventCallback';
-import { useHydrated } from './useHydrated';
-import { useLatest } from './useLatest';
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import { useEventCallback } from "./useEventCallback";
+import { useHydrated } from "./useHydrated";
+import { useLatest } from "./useLatest";
 
 export interface StorageOptions<T> {
   /** Custom serializer function (default: `JSON.stringify`) */
@@ -28,7 +22,7 @@ export type UseStorageReturn<T> = [
   removeValue: () => void,
 ];
 
-const CUSTOM_STORAGE_EVENT = 'custom-web-storage-change';
+const CUSTOM_STORAGE_EVENT = "custom-web-storage-change";
 
 interface CustomStorageEventDetail {
   key: string;
@@ -37,16 +31,14 @@ interface CustomStorageEventDetail {
 }
 
 function resolveInitial<T>(initialValue: T | (() => T)): T {
-  return typeof initialValue === 'function'
-    ? (initialValue as () => T)()
-    : initialValue;
+  return typeof initialValue === "function" ? (initialValue as () => T)() : initialValue;
 }
 
 export function useWebStorage<T>(
-  storageType: 'localStorage' | 'sessionStorage',
+  storageType: "localStorage" | "sessionStorage",
   key: string,
   initialValue: T | (() => T),
-  options: StorageOptions<T> = {}
+  options: StorageOptions<T> = {},
 ): UseStorageReturn<T> {
   const {
     serializer = JSON.stringify,
@@ -62,7 +54,7 @@ export function useWebStorage<T>(
   const onErrorRef = useLatest(onError);
 
   const getStorage = useCallback((): Storage | null => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return null;
     }
     try {
@@ -94,7 +86,7 @@ export function useWebStorage<T>(
 
   const [storedValue, setStoredValue] = useState<T>(() => {
     const fallback = resolveInitial(initialValue);
-    if (!initializeWithValue || typeof window === 'undefined') {
+    if (!initializeWithValue || typeof window === "undefined") {
       return fallback;
     }
 
@@ -121,36 +113,32 @@ export function useWebStorage<T>(
     syncStoredValue();
   }, [key, readValue]);
 
-  const setValue: Dispatch<SetStateAction<T>> = useEventCallback(
-    (value: SetStateAction<T>) => {
-      try {
-        const currentValue = isHydrated ? storedValue : readValue();
-        const nextValue =
-          typeof value === 'function'
-            ? (value as (prevState: T) => T)(currentValue)
-            : value;
+  const setValue: Dispatch<SetStateAction<T>> = useEventCallback((value: SetStateAction<T>) => {
+    try {
+      const currentValue = isHydrated ? storedValue : readValue();
+      const nextValue =
+        typeof value === "function" ? (value as (prevState: T) => T)(currentValue) : value;
 
-        setStoredValue(nextValue);
+      setStoredValue(nextValue);
 
-        const storage = getStorage();
-        if (storage) {
-          const serialized = serializerRef.current(nextValue);
-          storage.setItem(key, serialized);
-          window.dispatchEvent(
-            new CustomEvent<CustomStorageEventDetail>(CUSTOM_STORAGE_EVENT, {
-              detail: {
-                key,
-                newValue: serialized,
-                storageArea: storage,
-              },
-            })
-          );
-        }
-      } catch (error) {
-        onErrorRef.current?.(error);
+      const storage = getStorage();
+      if (storage) {
+        const serialized = serializerRef.current(nextValue);
+        storage.setItem(key, serialized);
+        window.dispatchEvent(
+          new CustomEvent<CustomStorageEventDetail>(CUSTOM_STORAGE_EVENT, {
+            detail: {
+              key,
+              newValue: serialized,
+              storageArea: storage,
+            },
+          }),
+        );
       }
+    } catch (error) {
+      onErrorRef.current?.(error);
     }
-  );
+  });
 
   const removeValue = useEventCallback(() => {
     try {
@@ -167,7 +155,7 @@ export function useWebStorage<T>(
               newValue: null,
               storageArea: storage,
             },
-          })
+          }),
         );
       }
     } catch (error) {
@@ -176,7 +164,7 @@ export function useWebStorage<T>(
   });
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
 
@@ -220,11 +208,11 @@ export function useWebStorage<T>(
       }
     };
 
-    window.addEventListener('storage', handleStorageEvent);
+    window.addEventListener("storage", handleStorageEvent);
     window.addEventListener(CUSTOM_STORAGE_EVENT, handleCustomEvent);
 
     return () => {
-      window.removeEventListener('storage', handleStorageEvent);
+      window.removeEventListener("storage", handleStorageEvent);
       window.removeEventListener(CUSTOM_STORAGE_EVENT, handleCustomEvent);
     };
   }, [key, getStorage, initialValueRef, deserializerRef, onErrorRef]);
@@ -249,9 +237,9 @@ export function useWebStorage<T>(
 export function useLocalStorage<T>(
   key: string,
   initialValue: T | (() => T),
-  options: UseLocalStorageOptions<T> = {}
+  options: UseLocalStorageOptions<T> = {},
 ): UseStorageReturn<T> {
-  return useWebStorage('localStorage', key, initialValue, options);
+  return useWebStorage("localStorage", key, initialValue, options);
 }
 
 export default useLocalStorage;

@@ -14,11 +14,11 @@ The `useBoolean` hook manages a boolean state and provides memoized helper callb
 ## Usage
 
 ```tsx
-import { useBoolean } from "@/hooks/useBoolean"
+import { useBoolean } from "@/hooks/useBoolean";
 ```
 
 ```tsx
-const { value, setTrue, setFalse, toggle } = useBoolean(false)
+const { value, setTrue, setFalse, toggle } = useBoolean(false);
 ```
 
 ## Examples
@@ -28,7 +28,7 @@ const { value, setTrue, setFalse, toggle } = useBoolean(false)
 Use `setTrue` and `setFalse` directly as event handlers without creating inline arrow functions.
 
 ```tsx
-const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false)
+const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
 
 return (
   <>
@@ -40,7 +40,7 @@ return (
       </div>
     )}
   </>
-)
+);
 ```
 
 ### Toggling State
@@ -48,14 +48,14 @@ return (
 Use `toggle` to flip the current boolean value, or `setValue` when you need to pass an explicit boolean.
 
 ```tsx
-const { value: isMuted, toggle, setValue } = useBoolean(false)
+const { value: isMuted, toggle, setValue } = useBoolean(false);
 
 return (
   <div>
     <button onClick={toggle}>{isMuted ? "Unmute" : "Mute"}</button>
     <button onClick={() => setValue(false)}>Reset sound</button>
   </div>
-)
+);
 ```
 
 ## API Reference

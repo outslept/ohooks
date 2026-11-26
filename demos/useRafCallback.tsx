@@ -1,98 +1,94 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "cn"
-import { RotateCcw, Zap } from "lucide-react"
+import { useState } from "react";
+import { cn } from "cn";
+import { RotateCcw, Zap } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useRafCallback } from "@/hooks/useRafCallback"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useRafCallback } from "@/hooks/useRafCallback";
 
-const MODES = ["raf", "flush", "cancel"] as const
-type ExecMode = (typeof MODES)[number]
+const MODES = ["raf", "flush", "cancel"] as const;
+type ExecMode = (typeof MODES)[number];
 
 export default function UseRafCallbackDemo() {
-  const [mode, setMode] = useState<ExecMode>("raf")
-  const [rawEvents, setRawEvents] = useState(0)
-  const [rafEvents, setRafEvents] = useState(0)
-  const [coords, setCoords] = useState({ x: 50, y: 50 })
-  const [isTracking, setIsTracking] = useState(false)
+  const [mode, setMode] = useState<ExecMode>("raf");
+  const [rawEvents, setRawEvents] = useState(0);
+  const [rafEvents, setRafEvents] = useState(0);
+  const [coords, setCoords] = useState({ x: 50, y: 50 });
+  const [isTracking, setIsTracking] = useState(false);
 
   const updateOnFrame = useRafCallback((x: number, y: number) => {
-    setRafEvents((c) => c + 1)
-    setCoords({ x, y })
-  })
+    setRafEvents((c) => c + 1);
+    setCoords({ x, y });
+  });
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
+    const rect = e.currentTarget.getBoundingClientRect();
     const nativeEvent = e.nativeEvent as PointerEvent & {
-      getCoalescedEvents?: () => PointerEvent[]
-    }
+      getCoalescedEvents?: () => PointerEvent[];
+    };
     const samples =
       typeof nativeEvent.getCoalescedEvents === "function"
         ? nativeEvent.getCoalescedEvents()
-        : [nativeEvent]
-    const events = samples.length > 0 ? samples : [nativeEvent]
+        : [nativeEvent];
+    const events = samples.length > 0 ? samples : [nativeEvent];
 
-    setRawEvents((c) => c + events.length)
+    setRawEvents((c) => c + events.length);
 
     for (const sample of events) {
-      const x = Math.round(((sample.clientX - rect.left) / rect.width) * 100)
-      const y = Math.round(((sample.clientY - rect.top) / rect.height) * 100)
-      updateOnFrame(
-        Math.max(0, Math.min(100, x)),
-        Math.max(0, Math.min(100, y))
-      )
+      const x = Math.round(((sample.clientX - rect.left) / rect.width) * 100);
+      const y = Math.round(((sample.clientY - rect.top) / rect.height) * 100);
+      updateOnFrame(Math.max(0, Math.min(100, x)), Math.max(0, Math.min(100, y)));
     }
 
     if (mode === "flush") {
-      updateOnFrame.flush()
+      updateOnFrame.flush();
     } else if (mode === "cancel") {
-      updateOnFrame.cancel()
+      updateOnFrame.cancel();
     }
-  }
+  };
 
   const handleBurst = () => {
-    const burstSize = 20
-    setRawEvents((c) => c + burstSize)
+    const burstSize = 20;
+    setRawEvents((c) => c + burstSize);
 
     for (let i = 1; i <= burstSize; i += 1) {
-      const nextX = Math.round(15 + ((coords.x + i * 17) % 70))
-      const nextY = Math.round(15 + ((coords.y + i * 13) % 70))
-      updateOnFrame(nextX, nextY)
+      const nextX = Math.round(15 + ((coords.x + i * 17) % 70));
+      const nextY = Math.round(15 + ((coords.y + i * 13) % 70));
+      updateOnFrame(nextX, nextY);
     }
 
     if (mode === "flush") {
-      updateOnFrame.flush()
+      updateOnFrame.flush();
     } else if (mode === "cancel") {
-      updateOnFrame.cancel()
+      updateOnFrame.cancel();
     }
-  }
+  };
 
   const handleReset = () => {
-    updateOnFrame.cancel()
-    setRawEvents(0)
-    setRafEvents(0)
-    setCoords({ x: 50, y: 50 })
-  }
+    updateOnFrame.cancel();
+    setRawEvents(0);
+    setRafEvents(0);
+    setCoords({ x: 50, y: 50 });
+  };
 
-  const offsetX = Math.round((coords.x - 50) * 0.4)
-  const offsetY = Math.round((coords.y - 50) * 0.24)
-  const savedCount = Math.max(0, rawEvents - rafEvents)
+  const offsetX = Math.round((coords.x - 50) * 0.4);
+  const offsetY = Math.round((coords.y - 50) * 0.24);
+  const savedCount = Math.max(0, rawEvents - rafEvents);
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="rAF control mode"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {MODES.map((m) => {
-              const active = mode === m
+              const active = mode === m;
               return (
                 <button
                   key={m}
@@ -102,12 +98,12 @@ export default function UseRafCallbackDemo() {
                     "rounded-[3px] px-2 py-0.5 font-mono text-2xs font-medium transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {m === "raf" ? "rAF" : m}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -119,9 +115,7 @@ export default function UseRafCallbackDemo() {
           className="relative flex h-28 cursor-crosshair touch-none flex-col justify-between overflow-hidden rounded-md border border-border-subtle bg-subtle/35 p-3 select-none"
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-2xs text-muted-foreground">
-              move pointer or burst
-            </span>
+            <span className="font-mono text-2xs text-muted-foreground">move pointer or burst</span>
             <Badge variant="code" size="compact" className="tabular-nums">
               {coords.x}%, {coords.y}%
             </Badge>
@@ -133,7 +127,7 @@ export default function UseRafCallbackDemo() {
                 "inline-flex items-center gap-1.5 rounded-sm border border-primary/30 bg-card/90 px-2.5 py-1 font-mono text-2xs text-foreground shadow-control",
                 isTracking
                   ? "transition-none"
-                  : "transition-transform duration-200 ease-out motion-reduce:transition-none"
+                  : "transition-transform duration-200 ease-out motion-reduce:transition-none",
               )}
               style={{
                 transform: `translate3d(${offsetX}px, ${offsetY}px, 0)`,
@@ -193,5 +187,5 @@ export default function UseRafCallbackDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

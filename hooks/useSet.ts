@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
+import { useCallback, useState } from "react";
+import { useEventCallback } from "./useEventCallback";
 
 /** Mutation and lookup actions returned by `useSet`. */
 export interface UseSetActions<T> {
@@ -29,9 +29,7 @@ export interface UseSetActions<T> {
  * const [tags, { add, remove, toggle, has }] = useSet(['react', 'typescript']);
  * ```
  */
-export function useSet<T>(
-  initialValue?: Iterable<T>,
-): [ReadonlySet<T>, UseSetActions<T>] {
+export function useSet<T>(initialValue?: Iterable<T>): [ReadonlySet<T>, UseSetActions<T>] {
   const [set, setSet] = useState<Set<T>>(() => new Set(initialValue));
 
   const add = useEventCallback((value: T) => {

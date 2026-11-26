@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLatest } from './useLatest';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLatest } from "./useLatest";
 
 export interface UseFileDialogOptions {
   /** Allow selecting multiple files (default: `true`) */
@@ -28,13 +28,10 @@ export interface UseFileDialogReturn {
 }
 
 const DEFAULT_OPTIONS: Required<
-  Pick<
-    UseFileDialogOptions,
-    'multiple' | 'accept' | 'directory' | 'reset'
-  >
+  Pick<UseFileDialogOptions, "multiple" | "accept" | "directory" | "reset">
 > = {
   multiple: true,
-  accept: '*',
+  accept: "*",
   directory: false,
   reset: false,
 };
@@ -51,9 +48,7 @@ const DEFAULT_OPTIONS: Required<
  * const { files, open, reset } = useFileDialog({ accept: 'image/*', multiple: false });
  * ```
  */
-export function useFileDialog(
-  options: UseFileDialogOptions = {}
-): UseFileDialogReturn {
+export function useFileDialog(options: UseFileDialogOptions = {}): UseFileDialogReturn {
   const [files, setFiles] = useState<FileList | null>(null);
   const inputRef: { current: HTMLInputElement | null } = useRef(null);
   const optionsRef = useLatest(options);
@@ -64,18 +59,18 @@ export function useFileDialog(
   const reset = useCallback(() => {
     setFiles(null);
     if (inputRef.current) {
-      inputRef.current.value = '';
+      inputRef.current.value = "";
     }
   }, []);
 
   const getOrCreateInput = useCallback((): HTMLInputElement | null => {
-    if (typeof document === 'undefined') {
+    if (typeof document === "undefined") {
       return null;
     }
 
     if (!inputRef.current) {
-      const input = document.createElement('input');
-      input.type = 'file';
+      const input = document.createElement("input");
+      input.type = "file";
 
       input.onchange = (event: Event) => {
         const target = event.target as HTMLInputElement;
@@ -129,23 +124,23 @@ export function useFileDialog(
       }
 
       input.multiple = Boolean(merged.multiple);
-      input.accept = merged.accept ?? '*';
+      input.accept = merged.accept ?? "*";
 
       if (merged.capture !== undefined) {
-        input.setAttribute('capture', merged.capture);
+        input.setAttribute("capture", merged.capture);
       } else {
-        input.removeAttribute('capture');
+        input.removeAttribute("capture");
       }
 
       if (merged.directory) {
-        input.setAttribute('webkitdirectory', '');
+        input.setAttribute("webkitdirectory", "");
       } else {
-        input.removeAttribute('webkitdirectory');
+        input.removeAttribute("webkitdirectory");
       }
 
       input.click();
     },
-    [getOrCreateInput, optionsRef, reset]
+    [getOrCreateInput, optionsRef, reset],
   );
 
   useEffect(() => {

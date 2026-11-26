@@ -1,12 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect, useRef, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 /** Allowed movement axes for pointer dragging. */
-export type PointerDragAxis = 'both' | 'x' | 'y';
+export type PointerDragAxis = "both" | "x" | "y";
 
 /** Reactive state representing the current pointer drag operation. */
 export interface PointerDragState {
@@ -78,11 +76,11 @@ const INITIAL_STATE: PointerDragState = {
  */
 export function usePointerDrag(
   target: EventListenerTarget<HTMLElement>,
-  options: UsePointerDragOptions = {}
+  options: UsePointerDragOptions = {},
 ): PointerDragState {
   const {
     enabled = true,
-    axis = 'both',
+    axis = "both",
     threshold = 0,
     preventUserSelect = true,
     preventDefault = false,
@@ -105,7 +103,7 @@ export function usePointerDrag(
   const savedUserSelectRef: { current: string | null } = useRef(null);
 
   useEffect(() => {
-    if (!enabled || typeof window === 'undefined') {
+    if (!enabled || typeof window === "undefined") {
       return;
     }
 
@@ -115,10 +113,7 @@ export function usePointerDrag(
     }
 
     const restoreUserSelect = () => {
-      if (
-        savedUserSelectRef.current !== null &&
-        typeof document !== 'undefined'
-      ) {
+      if (savedUserSelectRef.current !== null && typeof document !== "undefined") {
         document.body.style.userSelect = savedUserSelectRef.current;
         savedUserSelectRef.current = null;
       }
@@ -128,7 +123,7 @@ export function usePointerDrag(
       if (activePointerIdRef.current !== null) {
         return;
       }
-      if (event.button !== 0 && event.pointerType === 'mouse') {
+      if (event.button !== 0 && event.pointerType === "mouse") {
         return;
       }
 
@@ -141,9 +136,9 @@ export function usePointerDrag(
       startPointRef.current = { x: event.clientX, y: event.clientY };
       lastPointRef.current = { x: event.clientX, y: event.clientY };
 
-      if (preventUserSelect && typeof document !== 'undefined') {
+      if (preventUserSelect && typeof document !== "undefined") {
         savedUserSelectRef.current = document.body.style.userSelect;
-        document.body.style.userSelect = 'none';
+        document.body.style.userSelect = "none";
       }
 
       try {
@@ -191,10 +186,10 @@ export function usePointerDrag(
           y: event.clientY,
           startX: startPointRef.current.x,
           startY: startPointRef.current.y,
-          deltaX: axis === 'y' ? 0 : rawDeltaX,
-          deltaY: axis === 'x' ? 0 : rawDeltaY,
-          movementX: axis === 'y' ? 0 : rawDeltaX,
-          movementY: axis === 'x' ? 0 : rawDeltaY,
+          deltaX: axis === "y" ? 0 : rawDeltaX,
+          deltaY: axis === "x" ? 0 : rawDeltaY,
+          movementX: axis === "y" ? 0 : rawDeltaX,
+          movementY: axis === "x" ? 0 : rawDeltaY,
         };
         lastPointRef.current = { x: event.clientX, y: event.clientY };
         latestStateRef.current = startState;
@@ -207,12 +202,10 @@ export function usePointerDrag(
         event.preventDefault();
       }
 
-      const deltaX = axis === 'y' ? 0 : rawDeltaX;
-      const deltaY = axis === 'x' ? 0 : rawDeltaY;
-      const movementX =
-        axis === 'y' ? 0 : event.clientX - lastPointRef.current.x;
-      const movementY =
-        axis === 'x' ? 0 : event.clientY - lastPointRef.current.y;
+      const deltaX = axis === "y" ? 0 : rawDeltaX;
+      const deltaY = axis === "x" ? 0 : rawDeltaY;
+      const movementX = axis === "y" ? 0 : event.clientX - lastPointRef.current.x;
+      const movementY = axis === "x" ? 0 : event.clientY - lastPointRef.current.y;
 
       lastPointRef.current = { x: event.clientX, y: event.clientY };
 
@@ -264,29 +257,21 @@ export function usePointerDrag(
       }
     };
 
-    element.addEventListener('pointerdown', handlePointerDown);
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUpOrCancel);
-    window.addEventListener('pointercancel', handlePointerUpOrCancel);
+    element.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUpOrCancel);
+    window.addEventListener("pointercancel", handlePointerUpOrCancel);
 
     return () => {
-      element.removeEventListener('pointerdown', handlePointerDown);
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUpOrCancel);
-      window.removeEventListener('pointercancel', handlePointerUpOrCancel);
+      element.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUpOrCancel);
+      window.removeEventListener("pointercancel", handlePointerUpOrCancel);
       activePointerIdRef.current = null;
       hasExceededThresholdRef.current = false;
       restoreUserSelect();
     };
-  }, [
-    target,
-    enabled,
-    axis,
-    threshold,
-    preventUserSelect,
-    preventDefault,
-    optionsRef,
-  ]);
+  }, [target, enabled, axis, threshold, preventUserSelect, preventDefault, optionsRef]);
 
   return dragState;
 }

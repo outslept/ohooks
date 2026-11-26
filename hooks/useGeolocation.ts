@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export interface UseGeolocationOptions extends PositionOptions {
   /** Whether geolocation watching is active (default: `true`) */
@@ -30,7 +30,7 @@ export interface GeolocationState {
   error: GeolocationPositionError | null;
 }
 
-const INITIAL_STATE: Omit<GeolocationState, 'isSupported' | 'loading'> = {
+const INITIAL_STATE: Omit<GeolocationState, "isSupported" | "loading"> = {
   accuracy: null,
   altitude: null,
   altitudeAccuracy: null,
@@ -56,9 +56,7 @@ const INITIAL_STATE: Omit<GeolocationState, 'isSupported' | 'loading'> = {
  * });
  * ```
  */
-export function useGeolocation(
-  options: UseGeolocationOptions = {},
-): GeolocationState {
+export function useGeolocation(options: UseGeolocationOptions = {}): GeolocationState {
   const {
     enabled = true,
     enableHighAccuracy = false,
@@ -66,8 +64,7 @@ export function useGeolocation(
     timeout = Infinity,
   } = options;
 
-  const isSupported =
-    typeof navigator !== 'undefined' && 'geolocation' in navigator;
+  const isSupported = typeof navigator !== "undefined" && "geolocation" in navigator;
 
   const [state, setState] = useState<GeolocationState>({
     ...INITIAL_STATE,

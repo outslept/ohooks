@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLatest } from './useLatest';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLatest } from "./useLatest";
 
 export interface AnimationFrameInfo {
   /** High-resolution timestamp passed by `requestAnimationFrame` */
@@ -45,7 +45,7 @@ export interface UseAnimationFrameControls {
  */
 export function useAnimationFrame(
   callback: (info: AnimationFrameInfo) => void,
-  options: UseAnimationFrameOptions = {}
+  options: UseAnimationFrameOptions = {},
 ): UseAnimationFrameControls {
   const { immediate = true, fpsLimit } = options;
 
@@ -59,7 +59,7 @@ export function useAnimationFrame(
   const previousTimeRef: { current: number | null } = useRef(null);
 
   const cancelFrame = useCallback(() => {
-    if (rafIdRef.current !== null && typeof window !== 'undefined') {
+    if (rafIdRef.current !== null && typeof window !== "undefined") {
       window.cancelAnimationFrame(rafIdRef.current);
       rafIdRef.current = null;
     }
@@ -90,8 +90,7 @@ export function useAnimationFrame(
             rafIdRef.current = window.requestAnimationFrame(stepFrame);
             return;
           }
-          previousTimeRef.current =
-            timestamp - (deltaTime % minFrameInterval);
+          previousTimeRef.current = timestamp - (deltaTime % minFrameInterval);
         } else {
           previousTimeRef.current = timestamp;
         }
@@ -104,11 +103,11 @@ export function useAnimationFrame(
         });
       }
 
-      if (isActiveRef.current && typeof window !== 'undefined') {
+      if (isActiveRef.current && typeof window !== "undefined") {
         rafIdRef.current = window.requestAnimationFrame(stepFrame);
       }
     },
-    [callbackRef, fpsLimitRef]
+    [callbackRef, fpsLimitRef],
   );
 
   const start = useCallback(() => {
@@ -135,7 +134,7 @@ export function useAnimationFrame(
   }, [start, stop]);
 
   useEffect(() => {
-    if (!isActive || typeof window === 'undefined') {
+    if (!isActive || typeof window === "undefined") {
       cancelFrame();
       return;
     }

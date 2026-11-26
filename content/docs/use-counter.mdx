@@ -14,11 +14,11 @@ The `useCounter` hook manages a numeric state with optional `min` and `max` boun
 ## Usage
 
 ```tsx
-import { useCounter } from "@/hooks/useCounter"
+import { useCounter } from "@/hooks/useCounter";
 ```
 
 ```tsx
-const { count, inc, dec, reset } = useCounter(0, { min: 0, max: 10 })
+const { count, inc, dec, reset } = useCounter(0, { min: 0, max: 10 });
 ```
 
 ## Examples
@@ -28,7 +28,7 @@ const { count, inc, dec, reset } = useCounter(0, { min: 0, max: 10 })
 Pass `min` and `max` options to clamp the counter so it never exceeds the allowed range.
 
 ```tsx
-const { count, inc, dec, reset } = useCounter(1, { min: 1, max: 5 })
+const { count, inc, dec, reset } = useCounter(1, { min: 1, max: 5 });
 
 return (
   <div>
@@ -41,7 +41,7 @@ return (
     </button>
     <button onClick={reset}>Reset</button>
   </div>
-)
+);
 ```
 
 ### Custom Step Sizes and Direct Assignment
@@ -49,7 +49,7 @@ return (
 Pass a custom delta to `inc` or `dec`, or call `set` with a number or updater function.
 
 ```tsx
-const { count, inc, dec, set } = useCounter(0, { min: 0, max: 100 })
+const { count, inc, dec, set } = useCounter(0, { min: 0, max: 100 });
 
 return (
   <div>
@@ -58,7 +58,7 @@ return (
     <button onClick={() => inc(10)}>+10</button>
     <button onClick={() => set(50)}>Set to 50</button>
   </div>
-)
+);
 ```
 
 ## API Reference

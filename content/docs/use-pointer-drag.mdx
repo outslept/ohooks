@@ -14,12 +14,12 @@ The `usePointerDrag` hook tracks pointer drag gestures on a target element using
 ## Usage
 
 ```tsx
-import { usePointerDrag } from "@/hooks/usePointerDrag"
+import { usePointerDrag } from "@/hooks/usePointerDrag";
 ```
 
 ```tsx
-const boxRef = useRef<HTMLDivElement>(null)
-const { isDragging, deltaX, deltaY } = usePointerDrag(boxRef)
+const boxRef = useRef<HTMLDivElement>(null);
+const { isDragging, deltaX, deltaY } = usePointerDrag(boxRef);
 ```
 
 ## Examples
@@ -29,20 +29,20 @@ const { isDragging, deltaX, deltaY } = usePointerDrag(boxRef)
 Translate an element by `deltaX` and `deltaY` while dragging and accumulate the final offset in `onDragEnd`.
 
 ```tsx
-const boxRef = useRef<HTMLDivElement>(null)
-const [offset, setOffset] = useState({ x: 0, y: 0 })
+const boxRef = useRef<HTMLDivElement>(null);
+const [offset, setOffset] = useState({ x: 0, y: 0 });
 
 const { isDragging, deltaX, deltaY } = usePointerDrag(boxRef, {
   onDragEnd: (state) => {
     setOffset((prev) => ({
       x: prev.x + state.deltaX,
       y: prev.y + state.deltaY,
-    }))
+    }));
   },
-})
+});
 
-const x = offset.x + (isDragging ? deltaX : 0)
-const y = offset.y + (isDragging ? deltaY : 0)
+const x = offset.x + (isDragging ? deltaX : 0);
+const y = offset.y + (isDragging ? deltaY : 0);
 
 return (
   <div
@@ -54,7 +54,7 @@ return (
   >
     Drag me
   </div>
-)
+);
 ```
 
 ## API Reference

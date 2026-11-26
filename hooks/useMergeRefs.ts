@@ -1,22 +1,13 @@
-import {
-  type Ref,
-  type RefCallback,
-  type RefObject,
-  useCallback,
-  useRef,
-} from 'react';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { type Ref, type RefCallback, type RefObject, useCallback, useRef } from "react";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 export type PossibleRef<T> = Ref<T> | undefined | null;
 
-export function assignRef<T>(
-  ref: PossibleRef<T>,
-  value: T | null,
-): (() => void) | void {
-  if (typeof ref === 'function') {
+export function assignRef<T>(ref: PossibleRef<T>, value: T | null): (() => void) | void {
+  if (typeof ref === "function") {
     return ref(value);
   }
-  if (ref !== null && ref !== undefined && typeof ref === 'object') {
+  if (ref !== null && ref !== undefined && typeof ref === "object") {
     (ref as RefObject<T | null>).current = value;
   }
 }
@@ -25,9 +16,9 @@ function attachRefWithCleanup<T>(
   ref: PossibleRef<T>,
   node: T,
 ): { cleanup: () => void; hasExplicitCleanup: boolean } {
-  if (typeof ref === 'function') {
+  if (typeof ref === "function") {
     const result = ref(node);
-    if (typeof result === 'function') {
+    if (typeof result === "function") {
       return { cleanup: result, hasExplicitCleanup: true };
     }
     return {
@@ -38,7 +29,7 @@ function attachRefWithCleanup<T>(
     };
   }
 
-  if (ref !== null && ref !== undefined && typeof ref === 'object') {
+  if (ref !== null && ref !== undefined && typeof ref === "object") {
     (ref as RefObject<T | null>).current = node;
     return {
       cleanup: () => {
@@ -51,9 +42,7 @@ function attachRefWithCleanup<T>(
   return { cleanup: () => {}, hasExplicitCleanup: false };
 }
 
-export function mergeRefs<T>(
-  ...refs: ReadonlyArray<PossibleRef<T>>
-): RefCallback<T> {
+export function mergeRefs<T>(...refs: ReadonlyArray<PossibleRef<T>>): RefCallback<T> {
   return (node: T | null) => {
     if (node === null) {
       for (const ref of refs) {
@@ -96,9 +85,7 @@ export function mergeRefs<T>(
  * // <div ref={mergedRef} />
  * ```
  */
-export function useMergeRefs<T>(
-  ...refs: ReadonlyArray<PossibleRef<T>>
-): RefCallback<T> {
+export function useMergeRefs<T>(...refs: ReadonlyArray<PossibleRef<T>>): RefCallback<T> {
   const refsRef = useRef<ReadonlyArray<PossibleRef<T>>>(refs);
   const currentNodeRef = useRef<T | null>(null);
   const activeCleanupsRef = useRef<Map<PossibleRef<T>, () => void>>(new Map());

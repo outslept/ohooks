@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useHydrated } from './useHydrated';
+import { useEffect, useState } from "react";
+import { useHydrated } from "./useHydrated";
 
 /** Configuration options for `useSpinDelay`. */
 export interface SpinDelayOptions {
@@ -11,7 +11,7 @@ export interface SpinDelayOptions {
   ssr?: boolean;
 }
 
-type SpinState = 'IDLE' | 'DELAY' | 'DISPLAY' | 'EXPIRE';
+type SpinState = "IDLE" | "DELAY" | "DISPLAY" | "EXPIRE";
 
 /**
  * Prevents loading indicator flashes by delaying appearance and enforcing a minimum display duration.
@@ -26,10 +26,7 @@ type SpinState = 'IDLE' | 'DELAY' | 'DISPLAY' | 'EXPIRE';
  * const showSpinner = useSpinDelay(isFetching, { delay: 400, minDuration: 200 });
  * ```
  */
-export function useSpinDelay(
-  loading: boolean,
-  options: SpinDelayOptions = {}
-): boolean {
+export function useSpinDelay(loading: boolean, options: SpinDelayOptions = {}): boolean {
   const { delay = 500, minDuration = 200, ssr = true } = options;
   const isHydrated = useHydrated();
 
@@ -38,41 +35,41 @@ export function useSpinDelay(
 
   const [state, setState] = useState<SpinState>(() => {
     if (!loading) {
-      return 'IDLE';
+      return "IDLE";
     }
     if (ssr || safeDelay === 0) {
-      return 'DISPLAY';
+      return "DISPLAY";
     }
-    return 'DELAY';
+    return "DELAY";
   });
 
-  if (loading && state === 'IDLE') {
-    setState(safeDelay === 0 ? 'DISPLAY' : 'DELAY');
-  } else if (loading && state === 'DELAY' && safeDelay === 0) {
-    setState('DISPLAY');
-  } else if (!loading && state === 'DELAY') {
-    setState('IDLE');
-  } else if (!loading && state === 'DISPLAY') {
-    setState(safeMinDuration === 0 ? 'IDLE' : 'EXPIRE');
-  } else if (!loading && state === 'EXPIRE' && safeMinDuration === 0) {
-    setState('IDLE');
-  } else if (loading && state === 'EXPIRE') {
-    setState('DISPLAY');
+  if (loading && state === "IDLE") {
+    setState(safeDelay === 0 ? "DISPLAY" : "DELAY");
+  } else if (loading && state === "DELAY" && safeDelay === 0) {
+    setState("DISPLAY");
+  } else if (!loading && state === "DELAY") {
+    setState("IDLE");
+  } else if (!loading && state === "DISPLAY") {
+    setState(safeMinDuration === 0 ? "IDLE" : "EXPIRE");
+  } else if (!loading && state === "EXPIRE" && safeMinDuration === 0) {
+    setState("IDLE");
+  } else if (loading && state === "EXPIRE") {
+    setState("DISPLAY");
   }
 
   useEffect(() => {
-    if (state === 'DELAY') {
+    if (state === "DELAY") {
       const id = setTimeout(() => {
-        setState('DISPLAY');
+        setState("DISPLAY");
       }, safeDelay);
       return () => {
         clearTimeout(id);
       };
     }
 
-    if (state === 'EXPIRE') {
+    if (state === "EXPIRE") {
       const id = setTimeout(() => {
-        setState('IDLE');
+        setState("IDLE");
       }, safeMinDuration);
       return () => {
         clearTimeout(id);
@@ -86,7 +83,7 @@ export function useSpinDelay(
     return loading;
   }
 
-  return state === 'DISPLAY' || state === 'EXPIRE';
+  return state === "DISPLAY" || state === "EXPIRE";
 }
 
 export default useSpinDelay;

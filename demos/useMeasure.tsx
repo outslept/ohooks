@@ -1,49 +1,48 @@
-"use client"
+"use client";
 
-import { useCallback, useRef, useState } from "react"
-import { cn } from "cn"
-import { Maximize2 } from "lucide-react"
-import { useMeasure } from "@/hooks/useMeasure"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useCallback, useRef, useState } from "react";
+import { cn } from "cn";
+import { Maximize2 } from "lucide-react";
+import { useMeasure } from "@/hooks/useMeasure";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const PRESETS = [
   { w: 196, h: 80 },
   { w: 232, h: 96 },
   { w: 268, h: 112 },
-] as const
+] as const;
 
 const MODES = [
   { id: "content-box", label: "content" },
   { id: "border-box", label: "border" },
   { id: "off", label: "off" },
-] as const
+] as const;
 
-type ModeId = (typeof MODES)[number]["id"]
+type ModeId = (typeof MODES)[number]["id"];
 
 export default function UseMeasureDemo() {
-  const [mode, setMode] = useState<ModeId>("content-box")
-  const [presetIndex, setPresetIndex] = useState(1)
-  const nodeRef = useRef<HTMLDivElement | null>(null)
-  const readoutRef = useRef<HTMLDivElement>(null)
+  const [mode, setMode] = useState<ModeId>("content-box");
+  const [presetIndex, setPresetIndex] = useState(1);
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+  const readoutRef = useRef<HTMLDivElement>(null);
 
-  const isEnabled = mode !== "off"
-  const boxOption: ResizeObserverBoxOptions =
-    mode === "border-box" ? "border-box" : "content-box"
+  const isEnabled = mode !== "off";
+  const boxOption: ResizeObserverBoxOptions = mode === "border-box" ? "border-box" : "content-box";
 
   const [measureRef, rect] = useMeasure<HTMLDivElement>({
     box: boxOption,
     enabled: isEnabled,
-  })
+  });
 
   const attachRef = useCallback(
     (node: HTMLDivElement | null) => {
-      nodeRef.current = node
-      measureRef(node)
+      nodeRef.current = node;
+      measureRef(node);
     },
-    [measureRef]
-  )
+    [measureRef],
+  );
 
   const pulseReadout = () => {
     if (
@@ -55,43 +54,41 @@ export default function UseMeasureDemo() {
           { transform: "scale3d(0.97, 0.97, 1)", opacity: 0.75 },
           { transform: "scale3d(1, 1, 1)", opacity: 1 },
         ],
-        { duration: 180, easing: "cubic-bezier(0.23, 1, 0.32, 1)" }
-      )
+        { duration: 180, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+      );
     }
-  }
+  };
 
   const cyclePreset = () => {
-    const nextIndex = (presetIndex + 1) % PRESETS.length
-    const nextPreset = PRESETS[nextIndex]
-    setPresetIndex(nextIndex)
+    const nextIndex = (presetIndex + 1) % PRESETS.length;
+    const nextPreset = PRESETS[nextIndex];
+    setPresetIndex(nextIndex);
 
     if (nodeRef.current) {
-      nodeRef.current.style.width = `${nextPreset.w}px`
-      nodeRef.current.style.height = `${nextPreset.h}px`
+      nodeRef.current.style.width = `${nextPreset.w}px`;
+      nodeRef.current.style.height = `${nextPreset.h}px`;
     }
-    pulseReadout()
-  }
+    pulseReadout();
+  };
 
   const selectMode = (nextMode: ModeId) => {
-    setMode(nextMode)
-    pulseReadout()
-  }
+    setMode(nextMode);
+    pulseReadout();
+  };
 
-  const currentPreset = PRESETS[presetIndex]
+  const currentPreset = PRESETS[presetIndex];
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
-
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="Measurement box model"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {MODES.map((item) => {
-              const isSelected = mode === item.id
+              const isSelected = mode === item.id;
               return (
                 <button
                   key={item.id}
@@ -101,16 +98,15 @@ export default function UseMeasureDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs transition-all",
                     isSelected
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {item.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
-
 
         <div className="flex min-h-32 w-full items-center justify-center overflow-hidden rounded-md border border-border-subtle bg-subtle/35 p-2">
           <div
@@ -137,8 +133,8 @@ export default function UseMeasureDemo() {
                 {Math.round(rect.width)} × {Math.round(rect.height)} px
               </Badge>
               <span className="font-mono text-2xs text-muted-foreground tabular-nums">
-                ({Math.round(rect.left)}, {Math.round(rect.top)}) → (
-                {Math.round(rect.right)}, {Math.round(rect.bottom)})
+                ({Math.round(rect.left)}, {Math.round(rect.top)}) → ({Math.round(rect.right)},{" "}
+                {Math.round(rect.bottom)})
               </span>
             </div>
           </div>
@@ -157,5 +153,5 @@ export default function UseMeasureDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

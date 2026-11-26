@@ -14,11 +14,11 @@ The `useNetworkInformation` hook subscribes to `online`/`offline` events and the
 ## Usage
 
 ```tsx
-import { useNetworkInformation } from "@/hooks/useNetworkInformation"
+import { useNetworkInformation } from "@/hooks/useNetworkInformation";
 ```
 
 ```tsx
-const { isOnline, effectiveType, saveData } = useNetworkInformation()
+const { isOnline, effectiveType, saveData } = useNetworkInformation();
 ```
 
 ## Examples
@@ -28,20 +28,14 @@ const { isOnline, effectiveType, saveData } = useNetworkInformation()
 Serve lower-resolution images or disable autoplay video when the user is on a slow connection (`2g` / `slow-2g`) or has Data Saver enabled.
 
 ```tsx
-const { isOnline, effectiveType, saveData } = useNetworkInformation()
-const isLowBandwidth =
-  saveData || effectiveType === "slow-2g" || effectiveType === "2g"
+const { isOnline, effectiveType, saveData } = useNetworkInformation();
+const isLowBandwidth = saveData || effectiveType === "slow-2g" || effectiveType === "2g";
 
 if (!isOnline) {
-  return <p>You are currently offline.</p>
+  return <p>You are currently offline.</p>;
 }
 
-return (
-  <img
-    src={isLowBandwidth ? "/hero-low.jpg" : "/hero-hd.jpg"}
-    alt="Hero banner"
-  />
-)
+return <img src={isLowBandwidth ? "/hero-low.jpg" : "/hero-hd.jpg"} alt="Hero banner" />;
 ```
 
 ### Displaying Connection Diagnostics
@@ -49,7 +43,7 @@ return (
 Read `downlink` (Mbps) and `rtt` (round-trip time in ms) when `isSupported` is `true`.
 
 ```tsx
-const { isSupported, effectiveType, downlink, rtt } = useNetworkInformation()
+const { isSupported, effectiveType, downlink, rtt } = useNetworkInformation();
 
 return (
   <div>
@@ -61,7 +55,7 @@ return (
       <p>Network Information API not supported in this browser.</p>
     )}
   </div>
-)
+);
 ```
 
 ## API Reference
@@ -70,7 +64,4 @@ return (
 
 Network connectivity and quality metrics returned by the hook.
 
-<AutoTypeTable
-  path="./hooks/useNetworkInformation.ts"
-  name="NetworkInformationState"
-/>
+<AutoTypeTable path="./hooks/useNetworkInformation.ts" name="NetworkInformationState" />

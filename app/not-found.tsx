@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { ArrowLeft, BookOpen, Terminal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import Link from "next/link";
+import { ArrowLeft, BookOpen, Terminal } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
@@ -11,8 +11,8 @@ export default function NotFound() {
         </h1>
 
         <p className="mt-2.5 text-ui leading-relaxed text-muted-foreground">
-          The hook or documentation page you are looking for doesn&apos;t exist,
-          was renamed, or has been moved.
+          The hook or documentation page you are looking for doesn&apos;t exist, was renamed, or has
+          been moved.
         </p>
 
         <div className="mt-6 w-full overflow-hidden rounded-lg border border-default bg-code text-left font-mono text-xs shadow-2xs">
@@ -35,19 +35,11 @@ export default function NotFound() {
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
-          <Button
-            variant="primary"
-            leadingIcon={<ArrowLeft />}
-            render={<Link href="/" />}
-          >
+          <Button variant="primary" leadingIcon={<ArrowLeft />} render={<Link href="/" />}>
             Back to Docs
           </Button>
 
-          <Button
-            variant="secondary"
-            leadingIcon={<BookOpen />}
-            render={<Link href="/llms.txt" />}
-          >
+          <Button variant="secondary" leadingIcon={<BookOpen />} render={<Link href="/llms.txt" />}>
             llms.txt
           </Button>
         </div>

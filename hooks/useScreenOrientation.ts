@@ -1,4 +1,4 @@
-import { useCallback, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useRef, useSyncExternalStore } from "react";
 
 /** Reactive snapshot of the screen's orientation. */
 export interface ScreenOrientationState {
@@ -19,7 +19,7 @@ export interface UseScreenOrientationReturn extends ScreenOrientationState {
 }
 
 const SERVER_SNAPSHOT: ScreenOrientationState = Object.freeze({
-  type: 'portrait-primary',
+  type: "portrait-primary",
   angle: 0,
   isSupported: false,
 });
@@ -29,7 +29,7 @@ function getServerSnapshot(): ScreenOrientationState {
 }
 
 function readOrientationState(): ScreenOrientationState {
-  if (typeof window === 'undefined' || typeof screen === 'undefined') {
+  if (typeof window === "undefined" || typeof screen === "undefined") {
     return SERVER_SNAPSHOT;
   }
 
@@ -43,35 +43,35 @@ function readOrientationState(): ScreenOrientationState {
   }
 
   const isLandscape =
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(orientation: landscape)').matches;
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(orientation: landscape)").matches;
 
   return {
-    type: isLandscape ? 'landscape-primary' : 'portrait-primary',
+    type: isLandscape ? "landscape-primary" : "portrait-primary",
     angle: isLandscape ? 90 : 0,
     isSupported: false,
   };
 }
 
 function subscribe(onStoreChange: () => void): () => void {
-  if (typeof window === 'undefined' || typeof screen === 'undefined') {
+  if (typeof window === "undefined" || typeof screen === "undefined") {
     return () => {};
   }
 
   const orientation = screen.orientation;
-  if (orientation && typeof orientation.addEventListener === 'function') {
-    orientation.addEventListener('change', onStoreChange);
+  if (orientation && typeof orientation.addEventListener === "function") {
+    orientation.addEventListener("change", onStoreChange);
     return () => {
-      orientation.removeEventListener('change', onStoreChange);
+      orientation.removeEventListener("change", onStoreChange);
     };
   }
 
-  window.addEventListener('orientationchange', onStoreChange);
-  window.addEventListener('resize', onStoreChange);
+  window.addEventListener("orientationchange", onStoreChange);
+  window.addEventListener("resize", onStoreChange);
 
   return () => {
-    window.removeEventListener('orientationchange', onStoreChange);
-    window.removeEventListener('resize', onStoreChange);
+    window.removeEventListener("orientationchange", onStoreChange);
+    window.removeEventListener("resize", onStoreChange);
   };
 }
 
@@ -87,8 +87,7 @@ function subscribe(onStoreChange: () => void): () => void {
  * ```
  */
 export function useScreenOrientation(): UseScreenOrientationReturn {
-  const cacheRef: { current: ScreenOrientationState } =
-    useRef(SERVER_SNAPSHOT);
+  const cacheRef: { current: ScreenOrientationState } = useRef(SERVER_SNAPSHOT);
 
   const getSnapshot = useCallback((): ScreenOrientationState => {
     const next = readOrientationState();
@@ -108,15 +107,15 @@ export function useScreenOrientation(): UseScreenOrientationReturn {
 
   const lock = useCallback(async (orientation: string): Promise<void> => {
     if (
-      typeof screen === 'undefined' ||
+      typeof screen === "undefined" ||
       !screen.orientation ||
       typeof (
         screen.orientation as ScreenOrientation & {
           lock?: (o: string) => Promise<void>;
         }
-      ).lock !== 'function'
+      ).lock !== "function"
     ) {
-      throw new Error('Screen Orientation lock API is not supported.');
+      throw new Error("Screen Orientation lock API is not supported.");
     }
     await (
       screen.orientation as ScreenOrientation & {
@@ -127,9 +126,9 @@ export function useScreenOrientation(): UseScreenOrientationReturn {
 
   const unlock = useCallback((): void => {
     if (
-      typeof screen !== 'undefined' &&
+      typeof screen !== "undefined" &&
       screen.orientation &&
-      typeof screen.orientation.unlock === 'function'
+      typeof screen.orientation.unlock === "function"
     ) {
       screen.orientation.unlock();
     }

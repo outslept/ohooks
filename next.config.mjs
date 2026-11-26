@@ -1,6 +1,6 @@
-import { createMDX } from 'fumadocs-mdx/next';
-import pierreDark from '@pierre/theme/pierre-dark-vibrant';
-import pierreLight from '@pierre/theme/pierre-light-vibrant';
+import { createMDX } from "fumadocs-mdx/next";
+import pierreDark from "@pierre/theme/pierre-dark-vibrant";
+import pierreLight from "@pierre/theme/pierre-light-vibrant";
 
 const withMDX = createMDX({
   mdxOptions: {

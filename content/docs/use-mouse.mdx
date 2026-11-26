@@ -14,11 +14,11 @@ The `useMouse` hook listens to `mousemove` and `dragover` events (throttled via 
 ## Usage
 
 ```tsx
-import { useMouse } from "@/hooks/useMouse"
+import { useMouse } from "@/hooks/useMouse";
 ```
 
 ```tsx
-const { x, y, elementX, elementY } = useMouse(boxRef)
+const { x, y, elementX, elementY } = useMouse(boxRef);
 ```
 
 ## Examples
@@ -28,8 +28,8 @@ const { x, y, elementX, elementY } = useMouse(boxRef)
 Pass a target element ref to compute `elementX` and `elementY` relative to that element's top-left corner.
 
 ```tsx
-const cardRef = useRef<HTMLDivElement>(null)
-const { elementX, elementY } = useMouse(cardRef)
+const cardRef = useRef<HTMLDivElement>(null);
+const { elementX, elementY } = useMouse(cardRef);
 
 return (
   <div
@@ -41,7 +41,7 @@ return (
   >
     Move cursor inside card ({Math.round(elementX)}, {Math.round(elementY)})
   </div>
-)
+);
 ```
 
 ### Global Viewport Cursor Tracking
@@ -49,13 +49,13 @@ return (
 Call `useMouse()` without arguments to track global document and viewport coordinates.
 
 ```tsx
-const { clientX, clientY } = useMouse()
+const { clientX, clientY } = useMouse();
 
 return (
   <p>
     Viewport cursor: {clientX}, {clientY}
   </p>
-)
+);
 ```
 
 ## API Reference

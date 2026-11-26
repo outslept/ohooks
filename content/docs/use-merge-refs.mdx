@@ -14,11 +14,11 @@ The `useMergeRefs` hook merges any number of `RefObject`s and callback refs into
 ## Usage
 
 ```tsx
-import { useMergeRefs } from "@/hooks/useMergeRefs"
+import { useMergeRefs } from "@/hooks/useMergeRefs";
 ```
 
 ```tsx
-const mergedRef = useMergeRefs(localRef, forwardedRef)
+const mergedRef = useMergeRefs(localRef, forwardedRef);
 ```
 
 ## Examples
@@ -29,18 +29,18 @@ Merge an internal `useRef` with a consumer-supplied `ref` prop so both reference
 
 ```tsx
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  ref?: React.Ref<HTMLButtonElement>
+  ref?: React.Ref<HTMLButtonElement>;
 }
 
 export function CustomButton({ ref, children, ...props }: ButtonProps) {
-  const internalRef = useRef<HTMLButtonElement>(null)
-  const mergedRef = useMergeRefs(internalRef, ref)
+  const internalRef = useRef<HTMLButtonElement>(null);
+  const mergedRef = useMergeRefs(internalRef, ref);
 
   return (
     <button ref={mergedRef} {...props}>
       {children}
     </button>
-  )
+  );
 }
 ```
 
@@ -49,9 +49,9 @@ export function CustomButton({ ref, children, ...props }: ButtonProps) {
 Attach multiple ref-based hooks (such as `useMeasure` and `useFocus`) to the same element.
 
 ```tsx
-const focusRef = useRef<HTMLDivElement>(null)
-const [measureRef, { width }] = useMeasure<HTMLDivElement>()
-const combinedRef = useMergeRefs(focusRef, measureRef)
+const focusRef = useRef<HTMLDivElement>(null);
+const [measureRef, { width }] = useMeasure<HTMLDivElement>();
+const combinedRef = useMergeRefs(focusRef, measureRef);
 
-return <div ref={combinedRef}>Measured width: {width}px</div>
+return <div ref={combinedRef}>Measured width: {width}px</div>;
 ```

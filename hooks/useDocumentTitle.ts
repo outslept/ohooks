@@ -1,6 +1,6 @@
-import { useRef } from 'react';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { useUnmount } from './useUnmount';
+import { useRef } from "react";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
+import { useUnmount } from "./useUnmount";
 
 export interface UseDocumentTitleOptions {
   /** Restore the previous `document.title` when the component unmounts (default: `false`) */
@@ -19,15 +19,12 @@ export interface UseDocumentTitleOptions {
  * useDocumentTitle(`Inbox (${unreadCount})`, { restoreOnUnmount: true });
  * ```
  */
-export function useDocumentTitle(
-  title: string,
-  options: UseDocumentTitleOptions = {},
-): void {
+export function useDocumentTitle(title: string, options: UseDocumentTitleOptions = {}): void {
   const { restoreOnUnmount = false } = options;
   const originalTitleRef = useRef<string | null>(null);
 
   useIsomorphicLayoutEffect(() => {
-    if (typeof document === 'undefined') {
+    if (typeof document === "undefined") {
       return;
     }
 
@@ -41,11 +38,7 @@ export function useDocumentTitle(
   }, [title]);
 
   useUnmount(() => {
-    if (
-      restoreOnUnmount &&
-      typeof document !== 'undefined' &&
-      originalTitleRef.current !== null
-    ) {
+    if (restoreOnUnmount && typeof document !== "undefined" && originalTitleRef.current !== null) {
       document.title = originalTitleRef.current;
     }
   });

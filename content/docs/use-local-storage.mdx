@@ -14,11 +14,11 @@ The `useLocalStorage` hook synchronizes React state with `window.localStorage` u
 ## Usage
 
 ```tsx
-import { useLocalStorage } from "@/hooks/useLocalStorage"
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 ```
 
 ```tsx
-const [theme, setTheme, removeTheme] = useLocalStorage("theme", "light")
+const [theme, setTheme, removeTheme] = useLocalStorage("theme", "light");
 ```
 
 ## Examples
@@ -29,14 +29,14 @@ Objects and arrays are serialized with `JSON.stringify` and parsed with `JSON.pa
 
 ```tsx
 interface UserSettings {
-  sidebarCollapsed: boolean
-  pageSize: number
+  sidebarCollapsed: boolean;
+  pageSize: number;
 }
 
-const [settings, setSettings, resetSettings] = useLocalStorage<UserSettings>(
-  "user-settings",
-  { sidebarCollapsed: false, pageSize: 20 }
-)
+const [settings, setSettings, resetSettings] = useLocalStorage<UserSettings>("user-settings", {
+  sidebarCollapsed: false,
+  pageSize: 20,
+});
 
 return (
   <div>
@@ -52,7 +52,7 @@ return (
     </button>
     <button onClick={resetSettings}>Reset to defaults</button>
   </div>
-)
+);
 ```
 
 ### Custom Serializer and Error Handling
@@ -64,7 +64,7 @@ const [tags, setTags] = useLocalStorage<Set<string>>("saved-tags", new Set(), {
   serializer: (set) => JSON.stringify(Array.from(set)),
   deserializer: (raw) => new Set(JSON.parse(raw)),
   onError: (err) => console.error("Storage error:", err),
-})
+});
 ```
 
 ## API Reference

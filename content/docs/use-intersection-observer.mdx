@@ -14,12 +14,12 @@ The `useIntersectionObserver` hook wraps the browser `IntersectionObserver` API 
 ## Usage
 
 ```tsx
-import { useIntersectionObserver } from "@/hooks/useIntersectionObserver"
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 ```
 
 ```tsx
-const entry = useIntersectionObserver(sectionRef, { threshold: 0.5 })
-const isVisible = Boolean(entry?.isIntersecting)
+const entry = useIntersectionObserver(sectionRef, { threshold: 0.5 });
+const isVisible = Boolean(entry?.isIntersecting);
 ```
 
 ## Examples
@@ -29,13 +29,13 @@ const isVisible = Boolean(entry?.isIntersecting)
 Enable `freezeOnceVisible: true` to disconnect the observer as soon as the element becomes visible for the first time.
 
 ```tsx
-const cardRef = useRef<HTMLDivElement>(null)
+const cardRef = useRef<HTMLDivElement>(null);
 const entry = useIntersectionObserver(cardRef, {
   threshold: 0.25,
   freezeOnceVisible: true,
-})
+});
 
-const isVisible = Boolean(entry?.isIntersecting)
+const isVisible = Boolean(entry?.isIntersecting);
 
 return (
   <div
@@ -47,7 +47,7 @@ return (
   >
     Revealed once scrolled into view
   </div>
-)
+);
 ```
 
 ### Reacting via `onChange` Callback
@@ -55,18 +55,18 @@ return (
 Use the `onChange` option to trigger side effects (such as analytics impression tracking) without needing an extra `useEffect`.
 
 ```tsx
-const bannerRef = useRef<HTMLDivElement>(null)
+const bannerRef = useRef<HTMLDivElement>(null);
 
 useIntersectionObserver(bannerRef, {
   threshold: 0.8,
   onChange: (entry) => {
     if (entry.isIntersecting) {
-      trackBannerImpression()
+      trackBannerImpression();
     }
   },
-})
+});
 
-return <div ref={bannerRef}>Promotional banner</div>
+return <div ref={bannerRef}>Promotional banner</div>;
 ```
 
 ## API Reference
@@ -75,7 +75,4 @@ return <div ref={bannerRef}>Promotional banner</div>
 
 Configuration options for `IntersectionObserver` thresholds, root container, and lifecycle callbacks.
 
-<AutoTypeTable
-  path="./hooks/useIntersectionObserver.ts"
-  name="UseIntersectionObserverOptions"
-/>
+<AutoTypeTable path="./hooks/useIntersectionObserver.ts" name="UseIntersectionObserverOptions" />

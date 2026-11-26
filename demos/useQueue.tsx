@@ -1,59 +1,50 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react"
-import { cn } from "cn"
-import { ArrowRight, Play, Plus, RotateCcw, Trash2 } from "lucide-react"
+import { useRef, useState } from "react";
+import { cn } from "cn";
+import { ArrowRight, Play, Plus, RotateCcw, Trash2 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useQueue } from "@/hooks/useQueue"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useQueue } from "@/hooks/useQueue";
 
-const INITIAL_JOBS = ["#101", "#102", "#103"] as const
-const BATCH_OPTIONS = [1, 2] as const
+const INITIAL_JOBS = ["#101", "#102", "#103"] as const;
+const BATCH_OPTIONS = [1, 2] as const;
 
 export default function UseQueueDemo() {
-  const {
-    queue,
-    size,
-    first,
-    last,
-    isEmpty,
-    enqueue,
-    dequeue,
-    clear,
-    reset,
-  } = useQueue<string>(INITIAL_JOBS)
+  const { queue, size, first, last, isEmpty, enqueue, dequeue, clear, reset } =
+    useQueue<string>(INITIAL_JOBS);
 
-  const [batchSize, setBatchSize] = useState<(typeof BATCH_OPTIONS)[number]>(1)
-  const [lastDequeued, setLastDequeued] = useState<string | null>(null)
-  const nextIdRef = useRef(104)
+  const [batchSize, setBatchSize] = useState<(typeof BATCH_OPTIONS)[number]>(1);
+  const [lastDequeued, setLastDequeued] = useState<string | null>(null);
+  const nextIdRef = useRef(104);
 
   const handleEnqueue = () => {
-    const items: string[] = []
+    const items: string[] = [];
     for (let i = 0; i < batchSize; i += 1) {
-      items.push(`#${nextIdRef.current++}`)
+      items.push(`#${nextIdRef.current++}`);
     }
-    enqueue(...items)
-  }
+    enqueue(...items);
+  };
 
   const handleDequeue = () => {
-    const removed = dequeue()
+    const removed = dequeue();
     if (removed !== undefined) {
-      setLastDequeued(removed)
+      setLastDequeued(removed);
     }
-  }
+  };
 
   const handleReset = () => {
-    nextIdRef.current = 104
-    setLastDequeued(null)
-    reset()
-  }
+    nextIdRef.current = 104;
+    setLastDequeued(null);
+    reset();
+  };
 
   const handleClear = () => {
-    setLastDequeued(null)
-    clear()
-  }
+    setLastDequeued(null);
+    clear();
+  };
 
   return (
     <Card className="w-full max-w-80">
@@ -65,7 +56,7 @@ export default function UseQueueDemo() {
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {BATCH_OPTIONS.map((count) => {
-              const active = batchSize === count
+              const active = batchSize === count;
               return (
                 <button
                   key={count}
@@ -75,12 +66,12 @@ export default function UseQueueDemo() {
                     "rounded-[3px] px-2 py-0.5 font-mono text-2xs font-medium tabular-nums transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   +{count}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -117,10 +108,7 @@ export default function UseQueueDemo() {
               size: <strong className="text-foreground">{size}</strong>
             </span>
             <span>
-              last out:{" "}
-              <strong className="text-foreground">
-                {lastDequeued ?? "—"}
-              </strong>
+              last out: <strong className="text-foreground">{lastDequeued ?? "—"}</strong>
             </span>
           </div>
         </div>
@@ -183,5 +171,5 @@ export default function UseQueueDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

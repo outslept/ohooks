@@ -1,16 +1,16 @@
-import { useSwipe, type UseSwipeOptions } from '@/hooks/useSwipe';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useSwipe, type UseSwipeOptions } from "@/hooks/useSwipe";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useSwipe', () => {
+describe("useSwipe", () => {
   afterEach(() => {
-    document.body.innerHTML = '';
+    document.body.innerHTML = "";
   });
 
-  it('detects all 4 directions, respects threshold, and invokes lifecycle callbacks', async () => {
-    const area = document.createElement('div');
+  it("detects all 4 directions, respects threshold, and invokes lifecycle callbacks", async () => {
+    const area = document.createElement("div");
     document.body.appendChild(area);
 
     const onSwipeStart = vi.fn();
@@ -35,10 +35,9 @@ describe('useSwipe', () => {
       }),
     );
 
-
     await act(async () => {
       area.dispatchEvent(
-        new PointerEvent('pointerdown', {
+        new PointerEvent("pointerdown", {
           pointerId: 1,
           clientX: 200,
           clientY: 100,
@@ -46,7 +45,7 @@ describe('useSwipe', () => {
       );
 
       area.dispatchEvent(
-        new PointerEvent('pointerdown', {
+        new PointerEvent("pointerdown", {
           pointerId: 99,
           clientX: 0,
           clientY: 0,
@@ -54,7 +53,7 @@ describe('useSwipe', () => {
       );
 
       window.dispatchEvent(
-        new PointerEvent('pointermove', {
+        new PointerEvent("pointermove", {
           pointerId: 1,
           clientX: 190,
           clientY: 100,
@@ -64,11 +63,11 @@ describe('useSwipe', () => {
 
     expect(onSwipeStart).toHaveBeenCalledTimes(1);
     expect(result.current.isSwiping).toBe(true);
-    expect(result.current.direction).toBe('none');
+    expect(result.current.direction).toBe("none");
     expect(onSwipe).not.toHaveBeenCalled();
 
     await act(async () => {
-      const moveEvent = new PointerEvent('pointermove', {
+      const moveEvent = new PointerEvent("pointermove", {
         pointerId: 1,
         clientX: 120,
         clientY: 105,
@@ -78,66 +77,62 @@ describe('useSwipe', () => {
       expect(moveEvent.defaultPrevented).toBe(true);
     });
 
-    expect(result.current.direction).toBe('left');
+    expect(result.current.direction).toBe("left");
     expect(result.current.lengthX).toBe(80);
     expect(onSwipe).toHaveBeenCalledTimes(1);
 
-
     await act(async () => {
-      window.dispatchEvent(new PointerEvent('pointerup', { pointerId: 99 }));
+      window.dispatchEvent(new PointerEvent("pointerup", { pointerId: 99 }));
     });
     expect(result.current.isSwiping).toBe(true);
 
     await act(async () => {
-      window.dispatchEvent(new PointerEvent('pointerup', { pointerId: 1 }));
+      window.dispatchEvent(new PointerEvent("pointerup", { pointerId: 1 }));
     });
     expect(result.current.isSwiping).toBe(false);
     expect(onSwipeLeft).toHaveBeenCalledTimes(1);
     expect(onSwipeEnd).toHaveBeenCalledTimes(1);
 
-
     await act(async () => {
       area.dispatchEvent(
-        new PointerEvent('pointerdown', { pointerId: 2, clientX: 50, clientY: 50 }),
+        new PointerEvent("pointerdown", { pointerId: 2, clientX: 50, clientY: 50 }),
       );
       window.dispatchEvent(
-        new PointerEvent('pointermove', { pointerId: 2, clientX: 110, clientY: 55 }),
+        new PointerEvent("pointermove", { pointerId: 2, clientX: 110, clientY: 55 }),
       );
-      window.dispatchEvent(new PointerEvent('pointerup', { pointerId: 2 }));
+      window.dispatchEvent(new PointerEvent("pointerup", { pointerId: 2 }));
     });
-    expect(result.current.direction).toBe('right');
+    expect(result.current.direction).toBe("right");
     expect(onSwipeRight).toHaveBeenCalledTimes(1);
 
-
     await act(async () => {
       area.dispatchEvent(
-        new PointerEvent('pointerdown', { pointerId: 3, clientX: 50, clientY: 150 }),
+        new PointerEvent("pointerdown", { pointerId: 3, clientX: 50, clientY: 150 }),
       );
       window.dispatchEvent(
-        new PointerEvent('pointermove', { pointerId: 3, clientX: 55, clientY: 80 }),
+        new PointerEvent("pointermove", { pointerId: 3, clientX: 55, clientY: 80 }),
       );
-      window.dispatchEvent(new PointerEvent('pointercancel', { pointerId: 3 }));
+      window.dispatchEvent(new PointerEvent("pointercancel", { pointerId: 3 }));
     });
-    expect(result.current.direction).toBe('up');
+    expect(result.current.direction).toBe("up");
     expect(result.current.isSwiping).toBe(false);
     expect(onSwipeUp).toHaveBeenCalledTimes(1);
 
-
     await act(async () => {
       area.dispatchEvent(
-        new PointerEvent('pointerdown', { pointerId: 4, clientX: 100, clientY: 50 }),
+        new PointerEvent("pointerdown", { pointerId: 4, clientX: 100, clientY: 50 }),
       );
       window.dispatchEvent(
-        new PointerEvent('pointermove', { pointerId: 4, clientX: 105, clientY: 130 }),
+        new PointerEvent("pointermove", { pointerId: 4, clientX: 105, clientY: 130 }),
       );
-      window.dispatchEvent(new PointerEvent('pointerup', { pointerId: 4 }));
+      window.dispatchEvent(new PointerEvent("pointerup", { pointerId: 4 }));
     });
-    expect(result.current.direction).toBe('down');
+    expect(result.current.direction).toBe("down");
     expect(onSwipeDown).toHaveBeenCalledTimes(1);
   });
 
-  it('does not attach listeners when enabled is false and cleans up on unmount', async () => {
-    const area = document.createElement('div');
+  it("does not attach listeners when enabled is false and cleans up on unmount", async () => {
+    const area = document.createElement("div");
     document.body.appendChild(area);
     const onSwipeStart = vi.fn();
 
@@ -147,7 +142,7 @@ describe('useSwipe', () => {
     );
 
     await act(async () => {
-      area.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 1 }));
+      area.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1 }));
     });
     expect(onSwipeStart).not.toHaveBeenCalled();
 
@@ -155,7 +150,7 @@ describe('useSwipe', () => {
     await unmount();
 
     await act(async () => {
-      area.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 1 }));
+      area.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1 }));
     });
     expect(onSwipeStart).not.toHaveBeenCalled();
   });

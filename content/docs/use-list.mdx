@@ -14,11 +14,11 @@ The `useList` hook manages an array state and returns a tuple of `[list, actions
 ## Usage
 
 ```tsx
-import { useList } from "@/hooks/useList"
+import { useList } from "@/hooks/useList";
 ```
 
 ```tsx
-const [items, { push, removeAt, clear }] = useList<string>(["a", "b"])
+const [items, { push, removeAt, clear }] = useList<string>(["a", "b"]);
 ```
 
 ## Examples
@@ -31,7 +31,7 @@ Use `push`, `updateAt`, `removeAt`, and `clear` to manipulate list items without
 const [todos, { push, updateAt, removeAt, clear }] = useList([
   { text: "Write docs", done: false },
   { text: "Ship release", done: false },
-])
+]);
 
 return (
   <div>
@@ -42,9 +42,7 @@ return (
             <input
               type="checkbox"
               checked={todo.done}
-              onChange={() =>
-                updateAt(index, { ...todo, done: !todo.done })
-              }
+              onChange={() => updateAt(index, { ...todo, done: !todo.done })}
             />
             {todo.text}
           </label>
@@ -52,12 +50,10 @@ return (
         </li>
       ))}
     </ul>
-    <button onClick={() => push({ text: "New task", done: false })}>
-      Add task
-    </button>
+    <button onClick={() => push({ text: "New task", done: false })}>Add task</button>
     <button onClick={clear}>Clear all</button>
   </div>
-)
+);
 ```
 
 ### Sorting, Filtering, and Resetting
@@ -65,7 +61,7 @@ return (
 Use `filter`, `sort`, and `reset` to transform the list or revert it back to `initialValue`.
 
 ```tsx
-const [numbers, { filter, sort, reset }] = useList([5, 2, 8, 1, 9])
+const [numbers, { filter, sort, reset }] = useList([5, 2, 8, 1, 9]);
 
 return (
   <div>
@@ -74,7 +70,7 @@ return (
     <button onClick={() => filter((n) => n >= 5)}>Keep ≥ 5</button>
     <button onClick={reset}>Reset</button>
   </div>
-)
+);
 ```
 
 ## API Reference

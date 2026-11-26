@@ -4,12 +4,7 @@ import path from "node:path";
 import dynamic from "next/dynamic";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { HookPreviewFrame } from "@/components/hook-preview-frame";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface HookPreviewProps {
   name: string;
@@ -50,9 +45,7 @@ export async function HookPreview({ name }: HookPreviewProps) {
       </TabsList>
 
       <TabsContent value="Preview">
-        <HookPreviewFrame>
-          {React.createElement(getDemoComponent(name))}
-        </HookPreviewFrame>
+        <HookPreviewFrame>{React.createElement(getDemoComponent(name))}</HookPreviewFrame>
       </TabsContent>
 
       <TabsContent value="Code">

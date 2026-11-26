@@ -1,50 +1,42 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { useVisualViewport } from "@/hooks/useVisualViewport"
+import { useEffect, useRef, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useVisualViewport } from "@/hooks/useVisualViewport";
 
 export default function UseVisualViewportDemo() {
-  const {
-    width,
-    height,
-    scale,
-    offsetLeft,
-    offsetTop,
-    pageTop,
-  } = useVisualViewport()
+  const { width, height, scale, offsetLeft, offsetTop, pageTop } = useVisualViewport();
 
-  const [isActive, setIsActive] = useState(false)
-  const isFirstRender = useRef(true)
+  const [isActive, setIsActive] = useState(false);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
+      isFirstRender.current = false;
+      return;
     }
-    setIsActive(true)
-    const id = window.setTimeout(() => setIsActive(false), 160)
-    return () => window.clearTimeout(id)
-  }, [width, height, scale, offsetLeft, offsetTop, pageTop])
+    setIsActive(true);
+    const id = window.setTimeout(() => setIsActive(false), 160);
+    return () => window.clearTimeout(id);
+  }, [width, height, scale, offsetLeft, offsetTop, pageTop]);
 
-  const scaleX = width > 0 ? Math.min(1, Math.max(0.35, width / 1920)) : 0.75
-  const scaleY = height > 0 ? Math.min(1, Math.max(0.4, height / 1080)) : 0.75
-  const shiftX = Math.max(-16, Math.min(16, offsetLeft * 0.08))
-  const shiftY = Math.max(-12, Math.min(12, offsetTop * 0.08))
+  const scaleX = width > 0 ? Math.min(1, Math.max(0.35, width / 1920)) : 0.75;
+  const scaleY = height > 0 ? Math.min(1, Math.max(0.4, height / 1080)) : 0.75;
+  const shiftX = Math.max(-16, Math.min(16, offsetLeft * 0.08));
+  const shiftY = Math.max(-12, Math.min(12, offsetTop * 0.08));
 
-  const roundedW = Math.round(width)
-  const roundedH = Math.round(height)
-  const roundedOffsetX = Math.round(offsetLeft)
-  const roundedOffsetY = Math.round(offsetTop)
-  const roundedPageTop = Math.round(pageTop)
+  const roundedW = Math.round(width);
+  const roundedH = Math.round(height);
+  const roundedOffsetX = Math.round(offsetLeft);
+  const roundedOffsetY = Math.round(offsetTop);
+  const roundedPageTop = Math.round(pageTop);
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <Badge
             variant={isActive ? "accent" : "code"}
             size="compact"
@@ -86,13 +78,9 @@ export default function UseVisualViewportDemo() {
               transform: isActive ? "scale(1.02)" : "scale(1)",
             }}
           >
-            <span className="text-xl font-semibold tracking-tight text-foreground">
-              {roundedW}
-            </span>
+            <span className="text-xl font-semibold tracking-tight text-foreground">{roundedW}</span>
             <span className="text-xs text-muted-foreground">×</span>
-            <span className="text-xl font-semibold tracking-tight text-foreground">
-              {roundedH}
-            </span>
+            <span className="text-xl font-semibold tracking-tight text-foreground">{roundedH}</span>
             <span className="ml-0.5 text-2xs text-muted-foreground">px</span>
           </div>
         </div>
@@ -124,5 +112,5 @@ export default function UseVisualViewportDemo() {
         </div>
       </div>
     </Card>
-  )
+  );
 }

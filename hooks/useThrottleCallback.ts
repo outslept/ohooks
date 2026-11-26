@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { useLatest } from './useLatest';
+import { useEffect, useMemo, useRef } from "react";
+import { useLatest } from "./useLatest";
 
 /** Configuration options for `useThrottleCallback` and `useThrottleValue`. */
 export interface ThrottleOptions {
@@ -44,13 +44,12 @@ function getNow(): number {
 export function useThrottleCallback<T extends (...args: never[]) => unknown>(
   fn: T,
   wait: number,
-  options: ThrottleOptions = {}
+  options: ThrottleOptions = {},
 ): ThrottledFunction<T> {
   const { leading = true, trailing = true } = options;
 
   const fnRef = useLatest(fn);
-  const timerIdRef: { current: ReturnType<typeof setTimeout> | null } =
-    useRef(null);
+  const timerIdRef: { current: ReturnType<typeof setTimeout> | null } = useRef(null);
   const lastArgsRef: { current: Parameters<T> | null } = useRef(null);
   const lastInvokeTimeRef: { current: number } = useRef(0);
   const resultRef: { current: ReturnType<T> | undefined } = useRef(undefined);

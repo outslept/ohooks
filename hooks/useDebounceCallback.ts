@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { useLatest } from './useLatest';
+import { useEffect, useMemo, useRef } from "react";
+import { useLatest } from "./useLatest";
 
 export interface DebounceOptions {
   /** Invoke the callback on the leading edge of the timeout (default: `false`) */
@@ -44,13 +44,12 @@ function getNow(): number {
 export function useDebounceCallback<T extends (...args: never[]) => unknown>(
   fn: T,
   delay: number,
-  options: DebounceOptions = {}
+  options: DebounceOptions = {},
 ): DebouncedFunction<T> {
   const { leading = false, trailing = true, maxWait } = options;
 
   const fnRef = useLatest(fn);
-  const timerIdRef: { current: ReturnType<typeof setTimeout> | null } =
-    useRef(null);
+  const timerIdRef: { current: ReturnType<typeof setTimeout> | null } = useRef(null);
   const lastArgsRef: { current: Parameters<T> | null } = useRef(null);
   const lastCallTimeRef: { current: number | null } = useRef(null);
   const lastInvokeTimeRef: { current: number } = useRef(0);
@@ -59,9 +58,7 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
   const debounced = useMemo<DebouncedFunction<T>>(() => {
     const safeDelay = Math.max(0, delay);
     const hasMaxWait = maxWait !== undefined;
-    const safeMaxWait = hasMaxWait
-      ? Math.max(safeDelay, maxWait)
-      : undefined;
+    const safeMaxWait = hasMaxWait ? Math.max(safeDelay, maxWait) : undefined;
 
     const invokeFunc = (time: number): ReturnType<T> | undefined => {
       const args = lastArgsRef.current;
@@ -73,16 +70,12 @@ export function useDebounceCallback<T extends (...args: never[]) => unknown>(
       return resultRef.current;
     };
 
-    const startTimer = (
-      pendingFunc: () => void,
-      wait: number
-    ): ReturnType<typeof setTimeout> => {
+    const startTimer = (pendingFunc: () => void, wait: number): ReturnType<typeof setTimeout> => {
       return setTimeout(pendingFunc, wait);
     };
 
     const remainingWait = (time: number): number => {
-      const timeSinceLastCall =
-        time - (lastCallTimeRef.current ?? time);
+      const timeSinceLastCall = time - (lastCallTimeRef.current ?? time);
       const timeSinceLastInvoke = time - lastInvokeTimeRef.current;
       const timeWaiting = safeDelay - timeSinceLastCall;
 

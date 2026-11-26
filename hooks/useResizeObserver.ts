@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 /** Configuration options for `useResizeObserver`. */
 export interface UseResizeObserverOptions extends ResizeObserverOptions {
@@ -30,17 +28,13 @@ export interface UseResizeObserverOptions extends ResizeObserverOptions {
 export function useResizeObserver<T extends Element = HTMLElement>(
   target: EventListenerTarget<T>,
   callback: (entry: ResizeObserverEntry, observer: ResizeObserver) => void,
-  options: UseResizeObserverOptions = {}
+  options: UseResizeObserverOptions = {},
 ): void {
-  const { box = 'content-box', enabled = true } = options;
+  const { box = "content-box", enabled = true } = options;
   const callbackRef = useLatest(callback);
 
   useEffect(() => {
-    if (
-      !enabled ||
-      typeof window === 'undefined' ||
-      typeof ResizeObserver === 'undefined'
-    ) {
+    if (!enabled || typeof window === "undefined" || typeof ResizeObserver === "undefined") {
       return;
     }
 

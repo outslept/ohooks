@@ -14,11 +14,11 @@ The `useDevicePixelRatio` hook tracks `window.devicePixelRatio` using `useSyncEx
 ## Usage
 
 ```tsx
-import { useDevicePixelRatio } from "@/hooks/useDevicePixelRatio"
+import { useDevicePixelRatio } from "@/hooks/useDevicePixelRatio";
 ```
 
 ```tsx
-const dpr = useDevicePixelRatio({ defaultValue: 1 })
+const dpr = useDevicePixelRatio({ defaultValue: 1 });
 ```
 
 ## Examples
@@ -28,17 +28,11 @@ const dpr = useDevicePixelRatio({ defaultValue: 1 })
 Multiply the canvas backing store dimensions by `dpr` so drawings stay crisp on high-DPI screens.
 
 ```tsx
-const dpr = useDevicePixelRatio()
-const width = 300
-const height = 150
+const dpr = useDevicePixelRatio();
+const width = 300;
+const height = 150;
 
-return (
-  <canvas
-    width={width * dpr}
-    height={height * dpr}
-    style={{ width, height }}
-  />
-)
+return <canvas width={width * dpr} height={height * dpr} style={{ width, height }} />;
 ```
 
 ### Selecting High-Resolution Assets
@@ -46,10 +40,10 @@ return (
 Use `dpr` to pick appropriately scaled image URLs or icons based on the active screen density.
 
 ```tsx
-const dpr = useDevicePixelRatio({ defaultValue: 1 })
-const suffix = dpr >= 2 ? "@2x" : ""
+const dpr = useDevicePixelRatio({ defaultValue: 1 });
+const suffix = dpr >= 2 ? "@2x" : "";
 
-return <img src={`/images/logo${suffix}.png`} alt="Logo" />
+return <img src={`/images/logo${suffix}.png`} alt="Logo" />;
 ```
 
 ## API Reference
@@ -58,7 +52,4 @@ return <img src={`/images/logo${suffix}.png`} alt="Logo" />
 
 Configuration options for `useDevicePixelRatio`.
 
-<AutoTypeTable
-  path="./hooks/useDevicePixelRatio.ts"
-  name="UseDevicePixelRatioOptions"
-/>
+<AutoTypeTable path="./hooks/useDevicePixelRatio.ts" name="UseDevicePixelRatioOptions" />

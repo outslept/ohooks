@@ -1,9 +1,7 @@
-import { useEffect, useRef } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect, useRef } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 export interface UseFocusTrapOptions {
   /** Whether the focus trap is currently active (default: `true`) */
@@ -17,31 +15,27 @@ export interface UseFocusTrapOptions {
 }
 
 const FOCUSABLE_SELECTOR = [
-  'a[href]',
-  'area[href]',
+  "a[href]",
+  "area[href]",
   'input:not([disabled]):not([type="hidden"])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  'button:not([disabled])',
-  'iframe',
-  'object',
-  'embed',
-  '[contenteditable]',
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  "button:not([disabled])",
+  "iframe",
+  "object",
+  "embed",
+  "[contenteditable]",
   '[tabindex]:not([tabindex="-1"])',
-].join(',');
+].join(",");
 
 function getFocusableElements(container: HTMLElement): HTMLElement[] {
-  const nodes = Array.from(
-    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-  );
+  const nodes = Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
   return nodes.filter(
     (el) =>
-      !el.hasAttribute('disabled') &&
-      el.getAttribute('aria-hidden') !== 'true' &&
-      !el.hasAttribute('inert') &&
-      (el.offsetWidth > 0 ||
-        el.offsetHeight > 0 ||
-        el.getClientRects().length > 0)
+      !el.hasAttribute("disabled") &&
+      el.getAttribute("aria-hidden") !== "true" &&
+      !el.hasAttribute("inert") &&
+      (el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0),
   );
 }
 
@@ -62,22 +56,16 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
  */
 export function useFocusTrap(
   target: EventListenerTarget<HTMLElement>,
-  options: UseFocusTrapOptions = {}
+  options: UseFocusTrapOptions = {},
 ): void {
-  const {
-    enabled = true,
-    initialFocus,
-    restoreFocus = true,
-    onEscape,
-  } = options;
+  const { enabled = true, initialFocus, restoreFocus = true, onEscape } = options;
 
   const onEscapeRef = useLatest(onEscape);
   const initialFocusRef = useLatest(initialFocus);
-  const previousActiveElementRef: { current: HTMLElement | null } =
-    useRef(null);
+  const previousActiveElementRef: { current: HTMLElement | null } = useRef(null);
 
   useEffect(() => {
-    if (!enabled || typeof document === 'undefined') {
+    if (!enabled || typeof document === "undefined") {
       return;
     }
 
@@ -87,16 +75,13 @@ export function useFocusTrap(
     }
 
     previousActiveElementRef.current =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const focusInitialElement = () => {
       const configuredInitial = initialFocusRef.current;
       if (configuredInitial) {
-        if (typeof configuredInitial === 'string') {
-          const found =
-            container.querySelector<HTMLElement>(configuredInitial);
+        if (typeof configuredInitial === "string") {
+          const found = container.querySelector<HTMLElement>(configuredInitial);
           if (found) {
             found.focus();
             return;
@@ -114,8 +99,8 @@ export function useFocusTrap(
       if (focusable.length > 0) {
         focusable[0]?.focus();
       } else {
-        if (!container.hasAttribute('tabindex')) {
-          container.setAttribute('tabindex', '-1');
+        if (!container.hasAttribute("tabindex")) {
+          container.setAttribute("tabindex", "-1");
         }
         container.focus();
       }
@@ -124,12 +109,12 @@ export function useFocusTrap(
     focusInitialElement();
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onEscapeRef.current?.(event);
         return;
       }
 
-      if (event.key !== 'Tab') {
+      if (event.key !== "Tab") {
         return;
       }
 
@@ -153,27 +138,22 @@ export function useFocusTrap(
           lastElement.focus();
         }
       } else {
-        if (
-          activeElement === lastElement ||
-          !activeElement ||
-          !container.contains(activeElement)
-        ) {
+        if (activeElement === lastElement || !activeElement || !container.contains(activeElement)) {
           event.preventDefault();
           firstElement.focus();
         }
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
 
       if (restoreFocus && previousActiveElementRef.current) {
         try {
           previousActiveElementRef.current.focus();
-        } catch {
-        }
+        } catch {}
       }
     };
   }, [target, enabled, restoreFocus, initialFocusRef, onEscapeRef]);

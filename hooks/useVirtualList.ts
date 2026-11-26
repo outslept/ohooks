@@ -1,9 +1,7 @@
-import { CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 /** Metadata for a single visible item in a virtualized list. */
 export interface VirtualItem<T> {
@@ -78,7 +76,7 @@ function findStartIndex(offsets: readonly number[], scrollTop: number): number {
  */
 export function useVirtualList<T>(
   items: readonly T[],
-  options: UseVirtualListOptions
+  options: UseVirtualListOptions,
 ): UseVirtualListReturn<T> {
   const { containerTarget, itemHeight, overscan = 5 } = options;
   const [scrollTop, setScrollTop] = useState<number>(0);
@@ -86,7 +84,7 @@ export function useVirtualList<T>(
   const itemHeightRef = useLatest(itemHeight);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
     const container = resolveTargetElement(containerTarget);
@@ -119,9 +117,9 @@ export function useVirtualList<T>(
       }
     };
 
-    container.addEventListener('scroll', handleScroll, { passive: true });
+    container.addEventListener("scroll", handleScroll, { passive: true });
     let resizeObserver: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== 'undefined') {
+    if (typeof ResizeObserver !== "undefined") {
       resizeObserver = new ResizeObserver(() => {
         const nextViewportHeight = container.clientHeight;
         if (nextViewportHeight !== lastViewportHeight) {
@@ -131,15 +129,15 @@ export function useVirtualList<T>(
       });
       resizeObserver.observe(container);
     } else {
-      window.addEventListener('resize', syncMetrics);
+      window.addEventListener("resize", syncMetrics);
     }
 
     return () => {
-      container.removeEventListener('scroll', handleScroll);
+      container.removeEventListener("scroll", handleScroll);
       if (resizeObserver) {
         resizeObserver.disconnect();
       } else {
-        window.removeEventListener('resize', syncMetrics);
+        window.removeEventListener("resize", syncMetrics);
       }
     };
   }, [containerTarget]);
@@ -151,10 +149,7 @@ export function useVirtualList<T>(
     let runningTotal = 0;
     for (let i = 0; i < count; i += 1) {
       itemOffsets[i] = runningTotal;
-      const h =
-        typeof itemHeight === 'function'
-          ? itemHeight(i)
-          : itemHeight;
+      const h = typeof itemHeight === "function" ? itemHeight(i) : itemHeight;
       const safeHeight = Math.max(0, h);
       itemHeights[i] = safeHeight;
       runningTotal += safeHeight;
@@ -174,10 +169,7 @@ export function useVirtualList<T>(
     const rawStartIndex = findStartIndex(offsets, scrollTop);
     const visibleEndScroll = scrollTop + Math.max(viewportHeight, 1);
     let rawEndIndex = rawStartIndex;
-    while (
-      rawEndIndex < count - 1 &&
-      (offsets[rawEndIndex] ?? 0) < visibleEndScroll
-    ) {
+    while (rawEndIndex < count - 1 && (offsets[rawEndIndex] ?? 0) < visibleEndScroll) {
       rawEndIndex += 1;
     }
     const startIndex = Math.max(0, rawStartIndex - overscan);
@@ -195,7 +187,7 @@ export function useVirtualList<T>(
   }, [items, offsets, heights, scrollTop, viewportHeight, overscan]);
 
   const scrollToIndex = useCallback(
-    (index: number, behavior: ScrollBehavior = 'auto') => {
+    (index: number, behavior: ScrollBehavior = "auto") => {
       const container = resolveTargetElement(containerTarget);
       if (!container || items.length === 0) {
         return;
@@ -203,7 +195,7 @@ export function useVirtualList<T>(
       const clampedIndex = Math.max(0, Math.min(index, items.length - 1));
       let targetTop = 0;
       const currentItemHeight = itemHeightRef.current;
-      if (typeof currentItemHeight === 'number') {
+      if (typeof currentItemHeight === "number") {
         targetTop = clampedIndex * currentItemHeight;
       } else {
         for (let i = 0; i < clampedIndex; i += 1) {
@@ -215,18 +207,18 @@ export function useVirtualList<T>(
         behavior,
       });
     },
-    [containerTarget, items.length, itemHeightRef]
+    [containerTarget, items.length, itemHeightRef],
   );
 
   const wrapperProps = useMemo(
     () => ({
       style: {
-        position: 'relative' as const,
-        width: '100%',
+        position: "relative" as const,
+        width: "100%",
         height: `${totalHeight}px`,
       },
     }),
-    [totalHeight]
+    [totalHeight],
   );
 
   return {

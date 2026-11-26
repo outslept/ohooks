@@ -14,13 +14,13 @@ The `useEventListener` hook attaches a strongly typed event listener to `window`
 ## Usage
 
 ```tsx
-import { useEventListener } from "@/hooks/useEventListener"
+import { useEventListener } from "@/hooks/useEventListener";
 ```
 
 ```tsx
 useEventListener("keydown", (event) => {
-  if (event.key === "Escape") close()
-})
+  if (event.key === "Escape") close();
+});
 ```
 
 ## Examples
@@ -30,17 +30,17 @@ useEventListener("keydown", (event) => {
 Pass a `RefObject` as the third argument to scope the event listener to that element with full event type inference.
 
 ```tsx
-const buttonRef = useRef<HTMLButtonElement>(null)
+const buttonRef = useRef<HTMLButtonElement>(null);
 
 useEventListener(
   "click",
   (event) => {
-    console.log("Clicked at:", event.clientX, event.clientY)
+    console.log("Clicked at:", event.clientX, event.clientY);
   },
-  buttonRef
-)
+  buttonRef,
+);
 
-return <button ref={buttonRef}>Click me</button>
+return <button ref={buttonRef}>Click me</button>;
 ```
 
 ### Passive Scroll Listener with Options
@@ -51,9 +51,9 @@ Pass standard `AddEventListenerOptions` (`passive`, `capture`, `once`, or `signa
 useEventListener(
   "scroll",
   () => {
-    updateScrollProgress(window.scrollY)
+    updateScrollProgress(window.scrollY);
   },
   undefined,
-  { passive: true }
-)
+  { passive: true },
+);
 ```

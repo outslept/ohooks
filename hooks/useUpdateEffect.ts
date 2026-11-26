@@ -15,10 +15,7 @@ import { useFirstMountState } from "./useFirstMountState";
  * }, [content]);
  * ```
  */
-export function useUpdateEffect(
-  effect: EffectCallback,
-  deps?: DependencyList
-): void {
+export function useUpdateEffect(effect: EffectCallback, deps?: DependencyList): void {
   const isFirstMount = useFirstMountState();
 
   useEffect(() => {
@@ -28,6 +25,6 @@ export function useUpdateEffect(
 
     return effect();
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, deps);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+}

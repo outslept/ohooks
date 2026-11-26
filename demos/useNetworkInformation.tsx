@@ -1,22 +1,19 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { cn } from "cn"
-import { DatabaseZap } from "lucide-react"
-import {
-  useNetworkInformation,
-  type EffectiveConnectionType,
-} from "@/hooks/useNetworkInformation"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useEffect, useRef, useState } from "react";
+import { cn } from "cn";
+import { DatabaseZap } from "lucide-react";
+import { useNetworkInformation, type EffectiveConnectionType } from "@/hooks/useNetworkInformation";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 interface ProfilePreset {
-  id: "system" | EffectiveConnectionType
-  label: string
-  effectiveType?: EffectiveConnectionType
-  downlink?: number
-  rtt?: number
+  id: "system" | EffectiveConnectionType;
+  label: string;
+  effectiveType?: EffectiveConnectionType;
+  downlink?: number;
+  rtt?: number;
 }
 
 const PROFILES: readonly ProfilePreset[] = [
@@ -30,91 +27,73 @@ const PROFILES: readonly ProfilePreset[] = [
     downlink: 0.4,
     rtt: 1200,
   },
-]
+];
 
-type ProfileId = (typeof PROFILES)[number]["id"]
+type ProfileId = (typeof PROFILES)[number]["id"];
 
-function syncNavigatorConnection(
-  profileId: ProfileId,
-  saveDataOverride: boolean | null
-) {
-  if (typeof window === "undefined") return
+function syncNavigatorConnection(profileId: ProfileId, saveDataOverride: boolean | null) {
+  if (typeof window === "undefined") return;
 
-  delete (window.navigator as { connection?: unknown }).connection
+  delete (window.navigator as { connection?: unknown }).connection;
   const nativeConn = (
     window.navigator as Navigator & {
       connection?: {
-        downlink?: number
-        downlinkMax?: number
-        effectiveType?: EffectiveConnectionType
-        rtt?: number
-        saveData?: boolean
-        type?: string
-      }
+        downlink?: number;
+        downlinkMax?: number;
+        effectiveType?: EffectiveConnectionType;
+        rtt?: number;
+        saveData?: boolean;
+        type?: string;
+      };
     }
-  ).connection
+  ).connection;
 
   if (profileId === "system" && saveDataOverride === null) {
-    window.dispatchEvent(
-      new Event(window.navigator.onLine ? "online" : "offline")
-    )
-    return
+    window.dispatchEvent(new Event(window.navigator.onLine ? "online" : "offline"));
+    return;
   }
 
-  const preset = PROFILES.find((item) => item.id === profileId)
-  const mockTarget = new EventTarget()
+  const preset = PROFILES.find((item) => item.id === profileId);
+  const mockTarget = new EventTarget();
 
   Object.assign(mockTarget, {
     effectiveType:
-      profileId === "system"
-        ? (nativeConn?.effectiveType ?? "4g")
-        : preset?.effectiveType,
-    downlink:
-      profileId === "system"
-        ? (nativeConn?.downlink ?? 10)
-        : preset?.downlink,
+      profileId === "system" ? (nativeConn?.effectiveType ?? "4g") : preset?.effectiveType,
+    downlink: profileId === "system" ? (nativeConn?.downlink ?? 10) : preset?.downlink,
     downlinkMax: nativeConn?.downlinkMax,
     rtt: profileId === "system" ? (nativeConn?.rtt ?? 50) : preset?.rtt,
-    saveData:
-      saveDataOverride !== null
-        ? saveDataOverride
-        : Boolean(nativeConn?.saveData),
+    saveData: saveDataOverride !== null ? saveDataOverride : Boolean(nativeConn?.saveData),
     type: nativeConn?.type ?? "wifi",
-  })
+  });
 
   Object.defineProperty(window.navigator, "connection", {
     value: mockTarget,
     configurable: true,
-  })
+  });
 
-  window.dispatchEvent(
-    new Event(window.navigator.onLine ? "online" : "offline")
-  )
+  window.dispatchEvent(new Event(window.navigator.onLine ? "online" : "offline"));
 }
 
 export default function UseNetworkInformationDemo() {
-  const { isOnline, isSupported, effectiveType, downlink, rtt, saveData } =
-    useNetworkInformation()
-  const [profile, setProfile] = useState<ProfileId>("system")
-  const [saveDataOverride, setSaveDataOverride] = useState<boolean | null>(null)
-  const frameRef = useRef<HTMLDivElement>(null)
-  const isFirstRender = useRef(true)
+  const { isOnline, isSupported, effectiveType, downlink, rtt, saveData } = useNetworkInformation();
+  const [profile, setProfile] = useState<ProfileId>("system");
+  const [saveDataOverride, setSaveDataOverride] = useState<boolean | null>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     return () => {
       if (typeof window !== "undefined") {
-        delete (window.navigator as { connection?: unknown }).connection
-        window.dispatchEvent(
-          new Event(window.navigator.onLine ? "online" : "offline")
-        )
+        delete (window.navigator as { connection?: unknown }).connection;
+        window.dispatchEvent(new Event(window.navigator.onLine ? "online" : "offline"));
       }
-    }
-  }, [])
+    };
+  }, []);
 
   useEffect(() => {
     if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
+      isFirstRender.current = false;
+      return;
     }
 
     if (
@@ -126,39 +105,37 @@ export default function UseNetworkInformationDemo() {
           { transform: "scale3d(0.97, 0.97, 1)", opacity: 0.75 },
           { transform: "scale3d(1, 1, 1)", opacity: 1 },
         ],
-        { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" }
-      )
+        { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+      );
     }
-  }, [effectiveType, downlink, rtt, saveData, isOnline])
+  }, [effectiveType, downlink, rtt, saveData, isOnline]);
 
   const handleSelectProfile = (nextProfile: ProfileId) => {
-    const nextSaveData = nextProfile === "system" ? null : saveDataOverride
-    setProfile(nextProfile)
-    setSaveDataOverride(nextSaveData)
-    syncNavigatorConnection(nextProfile, nextSaveData)
-  }
+    const nextSaveData = nextProfile === "system" ? null : saveDataOverride;
+    setProfile(nextProfile);
+    setSaveDataOverride(nextSaveData);
+    syncNavigatorConnection(nextProfile, nextSaveData);
+  };
 
   const handleToggleSaveData = () => {
-    const nextSaveData = !saveData
-    const nextProfile = profile === "system" && !isSupported ? "4g" : profile
-    setProfile(nextProfile)
-    setSaveDataOverride(nextSaveData)
-    syncNavigatorConnection(nextProfile, nextSaveData)
-  }
+    const nextSaveData = !saveData;
+    const nextProfile = profile === "system" && !isSupported ? "4g" : profile;
+    setProfile(nextProfile);
+    setSaveDataOverride(nextSaveData);
+    syncNavigatorConnection(nextProfile, nextSaveData);
+  };
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
-
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="Network profile"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {PROFILES.map((item) => {
-              const isSelected = profile === item.id
+              const isSelected = profile === item.id;
               return (
                 <button
                   key={item.id}
@@ -168,16 +145,15 @@ export default function UseNetworkInformationDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs transition-all",
                     isSelected
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {item.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
-
 
         <div
           ref={frameRef}
@@ -196,7 +172,6 @@ export default function UseNetworkInformationDemo() {
         </div>
       </CardContent>
 
-
       <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
         <div className="flex flex-col gap-0.5 px-3 py-2">
           <span className="text-2xs font-medium tracking-wider text-muted-foreground uppercase">
@@ -213,7 +188,7 @@ export default function UseNetworkInformationDemo() {
           <span
             className={cn(
               "font-mono text-xs font-semibold",
-              saveData ? "text-primary" : "text-foreground"
+              saveData ? "text-primary" : "text-foreground",
             )}
           >
             {saveData !== undefined ? String(saveData) : "—"}
@@ -233,5 +208,5 @@ export default function UseNetworkInformationDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

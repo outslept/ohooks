@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 export type HotkeyCallback = (event: KeyboardEvent, combo: string) => void;
 
@@ -17,7 +15,7 @@ export interface UseHotkeysOptions {
   /** Allow hotkeys to trigger while focus is inside `<input>`, `<textarea>`, `<select>`, or `contentEditable` elements (default: `false`) */
   enableOnFormTags?: boolean;
   /** Keyboard event type to listen for (default: `'keydown'`) */
-  event?: 'keydown' | 'keyup';
+  event?: "keydown" | "keyup";
   /** Target element, document, or window to attach the listener to (default: `window`) */
   target?: EventListenerTarget<HTMLElement | Document | Window>;
 }
@@ -33,33 +31,26 @@ interface ParsedHotkey {
 }
 
 const KEY_ALIASES: Record<string, string> = {
-  esc: 'escape',
-  return: 'enter',
-  space: ' ',
-  spacebar: ' ',
-  up: 'arrowup',
-  down: 'arrowdown',
-  left: 'arrowleft',
-  right: 'arrowright',
-  del: 'delete',
-  ins: 'insert',
-  plus: '+',
+  esc: "escape",
+  return: "enter",
+  space: " ",
+  spacebar: " ",
+  up: "arrowup",
+  down: "arrowdown",
+  left: "arrowleft",
+  right: "arrowright",
+  del: "delete",
+  ins: "insert",
+  plus: "+",
 };
 
-const MODIFIER_EVENT_KEYS = new Set([
-  'control',
-  'shift',
-  'alt',
-  'meta',
-]);
+const MODIFIER_EVENT_KEYS = new Set(["control", "shift", "alt", "meta"]);
 
 function isMacPlatform(): boolean {
-  if (typeof navigator === 'undefined') {
+  if (typeof navigator === "undefined") {
     return false;
   }
-  return /Mac|iPod|iPhone|iPad/i.test(
-    navigator.platform || navigator.userAgent
-  );
+  return /Mac|iPod|iPhone|iPad/i.test(navigator.platform || navigator.userAgent);
 }
 
 function normalizeKeyName(key: string): string {
@@ -70,17 +61,17 @@ function normalizeKeyName(key: string): string {
 function tokenizeCombo(combo: string): string[] {
   const trimmed = combo.trim().toLowerCase();
   if (!trimmed) return [];
-  if (trimmed === '+') return ['+'];
+  if (trimmed === "+") return ["+"];
 
-  const hasTrailingPlusKey = trimmed.endsWith('++');
+  const hasTrailingPlusKey = trimmed.endsWith("++");
   const body = hasTrailingPlusKey ? trimmed.slice(0, -2) : trimmed;
   const tokens = body
-    .split('+')
+    .split("+")
     .map((part) => part.trim())
     .filter(Boolean);
 
   if (hasTrailingPlusKey) {
-    tokens.push('+');
+    tokens.push("+");
   }
 
   return tokens;
@@ -101,25 +92,25 @@ function parseHotkey(combo: string): ParsedHotkey {
 
   for (const token of tokens) {
     switch (token) {
-      case 'ctrl':
-      case 'control':
+      case "ctrl":
+      case "control":
         parsed.ctrl = true;
         break;
-      case 'shift':
+      case "shift":
         parsed.shift = true;
         break;
-      case 'alt':
-      case 'option':
+      case "alt":
+      case "option":
         parsed.alt = true;
         break;
-      case 'meta':
-      case 'cmd':
-      case 'command':
-      case 'win':
-      case 'super':
+      case "meta":
+      case "cmd":
+      case "command":
+      case "win":
+      case "super":
         parsed.meta = true;
         break;
-      case 'mod':
+      case "mod":
         parsed.mod = true;
         break;
       default:
@@ -138,18 +129,18 @@ function isEditableElement(target: EventTarget | null): boolean {
   const tagName = target.tagName.toLowerCase();
   return (
     target.isContentEditable ||
-    tagName === 'input' ||
-    tagName === 'textarea' ||
-    tagName === 'select'
+    tagName === "input" ||
+    tagName === "textarea" ||
+    tagName === "select"
   );
 }
 
 export function matchesHotkey(
   hotkey: string | ParsedHotkey,
   event: KeyboardEvent,
-  isMac: boolean = isMacPlatform()
+  isMac: boolean = isMacPlatform(),
 ): boolean {
-  const parsed = typeof hotkey === 'string' ? parseHotkey(hotkey) : hotkey;
+  const parsed = typeof hotkey === "string" ? parseHotkey(hotkey) : hotkey;
   const expectCtrl = parsed.ctrl || (parsed.mod && !isMac);
   const expectMeta = parsed.meta || (parsed.mod && isMac);
 
@@ -161,8 +152,7 @@ export function matchesHotkey(
   const eventKey = normalizeKeyName(event.key);
 
   if (parsed.key === null) {
-    const hasAnyModifier =
-      expectCtrl || expectMeta || parsed.shift || parsed.alt;
+    const hasAnyModifier = expectCtrl || expectMeta || parsed.shift || parsed.alt;
     return hasAnyModifier && MODIFIER_EVENT_KEYS.has(eventKey);
   }
 
@@ -196,35 +186,32 @@ export function matchesHotkey(
 export function useHotkeys(
   keys: string | readonly string[],
   callback: HotkeyCallback,
-  options: UseHotkeysOptions = {}
+  options: UseHotkeysOptions = {},
 ): void {
   const {
     enabled = true,
     preventDefault = true,
     stopPropagation = false,
     enableOnFormTags = false,
-    event: eventType = 'keydown',
+    event: eventType = "keydown",
     target,
   } = options;
 
   const callbackRef = useLatest(callback);
-  const keysString = Array.isArray(keys) ? keys.join(',') : (keys as string);
+  const keysString = Array.isArray(keys) ? keys.join(",") : (keys as string);
 
   useEffect(() => {
-    if (!enabled || typeof window === 'undefined') {
+    if (!enabled || typeof window === "undefined") {
       return;
     }
 
-    const targetNode = resolveTargetElement<HTMLElement | Document | Window>(
-      target,
-      window
-    );
+    const targetNode = resolveTargetElement<HTMLElement | Document | Window>(target, window);
     if (!targetNode) {
       return;
     }
 
     const combos = keysString
-      .split(',')
+      .split(",")
       .map((c) => c.trim())
       .filter(Boolean)
       .map(parseHotkey);

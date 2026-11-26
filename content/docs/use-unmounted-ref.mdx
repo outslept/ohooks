@@ -14,11 +14,11 @@ The `useUnmountedRef` hook returns a `Readonly<RefObject<boolean>>` whose `.curr
 ## Usage
 
 ```tsx
-import { useUnmountedRef } from "@/hooks/useUnmountedRef"
+import { useUnmountedRef } from "@/hooks/useUnmountedRef";
 ```
 
 ```tsx
-const unmountedRef = useUnmountedRef()
+const unmountedRef = useUnmountedRef();
 ```
 
 ## Examples
@@ -28,17 +28,17 @@ const unmountedRef = useUnmountedRef()
 Check `unmountedRef.current` after an `await` boundary before calling state setters or side effects.
 
 ```tsx
-const unmountedRef = useUnmountedRef()
-const [status, setStatus] = useState("idle")
+const unmountedRef = useUnmountedRef();
+const [status, setStatus] = useState("idle");
 
 const handleUpload = async () => {
-  setStatus("uploading")
-  await uploadFile()
-  if (unmountedRef.current) return
-  setStatus("done")
-}
+  setStatus("uploading");
+  await uploadFile();
+  if (unmountedRef.current) return;
+  setStatus("done");
+};
 
-return <button onClick={handleUpload}>Status: {status}</button>
+return <button onClick={handleUpload}>Status: {status}</button>;
 ```
 
 ### Stopping Polling Loops When Unmounted
@@ -46,15 +46,15 @@ return <button onClick={handleUpload}>Status: {status}</button>
 Break out of a recursive polling loop as soon as `unmountedRef.current` becomes `true`.
 
 ```tsx
-const unmountedRef = useUnmountedRef()
+const unmountedRef = useUnmountedRef();
 
 useEffect(() => {
   async function poll() {
     while (!unmountedRef.current) {
-      await fetchHealthCheck()
-      await new Promise((r) => setTimeout(r, 5000))
+      await fetchHealthCheck();
+      await new Promise((r) => setTimeout(r, 5000));
     }
   }
-  poll()
-}, [unmountedRef])
+  poll();
+}, [unmountedRef]);
 ```

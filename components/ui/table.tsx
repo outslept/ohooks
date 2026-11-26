@@ -24,20 +24,17 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
           data-size={size}
           className={cn(
             "not-prose relative w-full overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-control",
-            containerClassName
+            containerClassName,
           )}
         >
-          <ScrollArea
-            orientation="horizontal"
-            viewportClassName="scroll-fade-x w-full"
-          >
+          <ScrollArea orientation="horizontal" viewportClassName="scroll-fade-x w-full">
             <table
               ref={forwardedRef}
               data-slot="table"
               className={cn(
                 "w-full caption-bottom border-collapse text-left",
                 size === "compact" ? "text-xs" : "text-ui",
-                className
+                className,
               )}
               {...props}
             />
@@ -45,7 +42,7 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
         </div>
       </TableContext.Provider>
     );
-  }
+  },
 );
 Table.displayName = "Table";
 
@@ -56,10 +53,7 @@ const TableHeader = React.forwardRef<
   <thead
     ref={forwardedRef}
     data-slot="table-header"
-    className={cn(
-      "border-b border-border-subtle bg-muted/40 [&_tr]:border-b-0",
-      className
-    )}
+    className={cn("border-b border-border-subtle bg-muted/40 [&_tr]:border-b-0", className)}
     {...props}
   />
 ));
@@ -87,71 +81,64 @@ const TableFooter = React.forwardRef<
     data-slot="table-footer"
     className={cn(
       "border-t border-border-subtle bg-muted/30 font-medium [&>tr]:last:border-b-0",
-      className
+      className,
     )}
     {...props}
   />
 ));
 TableFooter.displayName = "TableFooter";
 
-const TableRow = React.forwardRef<
-  HTMLTableRowElement,
-  React.ComponentPropsWithoutRef<"tr">
->(({ className, ...props }, forwardedRef) => (
-  <tr
-    ref={forwardedRef}
-    data-slot="table-row"
-    className={cn(
-      "border-b border-border-subtle transition-colors duration-150 ease-out",
-      "pointer-hover:hover:bg-fluid-hover",
-      "data-[state=selected]:bg-fluid-selected",
-      className
-    )}
-    {...props}
-  />
-));
+const TableRow = React.forwardRef<HTMLTableRowElement, React.ComponentPropsWithoutRef<"tr">>(
+  ({ className, ...props }, forwardedRef) => (
+    <tr
+      ref={forwardedRef}
+      data-slot="table-row"
+      className={cn(
+        "border-b border-border-subtle transition-colors duration-150 ease-out",
+        "pointer-hover:hover:bg-fluid-hover",
+        "data-[state=selected]:bg-fluid-selected",
+        className,
+      )}
+      {...props}
+    />
+  ),
+);
 TableRow.displayName = "TableRow";
 
-const TableHead = React.forwardRef<
-  HTMLTableCellElement,
-  React.ComponentPropsWithoutRef<"th">
->(({ className, ...props }, forwardedRef) => {
-  const { size } = React.useContext(TableContext);
+const TableHead = React.forwardRef<HTMLTableCellElement, React.ComponentPropsWithoutRef<"th">>(
+  ({ className, ...props }, forwardedRef) => {
+    const { size } = React.useContext(TableContext);
 
-  return (
-    <th
-      ref={forwardedRef}
-      data-slot="table-head"
-      className={cn(
-        "align-middle font-medium whitespace-nowrap text-muted-foreground select-none",
-        size === "compact" ? "h-8 px-3 text-2xs" : "h-9 px-4 text-xs",
-        className
-      )}
-      {...props}
-    />
-  );
-});
+    return (
+      <th
+        ref={forwardedRef}
+        data-slot="table-head"
+        className={cn(
+          "align-middle font-medium whitespace-nowrap text-muted-foreground select-none",
+          size === "compact" ? "h-8 px-3 text-2xs" : "h-9 px-4 text-xs",
+          className,
+        )}
+        {...props}
+      />
+    );
+  },
+);
 TableHead.displayName = "TableHead";
 
-const TableCell = React.forwardRef<
-  HTMLTableCellElement,
-  React.ComponentPropsWithoutRef<"td">
->(({ className, ...props }, forwardedRef) => {
-  const { size } = React.useContext(TableContext);
+const TableCell = React.forwardRef<HTMLTableCellElement, React.ComponentPropsWithoutRef<"td">>(
+  ({ className, ...props }, forwardedRef) => {
+    const { size } = React.useContext(TableContext);
 
-  return (
-    <td
-      ref={forwardedRef}
-      data-slot="table-cell"
-      className={cn(
-        "align-top",
-        size === "compact" ? "px-3 py-2.5" : "px-4 py-3",
-        className
-      )}
-      {...props}
-    />
-  );
-});
+    return (
+      <td
+        ref={forwardedRef}
+        data-slot="table-cell"
+        className={cn("align-top", size === "compact" ? "px-3 py-2.5" : "px-4 py-3", className)}
+        {...props}
+      />
+    );
+  },
+);
 TableCell.displayName = "TableCell";
 
 const TableCaption = React.forwardRef<
@@ -167,13 +154,4 @@ const TableCaption = React.forwardRef<
 ));
 TableCaption.displayName = "TableCaption";
 
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableFooter,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableCaption,
-};
+export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };

@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { useRef, useState } from "react";
+import { useEventCallback } from "./useEventCallback";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 /** State and FIFO manipulation helpers returned by `useQueue`. */
 export interface UseQueueReturn<T> {
@@ -42,8 +42,7 @@ export function useQueue<T>(
   initialValue: ReadonlyArray<T> | (() => ReadonlyArray<T>) = [],
 ): UseQueueReturn<T> {
   const resolveInitial = (): T[] => {
-    const resolved =
-      typeof initialValue === 'function' ? initialValue() : initialValue;
+    const resolved = typeof initialValue === "function" ? initialValue() : initialValue;
     return [...resolved];
   };
 

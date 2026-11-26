@@ -1,4 +1,4 @@
-import { useEventListener } from './useEventListener';
+import { useEventListener } from "./useEventListener";
 
 /**
  * Prompts the user with a confirmation dialog before leaving or reloading the page.
@@ -12,26 +12,21 @@ import { useEventListener } from './useEventListener';
  * useBeforeUnload(isDirty, 'You have unsaved changes. Are you sure you want to leave?');
  * ```
  */
-export function useBeforeUnload(
-  enabled: boolean | (() => boolean) = true,
-  message?: string,
-): void {
+export function useBeforeUnload(enabled: boolean | (() => boolean) = true, message?: string): void {
   const shouldAttach = Boolean(enabled);
-  const target =
-    shouldAttach && typeof window !== 'undefined' ? window : null;
+  const target = shouldAttach && typeof window !== "undefined" ? window : null;
 
   useEventListener(
-    'beforeunload',
+    "beforeunload",
     (event: BeforeUnloadEvent) => {
-      const isEnabled =
-        typeof enabled === 'function' ? enabled() : enabled;
+      const isEnabled = typeof enabled === "function" ? enabled() : enabled;
 
       if (!isEnabled) {
         return;
       }
 
       event.preventDefault();
-      const returnValue = message ?? '';
+      const returnValue = message ?? "";
       event.returnValue = returnValue;
       return returnValue;
     },

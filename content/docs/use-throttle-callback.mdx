@@ -14,13 +14,13 @@ The `useThrottleCallback` hook returns a stable, throttled version of a callback
 ## Usage
 
 ```tsx
-import { useThrottleCallback } from "@/hooks/useThrottleCallback"
+import { useThrottleCallback } from "@/hooks/useThrottleCallback";
 ```
 
 ```tsx
 const handleScroll = useThrottleCallback((scrollY: number) => {
-  saveScrollPosition(scrollY)
-}, 200)
+  saveScrollPosition(scrollY);
+}, 200);
 ```
 
 ## Examples
@@ -32,19 +32,18 @@ Limit how frequently an expensive handler runs during continuous scroll or resiz
 ```tsx
 const logScroll = useThrottleCallback(
   (top: number) => {
-    reportScrollAnalytics(top)
+    reportScrollAnalytics(top);
   },
   500,
-  { leading: true, trailing: true }
-)
+  { leading: true, trailing: true },
+);
 
 return (
   <div
     onScroll={(e) => logScroll(e.currentTarget.scrollTop)}
     style={{ height: 200, overflowY: "auto" }}
-  >
-  </div>
-)
+  ></div>
+);
 ```
 
 ### Flushing or Cancelling a Trailing Call
@@ -53,8 +52,8 @@ Use `.flush()` to immediately run a pending trailing invocation or `.cancel()` t
 
 ```tsx
 const throttledSave = useThrottleCallback((draft: string) => {
-  api.save(draft)
-}, 1000)
+  api.save(draft);
+}, 1000);
 
 return (
   <div>
@@ -62,7 +61,7 @@ return (
     <button onClick={() => throttledSave.flush()}>Save immediately</button>
     <button onClick={() => throttledSave.cancel()}>Cancel pending</button>
   </div>
-)
+);
 ```
 
 ## API Reference

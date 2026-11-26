@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 export interface UseIntersectionObserverOptions {
   /** Ancestor element or document used as the viewport for checking visibility (default: `null`) */
@@ -36,11 +34,11 @@ export interface UseIntersectionObserverOptions {
  */
 export function useIntersectionObserver(
   target: EventListenerTarget<Element>,
-  options: UseIntersectionObserverOptions = {}
+  options: UseIntersectionObserverOptions = {},
 ): IntersectionObserverEntry | null {
   const {
     root = null,
-    rootMargin = '0px',
+    rootMargin = "0px",
     threshold = 0,
     freezeOnceVisible = false,
     enabled = true,
@@ -52,16 +50,14 @@ export function useIntersectionObserver(
   const thresholdRef = useLatest(threshold);
 
   const frozen = Boolean(entry?.isIntersecting && freezeOnceVisible);
-  const thresholdKey = Array.isArray(threshold)
-    ? threshold.join(',')
-    : String(threshold);
+  const thresholdKey = Array.isArray(threshold) ? threshold.join(",") : String(threshold);
 
   useEffect(() => {
     if (
       !enabled ||
       frozen ||
-      typeof window === 'undefined' ||
-      typeof IntersectionObserver === 'undefined'
+      typeof window === "undefined" ||
+      typeof IntersectionObserver === "undefined"
     ) {
       return;
     }
@@ -85,7 +81,7 @@ export function useIntersectionObserver(
         root: rootNode,
         rootMargin,
         threshold: thresholdRef.current,
-      }
+      },
     );
 
     observer.observe(element);
@@ -93,16 +89,7 @@ export function useIntersectionObserver(
     return () => {
       observer.disconnect();
     };
-  }, [
-    target,
-    root,
-    rootMargin,
-    thresholdKey,
-    thresholdRef,
-    frozen,
-    enabled,
-    onChangeRef,
-  ]);
+  }, [target, root, rootMargin, thresholdKey, thresholdRef, frozen, enabled, onChangeRef]);
 
   return entry;
 }

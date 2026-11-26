@@ -1,55 +1,54 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "cn"
-import { ArrowUpDown, RotateCcw } from "lucide-react"
+import { useState } from "react";
+import { cn } from "cn";
+import { ArrowUpDown, RotateCcw } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useUrlSearchParams } from "@/hooks/useUrlSearchParams"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useUrlSearchParams } from "@/hooks/useUrlSearchParams";
 
-const TAB_OPTIONS = ["hooks", "guides", "api"] as const
-const HISTORY_OPTIONS = ["replace", "push"] as const
+const TAB_OPTIONS = ["hooks", "guides", "api"] as const;
+const HISTORY_OPTIONS = ["replace", "push"] as const;
 
 export default function UseUrlSearchParamsDemo() {
-  const [modeIdx, setModeIdx] = useState(0)
-  const historyMode = HISTORY_OPTIONS[modeIdx]
+  const [modeIdx, setModeIdx] = useState(0);
+  const historyMode = HISTORY_OPTIONS[modeIdx];
 
   const [params, setParams] = useUrlSearchParams({
     historyMode,
     initialValue: { tab: "hooks", sort: "popular" },
-  })
+  });
 
-  const queryString = params.toString()
-  const currentTab = params.get("tab")
-  const currentSort = params.get("sort") ?? "popular"
-  const hasParams = queryString.length > 0
+  const queryString = params.toString();
+  const currentTab = params.get("tab");
+  const currentSort = params.get("sort") ?? "popular";
+  const hasParams = queryString.length > 0;
 
   const updateParam = (key: string, value: string) => {
     setParams((prev) => {
-      const next = new URLSearchParams(prev)
-      next.set(key, value)
-      return next
-    })
-  }
+      const next = new URLSearchParams(prev);
+      next.set(key, value);
+      return next;
+    });
+  };
 
   const toggleSort = () => {
-    updateParam("sort", currentSort === "popular" ? "recent" : "popular")
-  }
+    updateParam("sort", currentSort === "popular" ? "recent" : "popular");
+  };
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="History mode"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {HISTORY_OPTIONS.map((mode, idx) => {
-              const active = idx === modeIdx
+              const active = idx === modeIdx;
               return (
                 <button
                   key={mode}
@@ -59,12 +58,12 @@ export default function UseUrlSearchParamsDemo() {
                     "rounded-[3px] px-2 py-0.5 font-mono text-2xs font-medium transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {mode}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -85,7 +84,7 @@ export default function UseUrlSearchParamsDemo() {
 
           <div className="grid grid-cols-3 gap-1.5">
             {TAB_OPTIONS.map((tab) => {
-              const active = currentTab === tab
+              const active = currentTab === tab;
               return (
                 <button
                   key={tab}
@@ -95,12 +94,12 @@ export default function UseUrlSearchParamsDemo() {
                     "rounded-sm border py-1 font-mono text-2xs font-medium transition-all active:scale-[0.98]",
                     active
                       ? "border-primary/40 bg-primary/10 text-primary shadow-control"
-                      : "border-border-subtle bg-card/60 text-muted-foreground hover:bg-control hover:text-foreground"
+                      : "border-border-subtle bg-card/60 text-muted-foreground hover:bg-control hover:text-foreground",
                   )}
                 >
                   tab={tab}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -127,5 +126,5 @@ export default function UseUrlSearchParamsDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

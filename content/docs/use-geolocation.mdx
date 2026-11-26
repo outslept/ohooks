@@ -14,13 +14,13 @@ The `useGeolocation` hook subscribes to device position updates via `navigator.g
 ## Usage
 
 ```tsx
-import { useGeolocation } from "@/hooks/useGeolocation"
+import { useGeolocation } from "@/hooks/useGeolocation";
 ```
 
 ```tsx
 const { latitude, longitude, loading, error } = useGeolocation({
   enableHighAccuracy: true,
-})
+});
 ```
 
 ## Examples
@@ -30,16 +30,16 @@ const { latitude, longitude, loading, error } = useGeolocation({
 Render a loading indicator until the browser resolves the first position fix, and handle permission errors gracefully.
 
 ```tsx
-const { latitude, longitude, accuracy, loading, error } = useGeolocation()
+const { latitude, longitude, accuracy, loading, error } = useGeolocation();
 
-if (loading) return <p>Locating...</p>
-if (error) return <p role="alert">Error: {error.message}</p>
+if (loading) return <p>Locating...</p>;
+if (error) return <p role="alert">Error: {error.message}</p>;
 
 return (
   <p>
     Position: {latitude?.toFixed(4)}, {longitude?.toFixed(4)} (±{accuracy}m)
   </p>
-)
+);
 ```
 
 ### Conditional Location Tracking (`enabled`)
@@ -47,12 +47,12 @@ return (
 Set `enabled: false` until the user explicitly opts in so the browser does not prompt for location permission on page load.
 
 ```tsx
-const [tracking, setTracking] = useState(false)
+const [tracking, setTracking] = useState(false);
 const { latitude, longitude } = useGeolocation({
   enabled: tracking,
   enableHighAccuracy: true,
   maximumAge: 10_000,
-})
+});
 
 return (
   <div>
@@ -65,7 +65,7 @@ return (
       </p>
     )}
   </div>
-)
+);
 ```
 
 ## API Reference

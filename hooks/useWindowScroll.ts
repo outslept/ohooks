@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
-import { useEventListener } from './useEventListener';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { useThrottleCallback } from './useThrottleCallback';
+import { useRef, useState } from "react";
+import { useEventCallback } from "./useEventCallback";
+import { useEventListener } from "./useEventListener";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
+import { useThrottleCallback } from "./useThrottleCallback";
 
 /** Window scroll coordinates in pixels. */
 export interface WindowScrollPosition {
@@ -23,10 +23,7 @@ export interface UseWindowScrollOptions {
 /** Window scroll coordinates and programmatic `scrollTo` helper returned by `useWindowScroll`. */
 export interface UseWindowScrollReturn extends WindowScrollPosition {
   /** Scrolls the window to the given coordinates or `ScrollToOptions`. */
-  scrollTo: (
-    xOrOptions: number | ScrollToOptions,
-    y?: number,
-  ) => void;
+  scrollTo: (xOrOptions: number | ScrollToOptions, y?: number) => void;
 }
 
 /**
@@ -41,13 +38,11 @@ export interface UseWindowScrollReturn extends WindowScrollPosition {
  * const { y, scrollTo } = useWindowScroll({ throttleMs: 50 });
  * ```
  */
-export function useWindowScroll(
-  options: UseWindowScrollOptions = {},
-): UseWindowScrollReturn {
+export function useWindowScroll(options: UseWindowScrollOptions = {}): UseWindowScrollReturn {
   const { initializeWithValue = true, throttleMs = 0 } = options;
 
   const readPosition = (): WindowScrollPosition => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return { x: 0, y: 0 };
     }
     return {
@@ -63,20 +58,14 @@ export function useWindowScroll(
 
   const updatePosition = useEventCallback(() => {
     const next = readPosition();
-    if (
-      lastPositionRef.current.x === next.x &&
-      lastPositionRef.current.y === next.y
-    ) {
+    if (lastPositionRef.current.x === next.x && lastPositionRef.current.y === next.y) {
       return;
     }
     lastPositionRef.current = next;
     setPosition(next);
   });
 
-  const throttledUpdatePosition = useThrottleCallback(
-    updatePosition,
-    throttleMs,
-  );
+  const throttledUpdatePosition = useThrottleCallback(updatePosition, throttleMs);
 
   const handleScroll = (): void => {
     if (throttleMs > 0) {
@@ -86,25 +75,23 @@ export function useWindowScroll(
     }
   };
 
-  useEventListener('scroll', handleScroll, undefined, { passive: true });
+  useEventListener("scroll", handleScroll, undefined, { passive: true });
 
   useIsomorphicLayoutEffect(() => {
     updatePosition();
   }, []);
 
-  const scrollTo = useEventCallback(
-    (xOrOptions: number | ScrollToOptions, y?: number) => {
-      if (typeof window === 'undefined') {
-        return;
-      }
+  const scrollTo = useEventCallback((xOrOptions: number | ScrollToOptions, y?: number) => {
+    if (typeof window === "undefined") {
+      return;
+    }
 
-      if (typeof xOrOptions === 'number') {
-        window.scrollTo(xOrOptions, y ?? position.y);
-      } else {
-        window.scrollTo(xOrOptions);
-      }
-    },
-  );
+    if (typeof xOrOptions === "number") {
+      window.scrollTo(xOrOptions, y ?? position.y);
+    } else {
+      window.scrollTo(xOrOptions);
+    }
+  });
 
   return {
     x: position.x,

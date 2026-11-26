@@ -1,6 +1,6 @@
-import { useMemo, useRef } from 'react';
-import { useLatest } from './useLatest';
-import { useUnmount } from './useUnmount';
+import { useMemo, useRef } from "react";
+import { useLatest } from "./useLatest";
+import { useUnmount } from "./useUnmount";
 
 /** A callback scheduled via `requestAnimationFrame` with control methods. */
 export interface RafScheduledFunction<T extends (...args: never[]) => unknown> {
@@ -49,8 +49,8 @@ export function useRafCallback<T extends (...args: never[]) => unknown>(
     const cancel = (): void => {
       if (
         frameIdRef.current !== null &&
-        typeof window !== 'undefined' &&
-        typeof window.cancelAnimationFrame === 'function'
+        typeof window !== "undefined" &&
+        typeof window.cancelAnimationFrame === "function"
       ) {
         window.cancelAnimationFrame(frameIdRef.current);
       }
@@ -62,10 +62,7 @@ export function useRafCallback<T extends (...args: never[]) => unknown>(
       if (frameIdRef.current === null) {
         return resultRef.current;
       }
-      if (
-        typeof window !== 'undefined' &&
-        typeof window.cancelAnimationFrame === 'function'
-      ) {
+      if (typeof window !== "undefined" && typeof window.cancelAnimationFrame === "function") {
         window.cancelAnimationFrame(frameIdRef.current);
       }
       frameIdRef.current = null;
@@ -83,10 +80,7 @@ export function useRafCallback<T extends (...args: never[]) => unknown>(
         return;
       }
 
-      if (
-        typeof window === 'undefined' ||
-        typeof window.requestAnimationFrame !== 'function'
-      ) {
+      if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
         return;
       }
 

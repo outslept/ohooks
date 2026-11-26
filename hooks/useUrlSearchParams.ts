@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
+import { useCallback, useEffect, useState } from "react";
+import { useEventCallback } from "./useEventCallback";
 
 /** Accepted initializer formats for URL search parameters. */
 export type UrlSearchParamsInit =
@@ -11,7 +11,7 @@ export type UrlSearchParamsInit =
 /** Configuration options for `useUrlSearchParams`. */
 export interface UseUrlSearchParamsOptions {
   /** History API update mode (`'replace'` or `'push'`, default: `'replace'`). */
-  historyMode?: 'push' | 'replace';
+  historyMode?: "push" | "replace";
   /** Fallback query parameters when `window.location.search` is empty or during SSR. */
   initialValue?: UrlSearchParamsInit;
 }
@@ -26,15 +26,13 @@ export type UseUrlSearchParamsReturn = [
   params: URLSearchParams,
   setParams: (
     nextInit: SetUrlSearchParamsAction,
-    overrideOptions?: { historyMode?: 'push' | 'replace' }
+    overrideOptions?: { historyMode?: "push" | "replace" },
   ) => void,
 ];
 
-const URL_SEARCH_CHANGE_EVENT = 'custom-url-search-params-change';
+const URL_SEARCH_CHANGE_EVENT = "custom-url-search-params-change";
 
-function isTupleArray(
-  init: UrlSearchParamsInit
-): init is ReadonlyArray<readonly [string, string]> {
+function isTupleArray(init: UrlSearchParamsInit): init is ReadonlyArray<readonly [string, string]> {
   return Array.isArray(init);
 }
 
@@ -42,7 +40,7 @@ function createSearchParams(init?: UrlSearchParamsInit): URLSearchParams {
   if (!init) {
     return new URLSearchParams();
   }
-  if (typeof init === 'string') {
+  if (typeof init === "string") {
     return new URLSearchParams(init);
   }
   if (init instanceof URLSearchParams) {
@@ -61,10 +59,10 @@ function createSearchParams(init?: UrlSearchParamsInit): URLSearchParams {
 }
 
 function readWindowSearch(initialValue?: UrlSearchParamsInit): string {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return createSearchParams(initialValue).toString();
   }
-  const currentSearch = window.location.search.replace(/^\?/, '');
+  const currentSearch = window.location.search.replace(/^\?/, "");
   if (currentSearch.length > 0) {
     return currentSearch;
   }
@@ -85,59 +83,56 @@ function readWindowSearch(initialValue?: UrlSearchParamsInit): string {
  * ```
  */
 export function useUrlSearchParams(
-  options: UseUrlSearchParamsOptions = {}
+  options: UseUrlSearchParamsOptions = {},
 ): UseUrlSearchParamsReturn {
-  const { historyMode = 'replace', initialValue } = options;
+  const { historyMode = "replace", initialValue } = options;
 
-  const [rawSearch, setRawSearch] = useState<string>(() =>
-    readWindowSearch(initialValue)
-  );
+  const [rawSearch, setRawSearch] = useState<string>(() => readWindowSearch(initialValue));
 
   const params = new URLSearchParams(rawSearch);
 
   const setParams = useEventCallback(
     (
       nextInit: SetUrlSearchParamsAction,
-      overrideOptions?: { historyMode?: 'push' | 'replace' }
+      overrideOptions?: { historyMode?: "push" | "replace" },
     ) => {
       const currentParams = new URLSearchParams(rawSearch);
-      const resolvedInit =
-        typeof nextInit === 'function' ? nextInit(currentParams) : nextInit;
+      const resolvedInit = typeof nextInit === "function" ? nextInit(currentParams) : nextInit;
       const nextParams = createSearchParams(resolvedInit);
       const nextSearchString = nextParams.toString();
 
       setRawSearch(nextSearchString);
 
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const mode = overrideOptions?.historyMode ?? historyMode;
         const { pathname, hash } = window.location;
-        const query = nextSearchString ? `?${nextSearchString}` : '';
+        const query = nextSearchString ? `?${nextSearchString}` : "";
         const nextUrl = `${pathname}${query}${hash}`;
 
-        if (mode === 'push') {
-          window.history.pushState(window.history.state, '', nextUrl);
+        if (mode === "push") {
+          window.history.pushState(window.history.state, "", nextUrl);
         } else {
-          window.history.replaceState(window.history.state, '', nextUrl);
+          window.history.replaceState(window.history.state, "", nextUrl);
         }
 
         window.dispatchEvent(new Event(URL_SEARCH_CHANGE_EVENT));
       }
-    }
+    },
   );
 
   const syncFromLocation = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    setRawSearch(window.location.search.replace(/^\?/, ''));
+    if (typeof window === "undefined") return;
+    setRawSearch(window.location.search.replace(/^\?/, ""));
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
-    window.addEventListener('popstate', syncFromLocation);
+    window.addEventListener("popstate", syncFromLocation);
     window.addEventListener(URL_SEARCH_CHANGE_EVENT, syncFromLocation);
 
     return () => {
-      window.removeEventListener('popstate', syncFromLocation);
+      window.removeEventListener("popstate", syncFromLocation);
       window.removeEventListener(URL_SEARCH_CHANGE_EVENT, syncFromLocation);
     };
   }, [syncFromLocation]);

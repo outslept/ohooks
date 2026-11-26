@@ -14,11 +14,11 @@ The `usePermission` hook queries `navigator.permissions.query` for a given permi
 ## Usage
 
 ```tsx
-import { usePermission } from "@/hooks/usePermission"
+import { usePermission } from "@/hooks/usePermission";
 ```
 
 ```tsx
-const cameraPermission = usePermission("camera")
+const cameraPermission = usePermission("camera");
 ```
 
 ## Examples
@@ -28,14 +28,14 @@ const cameraPermission = usePermission("camera")
 Render contextual onboarding UI depending on whether the permission is `'prompt'`, `'granted'`, or `'denied'`.
 
 ```tsx
-const state = usePermission("geolocation")
+const state = usePermission("geolocation");
 
-if (state === "loading") return <p>Checking permission...</p>
+if (state === "loading") return <p>Checking permission...</p>;
 if (state === "denied") {
-  return <p>Location access is blocked in your browser settings.</p>
+  return <p>Location access is blocked in your browser settings.</p>;
 }
 
-return <p>Geolocation permission status: {state}</p>
+return <p>Geolocation permission status: {state}</p>;
 ```
 
 ### Passing an Extended Permission Descriptor
@@ -43,9 +43,9 @@ return <p>Geolocation permission status: {state}</p>
 Pass a descriptor object when querying permissions with extra options such as ` midi` (`sysex: true`).
 
 ```tsx
-const midiState = usePermission({ name: "midi", sysex: true })
+const midiState = usePermission({ name: "midi", sysex: true });
 
-return <p>MIDI SysEx access: {midiState}</p>
+return <p>MIDI SysEx access: {midiState}</p>;
 ```
 
 ## API Reference
@@ -54,7 +54,4 @@ return <p>MIDI SysEx access: {midiState}</p>
 
 Permission descriptor object accepted by `usePermission`.
 
-<AutoTypeTable
-  path="./hooks/usePermission.ts"
-  name="ExtendedPermissionDescriptor"
-/>
+<AutoTypeTable path="./hooks/usePermission.ts" name="ExtendedPermissionDescriptor" />

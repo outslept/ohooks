@@ -24,7 +24,7 @@ const scrollbarVariants = cva(
     defaultVariants: {
       orientation: "vertical",
     },
-  }
+  },
 );
 
 const thumbVariants = cva(
@@ -56,87 +56,75 @@ const thumbVariants = cva(
     defaultVariants: {
       orientation: "vertical",
     },
-  }
+  },
 );
 
-export interface ScrollAreaProps
-  extends React.ComponentPropsWithoutRef<typeof BaseScrollArea.Root> {
+export interface ScrollAreaProps extends React.ComponentPropsWithoutRef<
+  typeof BaseScrollArea.Root
+> {
   orientation?: ScrollAreaOrientation;
   viewportClassName?: string;
   className?: string;
 }
 
-export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
-  function ScrollArea(
-    {
-      orientation = "vertical",
-      viewportClassName,
-      className,
-      children,
-      ...otherProps
-    },
-    forwardedRef
-  ) {
-    const showVertical = orientation === "vertical" || orientation === "both";
-    const showHorizontal =
-      orientation === "horizontal" || orientation === "both";
+export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(function ScrollArea(
+  { orientation = "vertical", viewportClassName, className, children, ...otherProps },
+  forwardedRef,
+) {
+  const showVertical = orientation === "vertical" || orientation === "both";
+  const showHorizontal = orientation === "horizontal" || orientation === "both";
 
-    return (
-      <BaseScrollArea.Root
-        ref={forwardedRef}
-        data-slot="scroll-area"
-        data-orientation={orientation}
-        className={cn("relative overflow-hidden", className)}
-        {...otherProps}
-      >
-        <BaseScrollArea.Viewport
-          data-slot="scroll-area-viewport"
-          className={cn(
-            "size-full overscroll-contain rounded-[inherit] outline-none",
-            "scrollbar-none [&::-webkit-scrollbar]:hidden",
-            viewportClassName
-          )}
-        >
-          {children}
-        </BaseScrollArea.Viewport>
-
-        {showVertical && <ScrollBar orientation="vertical" />}
-        {showHorizontal && <ScrollBar orientation="horizontal" />}
-        {orientation === "both" && (
-          <BaseScrollArea.Corner
-            data-slot="scroll-area-corner"
-            className="bg-transparent"
-          />
+  return (
+    <BaseScrollArea.Root
+      ref={forwardedRef}
+      data-slot="scroll-area"
+      data-orientation={orientation}
+      className={cn("relative overflow-hidden", className)}
+      {...otherProps}
+    >
+      <BaseScrollArea.Viewport
+        data-slot="scroll-area-viewport"
+        className={cn(
+          "size-full overscroll-contain rounded-[inherit] outline-none",
+          "scrollbar-none [&::-webkit-scrollbar]:hidden",
+          viewportClassName,
         )}
-      </BaseScrollArea.Root>
-    );
-  }
-);
+      >
+        {children}
+      </BaseScrollArea.Viewport>
 
-export interface ScrollBarProps
-  extends React.ComponentPropsWithoutRef<typeof BaseScrollArea.Scrollbar> {
+      {showVertical && <ScrollBar orientation="vertical" />}
+      {showHorizontal && <ScrollBar orientation="horizontal" />}
+      {orientation === "both" && (
+        <BaseScrollArea.Corner data-slot="scroll-area-corner" className="bg-transparent" />
+      )}
+    </BaseScrollArea.Root>
+  );
+});
+
+export interface ScrollBarProps extends React.ComponentPropsWithoutRef<
+  typeof BaseScrollArea.Scrollbar
+> {
   orientation?: "vertical" | "horizontal";
 }
 
-export const ScrollBar = React.forwardRef<HTMLDivElement, ScrollBarProps>(
-  function ScrollBar(
-    { orientation = "vertical", className, ...otherProps },
-    forwardedRef
-  ) {
-    return (
-      <BaseScrollArea.Scrollbar
-        ref={forwardedRef}
-        orientation={orientation}
-        keepMounted={false}
-        data-slot="scroll-area-scrollbar"
-        className={cn(scrollbarVariants({ orientation }), className)}
-        {...otherProps}
-      >
-        <BaseScrollArea.Thumb
-          data-slot="scroll-area-thumb"
-          className={thumbVariants({ orientation })}
-        />
-      </BaseScrollArea.Scrollbar>
-    );
-  }
-);
+export const ScrollBar = React.forwardRef<HTMLDivElement, ScrollBarProps>(function ScrollBar(
+  { orientation = "vertical", className, ...otherProps },
+  forwardedRef,
+) {
+  return (
+    <BaseScrollArea.Scrollbar
+      ref={forwardedRef}
+      orientation={orientation}
+      keepMounted={false}
+      data-slot="scroll-area-scrollbar"
+      className={cn(scrollbarVariants({ orientation }), className)}
+      {...otherProps}
+    >
+      <BaseScrollArea.Thumb
+        data-slot="scroll-area-thumb"
+        className={thumbVariants({ orientation })}
+      />
+    </BaseScrollArea.Scrollbar>
+  );
+});

@@ -14,13 +14,13 @@ The `useEventCallback` hook wraps a function in a stable callback reference whos
 ## Usage
 
 ```tsx
-import { useEventCallback } from "@/hooks/useEventCallback"
+import { useEventCallback } from "@/hooks/useEventCallback";
 ```
 
 ```tsx
 const handleSubmit = useEventCallback((data: FormData) => {
-  send(data, latestProp)
-})
+  send(data, latestProp);
+});
 ```
 
 ## Examples
@@ -30,18 +30,18 @@ const handleSubmit = useEventCallback((data: FormData) => {
 Pass the returned function to `React.memo` child components so they do not re-render when parent state changes.
 
 ```tsx
-const [draft, setDraft] = useState("")
+const [draft, setDraft] = useState("");
 
 const handleSave = useEventCallback(() => {
-  api.save(draft)
-})
+  api.save(draft);
+});
 
 return (
   <div>
     <input value={draft} onChange={(e) => setDraft(e.target.value)} />
     <MemoizedToolbar onSave={handleSave} />
   </div>
-)
+);
 ```
 
 ### Avoiding Effect Re-Subscriptions
@@ -50,12 +50,12 @@ Call an event callback inside `useEffect` without adding rapidly changing depend
 
 ```tsx
 const onMessageReceived = useEventCallback((payload: string) => {
-  notifyUser(payload, currentChannelName)
-})
+  notifyUser(payload, currentChannelName);
+});
 
 useEffect(() => {
-  const socket = connectSocket()
-  socket.on("message", onMessageReceived)
-  return () => socket.disconnect()
-}, [onMessageReceived])
+  const socket = connectSocket();
+  socket.on("message", onMessageReceived);
+  return () => socket.disconnect();
+}, [onMessageReceived]);
 ```

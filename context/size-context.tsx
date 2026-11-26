@@ -68,20 +68,17 @@ export function SizeProvider({
   defaultSize = "default",
   children,
 }: SizeProviderProps) {
-  const [uncontrolledSize, setUncontrolledSize] =
-    React.useState<SizeStep>(defaultSize);
+  const [uncontrolledSize, setUncontrolledSize] = React.useState<SizeStep>(defaultSize);
 
   const resolvedSize = controlledSize ?? uncontrolledSize;
 
-  const setSize = React.useCallback<
-    React.Dispatch<React.SetStateAction<SizeStep>>
-  >(
+  const setSize = React.useCallback<React.Dispatch<React.SetStateAction<SizeStep>>>(
     (updater) => {
       if (controlledSize === undefined) {
         setUncontrolledSize(updater);
       }
     },
-    [controlledSize]
+    [controlledSize],
   );
 
   const value = React.useMemo<SizeContextValue>(
@@ -90,7 +87,7 @@ export function SizeProvider({
       setSize,
       tokens: SIZE_TOKENS[resolvedSize],
     }),
-    [resolvedSize, setSize]
+    [resolvedSize, setSize],
   );
 
   return <SizeContext.Provider value={value}>{children}</SizeContext.Provider>;

@@ -14,14 +14,14 @@ The `useFocusTrap` hook constrains keyboard `Tab` and `Shift+Tab` navigation to 
 ## Usage
 
 ```tsx
-import { useFocusTrap } from "@/hooks/useFocusTrap"
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 ```
 
 ```tsx
 useFocusTrap(modalRef, {
   enabled: isOpen,
   onEscape: () => setIsOpen(false),
-})
+});
 ```
 
 ## Examples
@@ -31,14 +31,14 @@ useFocusTrap(modalRef, {
 Combine `enabled`, `initialFocus`, and `onEscape` to trap focus inside an open modal and close it when the user presses `Escape`.
 
 ```tsx
-const [isOpen, setIsOpen] = useState(false)
-const dialogRef = useRef<HTMLDivElement>(null)
+const [isOpen, setIsOpen] = useState(false);
+const dialogRef = useRef<HTMLDivElement>(null);
 
 useFocusTrap(dialogRef, {
   enabled: isOpen,
   initialFocus: "[data-autofocus]",
   onEscape: () => setIsOpen(false),
-})
+});
 
 return (
   <>
@@ -50,7 +50,7 @@ return (
       </div>
     )}
   </>
-)
+);
 ```
 
 ### Custom Initial Focus Element
@@ -58,13 +58,13 @@ return (
 Pass a `RefObject` or CSS selector to `initialFocus` to control which element receives focus when the trap activates.
 
 ```tsx
-const containerRef = useRef<HTMLDivElement>(null)
-const cancelBtnRef = useRef<HTMLButtonElement>(null)
+const containerRef = useRef<HTMLDivElement>(null);
+const cancelBtnRef = useRef<HTMLButtonElement>(null);
 
 useFocusTrap(containerRef, {
   initialFocus: cancelBtnRef,
   restoreFocus: true,
-})
+});
 ```
 
 ## API Reference

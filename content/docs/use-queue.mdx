@@ -14,11 +14,11 @@ The `useQueue` hook manages a reactive first-in, first-out (FIFO) queue in React
 ## Usage
 
 ```tsx
-import { useQueue } from "@/hooks/useQueue"
+import { useQueue } from "@/hooks/useQueue";
 ```
 
 ```tsx
-const { queue, enqueue, dequeue, first } = useQueue<string>(["task-1"])
+const { queue, enqueue, dequeue, first } = useQueue<string>(["task-1"]);
 ```
 
 ## Examples
@@ -28,13 +28,11 @@ const { queue, enqueue, dequeue, first } = useQueue<string>(["task-1"])
 Add incoming messages to the back of the queue with `enqueue` and dismiss the oldest message from the front with `dequeue`.
 
 ```tsx
-const { first, size, enqueue, dequeue, clear } = useQueue<string>()
+const { first, size, enqueue, dequeue, clear } = useQueue<string>();
 
 return (
   <div>
-    <button onClick={() => enqueue(`Notification #${Date.now()}`)}>
-      Queue notification
-    </button>
+    <button onClick={() => enqueue(`Notification #${Date.now()}`)}>Queue notification</button>
     {first && (
       <div role="status">
         <p>
@@ -45,7 +43,7 @@ return (
       </div>
     )}
   </div>
-)
+);
 ```
 
 ### Batch Enqueueing Items
@@ -53,7 +51,7 @@ return (
 Pass multiple items to `enqueue` at once to append a batch to the end of the queue.
 
 ```tsx
-const { queue, enqueue, reset } = useQueue<number>([1, 2])
+const { queue, enqueue, reset } = useQueue<number>([1, 2]);
 
 return (
   <div>
@@ -61,7 +59,7 @@ return (
     <button onClick={() => enqueue(3, 4, 5)}>Enqueue 3, 4, 5</button>
     <button onClick={reset}>Reset</button>
   </div>
-)
+);
 ```
 
 ## API Reference

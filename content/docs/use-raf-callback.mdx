@@ -14,13 +14,13 @@ The `useRafCallback` hook wraps a function so repeated calls within the same fra
 ## Usage
 
 ```tsx
-import { useRafCallback } from "@/hooks/useRafCallback"
+import { useRafCallback } from "@/hooks/useRafCallback";
 ```
 
 ```tsx
 const onPointerMove = useRafCallback((x: number, y: number) => {
-  updatePosition(x, y)
-})
+  updatePosition(x, y);
+});
 ```
 
 ## Examples
@@ -30,20 +30,17 @@ const onPointerMove = useRafCallback((x: number, y: number) => {
 Throttle `onPointerMove` updates to the display refresh rate so DOM updates stay synchronized with browser repaints.
 
 ```tsx
-const [coords, setCoords] = useState({ x: 0, y: 0 })
+const [coords, setCoords] = useState({ x: 0, y: 0 });
 
 const handlePointerMove = useRafCallback((x: number, y: number) => {
-  setCoords({ x, y })
-})
+  setCoords({ x, y });
+});
 
 return (
-  <div
-    onPointerMove={(e) => handlePointerMove(e.clientX, e.clientY)}
-    style={{ height: 200 }}
-  >
+  <div onPointerMove={(e) => handlePointerMove(e.clientX, e.clientY)} style={{ height: 200 }}>
     Cursor: {Math.round(coords.x)}, {Math.round(coords.y)}
   </div>
-)
+);
 ```
 
 ### Cancelling a Pending Frame
@@ -52,15 +49,15 @@ Call `.cancel()` to abort a scheduled animation frame or `.isPending()` to check
 
 ```tsx
 const scheduleSync = useRafCallback(() => {
-  syncCanvas()
-})
+  syncCanvas();
+});
 
 return (
   <div>
     <button onClick={() => scheduleSync()}>Schedule sync</button>
     <button onClick={() => scheduleSync.cancel()}>Cancel pending frame</button>
   </div>
-)
+);
 ```
 
 ## API Reference

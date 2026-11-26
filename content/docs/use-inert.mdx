@@ -14,11 +14,11 @@ The `useInert` hook applies the native `inert` attribute (and `aria-hidden="true
 ## Usage
 
 ```tsx
-import { useInert } from "@/hooks/useInert"
+import { useInert } from "@/hooks/useInert";
 ```
 
 ```tsx
-useInert(modalRef, isOpen, { trapSiblings: true })
+useInert(modalRef, isOpen, { trapSiblings: true });
 ```
 
 ## Examples
@@ -28,10 +28,10 @@ useInert(modalRef, isOpen, { trapSiblings: true })
 Pass `trapSiblings: true` so every sibling outside the modal becomes non-interactive and hidden from assistive technologies while the modal is open.
 
 ```tsx
-const [isOpen, setIsOpen] = useState(false)
-const dialogRef = useRef<HTMLDivElement>(null)
+const [isOpen, setIsOpen] = useState(false);
+const dialogRef = useRef<HTMLDivElement>(null);
 
-useInert(dialogRef, isOpen, { trapSiblings: true })
+useInert(dialogRef, isOpen, { trapSiblings: true });
 
 return (
   <>
@@ -43,7 +43,7 @@ return (
       </div>
     )}
   </>
-)
+);
 ```
 
 ### Disabling a Specific Section Directly
@@ -51,17 +51,17 @@ return (
 With `trapSiblings: false` (the default), `useInert` marks the target element itself as `inert`—useful for disabling a form or panel while saving.
 
 ```tsx
-const formRef = useRef<HTMLFormElement>(null)
-const [isSaving, setIsSaving] = useState(false)
+const formRef = useRef<HTMLFormElement>(null);
+const [isSaving, setIsSaving] = useState(false);
 
-useInert(formRef, isSaving)
+useInert(formRef, isSaving);
 
 return (
   <form ref={formRef}>
     <input placeholder="Full name" />
     <button type="submit">Save</button>
   </form>
-)
+);
 ```
 
 ## API Reference

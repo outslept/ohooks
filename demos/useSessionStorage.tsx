@@ -1,80 +1,76 @@
-"use client"
+"use client";
 
-import { useSyncExternalStore } from "react"
-import { cn } from "cn"
-import { RefreshCw, Trash2 } from "lucide-react"
+import { useSyncExternalStore } from "react";
+import { cn } from "cn";
+import { RefreshCw, Trash2 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { useSessionStorage } from "@/hooks/useSessionStorage"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useSessionStorage } from "@/hooks/useSessionStorage";
 
 interface CheckoutDraft {
-  step: number
-  coupon: string
+  step: number;
+  coupon: string;
 }
 
-const STORAGE_KEY = "fumadocs-demo-session-draft"
-const STEPS = [1, 2, 3] as const
-const COUPON_PRESETS = ["REACT2025", "SHIPFREE", "VIP50"] as const
+const STORAGE_KEY = "fumadocs-demo-session-draft";
+const STEPS = [1, 2, 3] as const;
+const COUPON_PRESETS = ["REACT2025", "SHIPFREE", "VIP50"] as const;
 
 function subscribeToSessionStorage(callback: () => void) {
-  window.addEventListener("storage", callback)
-  return () => window.removeEventListener("storage", callback)
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
 }
 
 function getHasStoredKeySnapshot(): boolean {
   try {
-    return window.sessionStorage.getItem(STORAGE_KEY) !== null
+    return window.sessionStorage.getItem(STORAGE_KEY) !== null;
   } catch {
-    return false
+    return false;
   }
 }
 
 function getServerHasStoredKeySnapshot(): boolean {
-  return false
+  return false;
 }
 
 export default function UseSessionStorageDemo() {
-  const [draft, setDraft, removeDraft] = useSessionStorage<CheckoutDraft>(
-    STORAGE_KEY,
-    { step: 1, coupon: "REACT2025" }
-  )
+  const [draft, setDraft, removeDraft] = useSessionStorage<CheckoutDraft>(STORAGE_KEY, {
+    step: 1,
+    coupon: "REACT2025",
+  });
 
   const hasStoredKey = useSyncExternalStore(
     subscribeToSessionStorage,
     getHasStoredKeySnapshot,
-    getServerHasStoredKeySnapshot
-  )
+    getServerHasStoredKeySnapshot,
+  );
 
   const handleCycleCoupon = () => {
-    const currentIndex = COUPON_PRESETS.indexOf(
-      draft.coupon as (typeof COUPON_PRESETS)[number]
-    )
-    const nextCoupon =
-      COUPON_PRESETS[(currentIndex + 1) % COUPON_PRESETS.length]
-    setDraft((prev) => ({ ...prev, coupon: nextCoupon }))
-  }
+    const currentIndex = COUPON_PRESETS.indexOf(draft.coupon as (typeof COUPON_PRESETS)[number]);
+    const nextCoupon = COUPON_PRESETS[(currentIndex + 1) % COUPON_PRESETS.length];
+    setDraft((prev) => ({ ...prev, coupon: nextCoupon }));
+  };
 
   const handleRemove = () => {
-    removeDraft()
-  }
+    removeDraft();
+  };
 
-  const serialized = JSON.stringify(draft)
+  const serialized = JSON.stringify(draft);
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Wizard step"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {STEPS.map((step) => {
-              const active = draft.step === step
+              const active = draft.step === step;
               return (
                 <button
                   key={step}
@@ -84,12 +80,12 @@ export default function UseSessionStorageDemo() {
                     "rounded-[3px] px-2 py-0.5 font-mono text-2xs font-medium tabular-nums transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   S{step}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -98,9 +94,7 @@ export default function UseSessionStorageDemo() {
           type="text"
           size="compact"
           value={draft.coupon}
-          onChange={(e) =>
-            setDraft((prev) => ({ ...prev, coupon: e.target.value }))
-          }
+          onChange={(e) => setDraft((prev) => ({ ...prev, coupon: e.target.value }))}
           placeholder="PROMO"
           aria-label="Promo code"
           className="font-mono"
@@ -140,5 +134,5 @@ export default function UseSessionStorageDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

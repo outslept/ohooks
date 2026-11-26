@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { resolveTargetElement } from "@/lib/utils";
 
 /** Reactive state representing the user's current DOM text selection. */
 export interface TextSelectionState {
@@ -17,7 +15,7 @@ export interface TextSelectionState {
 }
 
 const EMPTY_STATE: TextSelectionState = {
-  text: '',
+  text: "",
   rect: null,
   ranges: [],
   selection: null,
@@ -26,12 +24,7 @@ const EMPTY_STATE: TextSelectionState = {
 function isSameRect(a: DOMRect | null, b: DOMRect | null): boolean {
   if (a === b) return true;
   if (!a || !b) return false;
-  return (
-    a.top === b.top &&
-    a.left === b.left &&
-    a.width === b.width &&
-    a.height === b.height
-  );
+  return a.top === b.top && a.left === b.left && a.width === b.width && a.height === b.height;
 }
 
 function isSameRanges(a: Range[], b: Range[]): boolean {
@@ -53,12 +46,14 @@ function isSameRanges(a: Range[], b: Range[]): boolean {
   return true;
 }
 
-function isSameSelectionState(
-  prev: TextSelectionState,
-  next: TextSelectionState
-): boolean {
+function isSameSelectionState(prev: TextSelectionState, next: TextSelectionState): boolean {
   if (prev === next) return true;
-  if (prev.text === '' && next.text === '' && prev.ranges.length === 0 && next.ranges.length === 0) {
+  if (
+    prev.text === "" &&
+    next.text === "" &&
+    prev.ranges.length === 0 &&
+    next.ranges.length === 0
+  ) {
     return true;
   }
   return (
@@ -80,30 +75,24 @@ function isSameSelectionState(
  * const { text, rect } = useTextSelection();
  * ```
  */
-export function useTextSelection(
-  target?: EventListenerTarget<HTMLElement>
-): TextSelectionState {
+export function useTextSelection(target?: EventListenerTarget<HTMLElement>): TextSelectionState {
   const [state, setState] = useState<TextSelectionState>(EMPTY_STATE);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
+    if (typeof window === "undefined" || typeof document === "undefined") {
       return;
     }
 
     const updateSelection = () => {
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
-        setState((prev) =>
-          isSameSelectionState(prev, EMPTY_STATE) ? prev : EMPTY_STATE
-        );
+        setState((prev) => (isSameSelectionState(prev, EMPTY_STATE) ? prev : EMPTY_STATE));
         return;
       }
 
       const text = sel.toString();
       if (!text) {
-        setState((prev) =>
-          isSameSelectionState(prev, EMPTY_STATE) ? prev : EMPTY_STATE
-        );
+        setState((prev) => (isSameSelectionState(prev, EMPTY_STATE) ? prev : EMPTY_STATE));
         return;
       }
 
@@ -111,15 +100,11 @@ export function useTextSelection(
       if (containerElement) {
         const anchorNode = sel.anchorNode;
         const focusNode = sel.focusNode;
-        const containsAnchor =
-          anchorNode !== null && containerElement.contains(anchorNode);
-        const containsFocus =
-          focusNode !== null && containerElement.contains(focusNode);
+        const containsAnchor = anchorNode !== null && containerElement.contains(anchorNode);
+        const containsFocus = focusNode !== null && containerElement.contains(focusNode);
 
         if (!containsAnchor && !containsFocus) {
-          setState((prev) =>
-            isSameSelectionState(prev, EMPTY_STATE) ? prev : EMPTY_STATE
-          );
+          setState((prev) => (isSameSelectionState(prev, EMPTY_STATE) ? prev : EMPTY_STATE));
           return;
         }
       }
@@ -139,19 +124,17 @@ export function useTextSelection(
         selection: sel,
       };
 
-      setState((prev) =>
-        isSameSelectionState(prev, nextState) ? prev : nextState
-      );
+      setState((prev) => (isSameSelectionState(prev, nextState) ? prev : nextState));
     };
 
-    document.addEventListener('selectionchange', updateSelection);
-    window.addEventListener('mouseup', updateSelection);
-    window.addEventListener('keyup', updateSelection);
+    document.addEventListener("selectionchange", updateSelection);
+    window.addEventListener("mouseup", updateSelection);
+    window.addEventListener("keyup", updateSelection);
 
     return () => {
-      document.removeEventListener('selectionchange', updateSelection);
-      window.removeEventListener('mouseup', updateSelection);
-      window.removeEventListener('keyup', updateSelection);
+      document.removeEventListener("selectionchange", updateSelection);
+      window.removeEventListener("mouseup", updateSelection);
+      window.removeEventListener("keyup", updateSelection);
     };
   }, [target]);
 

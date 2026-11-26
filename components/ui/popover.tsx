@@ -16,15 +16,16 @@ const PopoverTrigger = React.forwardRef<
     data-slot="popover-trigger"
     className={cn(
       "cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring",
-      className
+      className,
     )}
     {...props}
   />
 ));
 PopoverTrigger.displayName = "PopoverTrigger";
 
-export interface PopoverContentProps
-  extends React.ComponentPropsWithoutRef<typeof BasePopover.Popup> {
+export interface PopoverContentProps extends React.ComponentPropsWithoutRef<
+  typeof BasePopover.Popup
+> {
   side?: React.ComponentPropsWithoutRef<typeof BasePopover.Positioner>["side"];
   align?: React.ComponentPropsWithoutRef<typeof BasePopover.Positioner>["align"];
   sideOffset?: number;
@@ -42,7 +43,7 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
       children,
       ...props
     },
-    forwardedRef
+    forwardedRef,
   ) => (
     <BasePopover.Portal>
       <BasePopover.Positioner
@@ -62,7 +63,7 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
             "starting:scale-95 starting:opacity-0 starting:blur-xs",
             "data-ending-style:scale-95 data-ending-style:opacity-0 data-ending-style:blur-2xs data-ending-style:duration-100",
             "motion-reduce:transition-none",
-            className
+            className,
           )}
           {...props}
         >
@@ -70,7 +71,7 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
         </BasePopover.Popup>
       </BasePopover.Positioner>
     </BasePopover.Portal>
-  )
+  ),
 );
 PopoverContent.displayName = "PopoverContent";
 
@@ -102,11 +103,4 @@ PopoverDescription.displayName = "PopoverDescription";
 
 const PopoverClose = BasePopover.Close;
 
-export {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverTitle,
-  PopoverDescription,
-  PopoverClose,
-};
+export { Popover, PopoverTrigger, PopoverContent, PopoverTitle, PopoverDescription, PopoverClose };

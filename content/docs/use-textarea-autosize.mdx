@@ -14,12 +14,12 @@ The `useTextareaAutosize` hook dynamically resizes a `<textarea>` element's heig
 ## Usage
 
 ```tsx
-import { useTextareaAutosize } from "@/hooks/useTextareaAutosize"
+import { useTextareaAutosize } from "@/hooks/useTextareaAutosize";
 ```
 
 ```tsx
-const textareaRef = useRef<HTMLTextAreaElement>(null)
-useTextareaAutosize(textareaRef, text, { maxHeight: 300 })
+const textareaRef = useRef<HTMLTextAreaElement>(null);
+useTextareaAutosize(textareaRef, text, { maxHeight: 300 });
 ```
 
 ## Examples
@@ -29,13 +29,13 @@ useTextareaAutosize(textareaRef, text, { maxHeight: 300 })
 Cap growth with `maxHeight` so the textarea expands up to a limit and then scrolls internally.
 
 ```tsx
-const [message, setMessage] = useState("")
-const textareaRef = useRef<HTMLTextAreaElement>(null)
+const [message, setMessage] = useState("");
+const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 useTextareaAutosize(textareaRef, message, {
   minHeight: 40,
   maxHeight: 160,
-})
+});
 
 return (
   <textarea
@@ -45,7 +45,7 @@ return (
     placeholder="Write a message..."
     rows={1}
   />
-)
+);
 ```
 
 ### Triggering a Manual Resize Calculation
@@ -53,19 +53,19 @@ return (
 Call the returned `resize()` function after programmatic font size or layout changes, or listen to height changes via `onResize`.
 
 ```tsx
-const [note, setNote] = useState("")
-const ref = useRef<HTMLTextAreaElement>(null)
+const [note, setNote] = useState("");
+const ref = useRef<HTMLTextAreaElement>(null);
 
 const { resize } = useTextareaAutosize(ref, note, {
   onResize: (height) => console.log("New height:", height),
-})
+});
 
 return (
   <div>
     <textarea ref={ref} value={note} onChange={(e) => setNote(e.target.value)} />
     <button onClick={resize}>Recalculate height</button>
   </div>
-)
+);
 ```
 
 ## API Reference
@@ -74,16 +74,10 @@ return (
 
 Configuration options for minimum/maximum height bounds and resize callbacks.
 
-<AutoTypeTable
-  path="./hooks/useTextareaAutosize.ts"
-  name="UseTextareaAutosizeOptions"
-/>
+<AutoTypeTable path="./hooks/useTextareaAutosize.ts" name="UseTextareaAutosizeOptions" />
 
 ### `UseTextareaAutosizeReturn`
 
 Control methods returned by the hook.
 
-<AutoTypeTable
-  path="./hooks/useTextareaAutosize.ts"
-  name="UseTextareaAutosizeReturn"
-/>
+<AutoTypeTable path="./hooks/useTextareaAutosize.ts" name="UseTextareaAutosizeReturn" />

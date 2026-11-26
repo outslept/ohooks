@@ -14,11 +14,11 @@ The `useElementSize` hook observes a target DOM element with `ResizeObserver` an
 ## Usage
 
 ```tsx
-import { useElementSize } from "@/hooks/useElementSize"
+import { useElementSize } from "@/hooks/useElementSize";
 ```
 
 ```tsx
-const { width, height } = useElementSize(boxRef, { box: "border-box" })
+const { width, height } = useElementSize(boxRef, { box: "border-box" });
 ```
 
 ## Examples
@@ -28,8 +28,8 @@ const { width, height } = useElementSize(boxRef, { box: "border-box" })
 Adapt a component's layout based on its own container width rather than the global viewport size.
 
 ```tsx
-const cardRef = useRef<HTMLDivElement>(null)
-const { width, height } = useElementSize(cardRef)
+const cardRef = useRef<HTMLDivElement>(null);
+const { width, height } = useElementSize(cardRef);
 
 return (
   <div ref={cardRef} style={{ width: "100%" }}>
@@ -46,7 +46,7 @@ return (
       <div>Column B</div>
     </div>
   </div>
-)
+);
 ```
 
 ### Selecting the Box Model and Initial Size
@@ -54,11 +54,11 @@ return (
 Specify `box: "border-box"` to include padding and borders, and `initialSize` to provide fallback dimensions before the element mounts.
 
 ```tsx
-const [ref, element] = useElementRef<HTMLDivElement>()
+const [ref, element] = useElementRef<HTMLDivElement>();
 const { width, height } = useElementSize(element, {
   box: "border-box",
   initialSize: { width: 320, height: 180 },
-})
+});
 ```
 
 ## API Reference

@@ -14,11 +14,11 @@ The `useDocumentTitle` hook synchronizes `document.title` with a string value an
 ## Usage
 
 ```tsx
-import { useDocumentTitle } from "@/hooks/useDocumentTitle"
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 ```
 
 ```tsx
-useDocumentTitle(`Inbox (${unreadCount})`, { restoreOnUnmount: true })
+useDocumentTitle(`Inbox (${unreadCount})`, { restoreOnUnmount: true });
 ```
 
 ## Examples
@@ -28,13 +28,11 @@ useDocumentTitle(`Inbox (${unreadCount})`, { restoreOnUnmount: true })
 Include live state in the title string to reflect unread counts or background task status in the browser tab.
 
 ```tsx
-const [unread, setUnread] = useState(3)
+const [unread, setUnread] = useState(3);
 
-useDocumentTitle(unread > 0 ? `(${unread}) Messages` : "Messages")
+useDocumentTitle(unread > 0 ? `(${unread}) Messages` : "Messages");
 
-return (
-  <button onClick={() => setUnread(0)}>Mark all as read</button>
-)
+return <button onClick={() => setUnread(0)}>Mark all as read</button>;
 ```
 
 ### Restoring the Previous Title on Unmount
@@ -44,7 +42,7 @@ Enable `restoreOnUnmount: true` inside modals, drawers, or temporary views so cl
 ```tsx
 useDocumentTitle("Editing Profile — Settings", {
   restoreOnUnmount: true,
-})
+});
 ```
 
 ## API Reference
@@ -53,7 +51,4 @@ useDocumentTitle("Editing Profile — Settings", {
 
 Configuration options for `useDocumentTitle`.
 
-<AutoTypeTable
-  path="./hooks/useDocumentTitle.ts"
-  name="UseDocumentTitleOptions"
-/>
+<AutoTypeTable path="./hooks/useDocumentTitle.ts" name="UseDocumentTitleOptions" />

@@ -14,11 +14,11 @@ The `useDarkMode` hook resolves dark mode from the user's stored preference (`'l
 ## Usage
 
 ```tsx
-import { useDarkMode } from "@/hooks/useDarkMode"
+import { useDarkMode } from "@/hooks/useDarkMode";
 ```
 
 ```tsx
-const { isDarkMode, preference, toggle, resetToSystem } = useDarkMode()
+const { isDarkMode, preference, toggle, resetToSystem } = useDarkMode();
 ```
 
 ## Examples
@@ -28,23 +28,21 @@ const { isDarkMode, preference, toggle, resetToSystem } = useDarkMode()
 Use `enable`, `disable`, and `resetToSystem` (or `setPreference`) to build a three-way theme selector.
 
 ```tsx
-const { isDarkMode, preference, setPreference } = useDarkMode()
+const { isDarkMode, preference, setPreference } = useDarkMode();
 
 return (
   <div>
     <p>Active theme: {isDarkMode ? "Dark" : "Light"}</p>
     <select
       value={preference}
-      onChange={(e) =>
-        setPreference(e.target.value as "light" | "dark" | "system")
-      }
+      onChange={(e) => setPreference(e.target.value as "light" | "dark" | "system")}
     >
       <option value="system">System</option>
       <option value="light">Light</option>
       <option value="dark">Dark</option>
     </select>
   </div>
-)
+);
 ```
 
 ### Custom Storage Key and Class Name
@@ -56,13 +54,9 @@ const { isDarkMode, toggle } = useDarkMode({
   storageKey: "app-color-scheme",
   classNameDark: "theme-dark",
   defaultValue: "dark",
-})
+});
 
-return (
-  <button onClick={toggle}>
-    Switch to {isDarkMode ? "light" : "dark"} mode
-  </button>
-)
+return <button onClick={toggle}>Switch to {isDarkMode ? "light" : "dark"} mode</button>;
 ```
 
 ## API Reference

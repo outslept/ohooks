@@ -14,13 +14,13 @@ The `useUnmount` hook runs a callback when the component unmounts from the DOM, 
 ## Usage
 
 ```tsx
-import { useUnmount } from "@/hooks/useUnmount"
+import { useUnmount } from "@/hooks/useUnmount";
 ```
 
 ```tsx
 useUnmount(() => {
-  analytics.trackExit(latestStep)
-})
+  analytics.trackExit(latestStep);
+});
 ```
 
 ## Examples
@@ -30,21 +30,17 @@ useUnmount(() => {
 Persist the latest form input value when the user navigates away and unmounts the component.
 
 ```tsx
-const [draft, setDraft] = useState("")
+const [draft, setDraft] = useState("");
 
 useUnmount(() => {
   if (draft.trim()) {
-    localStorage.setItem("unsaved-draft", draft)
+    localStorage.setItem("unsaved-draft", draft);
   }
-})
+});
 
 return (
-  <textarea
-    value={draft}
-    onChange={(e) => setDraft(e.target.value)}
-    placeholder="Type a note..."
-  />
-)
+  <textarea value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Type a note..." />
+);
 ```
 
 ### Reporting Analytics View Duration
@@ -52,9 +48,9 @@ return (
 Record how far the user progressed before closing a view.
 
 ```tsx
-const [completedSteps, setCompletedSteps] = useState(1)
+const [completedSteps, setCompletedSteps] = useState(1);
 
 useUnmount(() => {
-  sendTelemetry({ event: "wizard_closed", completedSteps })
-})
+  sendTelemetry({ event: "wizard_closed", completedSteps });
+});
 ```

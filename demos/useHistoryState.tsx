@@ -1,67 +1,49 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import {
-  PlusIcon,
-  Redo2Icon,
-  RotateCcwIcon,
-  Trash2Icon,
-  Undo2Icon,
-} from "lucide-react"
-import { cn } from "cn"
+import { useState } from "react";
+import { PlusIcon, Redo2Icon, RotateCcwIcon, Trash2Icon, Undo2Icon } from "lucide-react";
+import { cn } from "cn";
 
-import { useHistoryState } from "@/hooks/useHistoryState"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { useHistoryState } from "@/hooks/useHistoryState";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 const CAPACITY_OPTIONS = [
   { label: "cap 3", value: 3 },
   { label: "cap 5", value: 5 },
   { label: "cap 10", value: 10 },
-] as const
+] as const;
 
 export default function UseHistoryStateDemo() {
-  const [capacity, setCapacity] = useState<number>(5)
-  const [stepCounter, setStepCounter] = useState<number>(2)
+  const [capacity, setCapacity] = useState<number>(5);
+  const [stepCounter, setStepCounter] = useState<number>(2);
 
-  const {
-    state,
-    set,
-    undo,
-    redo,
-    clear,
-    reset,
-    canUndo,
-    canRedo,
-    past,
-    future,
-  } = useHistoryState<string>("v1: Initial draft", capacity)
+  const { state, set, undo, redo, clear, reset, canUndo, canRedo, past, future } =
+    useHistoryState<string>("v1: Initial draft", capacity);
 
   const commitStep = () => {
-    const nextVersion = stepCounter
-    setStepCounter((c) => c + 1)
-    set(`v${nextVersion}: Snapshot #${nextVersion}`)
-  }
+    const nextVersion = stepCounter;
+    setStepCounter((c) => c + 1);
+    set(`v${nextVersion}: Snapshot #${nextVersion}`);
+  };
 
-  const hasHistory = canUndo || canRedo
-  const lastPast = past.length > 0 ? past[past.length - 1] : null
-  const nextFuture = future.length > 0 ? future[0] : null
+  const hasHistory = canUndo || canRedo;
+  const lastPast = past.length > 0 ? past[past.length - 1] : null;
+  const nextFuture = future.length > 0 ? future[0] : null;
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
-
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="History capacity"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {CAPACITY_OPTIONS.map((option) => {
-              const active = capacity === option.value
+              const active = capacity === option.value;
               return (
                 <button
                   key={option.value}
@@ -71,16 +53,15 @@ export default function UseHistoryStateDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-3xs font-medium tabular-nums transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {option.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
-
 
         <div className="flex items-center justify-between gap-2 rounded-md border border-border-subtle bg-subtle/35 px-3 py-2.5">
           <div className="flex min-w-0 flex-col gap-0.5">
@@ -95,7 +76,6 @@ export default function UseHistoryStateDemo() {
             present
           </Badge>
         </div>
-
 
         <div className="flex items-center gap-1.5">
           <Input
@@ -118,7 +98,6 @@ export default function UseHistoryStateDemo() {
           </Button>
         </div>
       </CardContent>
-
 
       <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
         <div className="flex min-w-0 flex-col gap-0.5 px-3 py-2">
@@ -173,8 +152,8 @@ export default function UseHistoryStateDemo() {
           variant="tertiary"
           size="icon-compact"
           onClick={() => {
-            setStepCounter(2)
-            reset("v1: Initial draft")
+            setStepCounter(2);
+            reset("v1: Initial draft");
           }}
           aria-label="Reset history state"
         >
@@ -182,5 +161,5 @@ export default function UseHistoryStateDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

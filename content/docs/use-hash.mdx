@@ -14,11 +14,11 @@ The `useHash` hook reads `window.location.hash` (without the leading `#` charact
 ## Usage
 
 ```tsx
-import { useHash } from "@/hooks/useHash"
+import { useHash } from "@/hooks/useHash";
 ```
 
 ```tsx
-const [hash, setHash] = useHash()
+const [hash, setHash] = useHash();
 ```
 
 ## Examples
@@ -28,8 +28,8 @@ const [hash, setHash] = useHash()
 Sync the active tab with the URL hash so users can bookmark or share links to specific sections.
 
 ```tsx
-const [hash, setHash] = useHash({ defaultValue: "overview" })
-const activeTab = hash || "overview"
+const [hash, setHash] = useHash({ defaultValue: "overview" });
+const activeTab = hash || "overview";
 
 return (
   <div>
@@ -37,7 +37,7 @@ return (
     <button onClick={() => setHash("activity")}>Activity</button>
     <p>Current section: {activeTab}</p>
   </div>
-)
+);
 ```
 
 ### Replacing History Entries Instead of Pushing
@@ -45,16 +45,14 @@ return (
 Pass `{ replace: true }` as the second argument to `setHash` to update the URL hash via `history.replaceState` without creating a new browser history entry.
 
 ```tsx
-const [hash, setHash] = useHash()
+const [hash, setHash] = useHash();
 
 return (
   <div>
-    <button onClick={() => setHash("step-2", { replace: true })}>
-      Go to Step 2 (replace)
-    </button>
+    <button onClick={() => setHash("step-2", { replace: true })}>Go to Step 2 (replace)</button>
     <button onClick={() => setHash("", { replace: true })}>Clear hash</button>
   </div>
-)
+);
 ```
 
 ## API Reference

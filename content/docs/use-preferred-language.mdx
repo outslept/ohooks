@@ -14,11 +14,11 @@ The `usePreferredLanguage` hook reads `navigator.language` and subscribes to the
 ## Usage
 
 ```tsx
-import { usePreferredLanguage } from "@/hooks/usePreferredLanguage"
+import { usePreferredLanguage } from "@/hooks/usePreferredLanguage";
 ```
 
 ```tsx
-const language = usePreferredLanguage("en-US")
+const language = usePreferredLanguage("en-US");
 ```
 
 ## Examples
@@ -28,16 +28,16 @@ const language = usePreferredLanguage("en-US")
 Pass the detected BCP 47 language tag to `Intl.DateTimeFormat` or `Intl.NumberFormat`.
 
 ```tsx
-const locale = usePreferredLanguage("en-US")
+const locale = usePreferredLanguage("en-US");
 
 const formattedPrice = new Intl.NumberFormat(locale, {
   style: "currency",
   currency: "USD",
-}).format(1299.5)
+}).format(1299.5);
 
 return (
   <p>
     Locale ({locale}): {formattedPrice}
   </p>
-)
+);
 ```

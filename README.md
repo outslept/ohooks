@@ -183,14 +183,14 @@ npx shadcn@latest add @ohook/all
 
 ohook serves human-readable docs, machine-readable Markdown, and `shadcn` JSON payloads from a unified URL structure:
 
-| Pattern            | Description                                                             |
-| ------------------ | ----------------------------------------------------------------------- |
-| `/r/registry.json` | Full `shadcn` registry catalog (`npx shadcn list` / `search`)           |
-| `/r/<hook>.json`   | Individual `registry:hook` payload (`camelCase` or `kebab-case`)        |
-| `/r/all.json`      | Complete bundle containing all 88 hooks and DOM utilities               |
-| `/llms.txt`        | Concise Markdown index of all documentation pages for LLMs              |
-| `/llms-full.txt`   | Complete documentation corpus concatenated into a single Markdown file  |
-| `/<path>.md`       | Raw Markdown version of any documentation page                          |
+| Pattern            | Description                                                            |
+| ------------------ | ---------------------------------------------------------------------- |
+| `/r/registry.json` | Full `shadcn` registry catalog (`npx shadcn list` / `search`)          |
+| `/r/<hook>.json`   | Individual `registry:hook` payload (`camelCase` or `kebab-case`)       |
+| `/r/all.json`      | Complete bundle containing all 88 hooks and DOM utilities              |
+| `/llms.txt`        | Concise Markdown index of all documentation pages for LLMs             |
+| `/llms-full.txt`   | Complete documentation corpus concatenated into a single Markdown file |
+| `/<path>.md`       | Raw Markdown version of any documentation page                         |
 
 ## Local development
 

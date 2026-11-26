@@ -11,9 +11,7 @@ import { Input } from "@/components/ui/input";
 export function UseBeforeUnloadDemo() {
   const [draft, setDraft] = React.useState("Unsaved article draft");
   const [savedDraft, setSavedDraft] = React.useState("Unsaved article draft");
-  const [lastCheck, setLastCheck] = React.useState<
-    "blocked" | "allowed" | null
-  >(null);
+  const [lastCheck, setLastCheck] = React.useState<"blocked" | "allowed" | null>(null);
 
   const isDirty = draft !== savedDraft;
   useBeforeUnload(isDirty, "You have unsaved changes.");
@@ -39,7 +37,6 @@ export function UseBeforeUnloadDemo() {
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex h-5 items-center justify-between">
-
           {lastCheck ? (
             <Badge
               key={`${lastCheck}-${String(isDirty)}`}

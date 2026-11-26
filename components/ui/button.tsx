@@ -62,18 +62,16 @@ export const buttonVariants = cva(
       size: {
         default:
           "h-9 rounded-lg px-3 gap-2 text-[length:var(--text-ui)] leading-[var(--text-ui--line-height)] [&_svg]:size-4 [&_svg]:shrink-0",
-        compact:
-          "h-7 rounded-md px-2.5 gap-1 text-xs [&_svg]:size-3.5 [&_svg]:shrink-0",
+        compact: "h-7 rounded-md px-2.5 gap-1 text-xs [&_svg]:size-3.5 [&_svg]:shrink-0",
         icon: "size-9 rounded-lg p-0 [&_svg]:size-4 [&_svg]:shrink-0",
-        "icon-compact":
-          "size-7 rounded-md p-0 [&_svg]:size-3.5 [&_svg]:shrink-0",
+        "icon-compact": "size-7 rounded-md p-0 [&_svg]:size-3.5 [&_svg]:shrink-0",
       },
     },
     defaultVariants: {
       variant: "primary",
       size: "default",
     },
-  }
+  },
 );
 
 export type ButtonSize = "default" | "compact" | "icon" | "icon-compact";
@@ -90,7 +88,7 @@ function renderIconSlot(icon: IconProp | undefined) {
   if (React.isValidElement(icon)) {
     return React.cloneElement(
       icon as React.ReactElement<{ "aria-hidden"?: boolean | "true" | "false" }>,
-      { "aria-hidden": true }
+      { "aria-hidden": true },
     );
   }
   if (
@@ -105,7 +103,7 @@ function renderIconSlot(icon: IconProp | undefined) {
 
 function resolveButtonSize(
   sizeProp: ButtonSize | LegacyButtonSize | undefined,
-  providerSize: SizeStep
+  providerSize: SizeStep,
 ): ButtonSize {
   if (!sizeProp) return providerSize;
   switch (sizeProp) {
@@ -120,7 +118,8 @@ function resolveButtonSize(
 }
 
 export interface ButtonProps
-  extends Omit<useRender.ComponentProps<"button">, "disabled" | "size">,
+  extends
+    Omit<useRender.ComponentProps<"button">, "disabled" | "size">,
     Omit<VariantProps<typeof buttonVariants>, "size"> {
   size?: ButtonSize | LegacyButtonSize;
   loading?: boolean;
@@ -131,109 +130,97 @@ export interface ButtonProps
   disabled?: boolean;
 }
 
-export const Button = React.forwardRef<HTMLElement, ButtonProps>(
-  function Button(
-    {
-      variant = "primary",
-      size: sizeProp,
-      loading = false,
-      active = false,
-      leadingIcon,
-      trailingIcon,
-      asChild = false,
-      render,
-      disabled = false,
-      className,
-      children,
-      type = "button",
-      ...otherProps
-    },
-    forwardedRef
-  ) {
-    const { size: providerSize } = useSizeContext();
-    const resolvedSize = resolveButtonSize(sizeProp, providerSize);
-    const isDisabled = disabled || loading;
+export const Button = React.forwardRef<HTMLElement, ButtonProps>(function Button(
+  {
+    variant = "primary",
+    size: sizeProp,
+    loading = false,
+    active = false,
+    leadingIcon,
+    trailingIcon,
+    asChild = false,
+    render,
+    disabled = false,
+    className,
+    children,
+    type = "button",
+    ...otherProps
+  },
+  forwardedRef,
+) {
+  const { size: providerSize } = useSizeContext();
+  const resolvedSize = resolveButtonSize(sizeProp, providerSize);
+  const isDisabled = disabled || loading;
 
-    const resolvedRender =
-      render ??
-      (asChild && React.isValidElement(children)
-        ? (children as React.ReactElement)
-        : undefined);
+  const resolvedRender =
+    render ??
+    (asChild && React.isValidElement(children) ? (children as React.ReactElement) : undefined);
 
-    const rawChildren =
-      asChild && !render && React.isValidElement(children)
-        ? (children.props as { children?: React.ReactNode }).children
-        : children;
+  const rawChildren =
+    asChild && !render && React.isValidElement(children)
+      ? (children.props as { children?: React.ReactNode }).children
+      : children;
 
-    const content = (
-      <>
-        <span
-          className={cn(
-            "inline-flex items-center justify-center gap-[inherit]",
-            "transition-[opacity,filter,transform] duration-180 ease-snappy motion-reduce:transition-none",
-            loading
-              ? "scale-95 opacity-0 blur-xs"
-              : "scale-100 opacity-100 blur-0"
-          )}
-        >
-          {renderIconSlot(leadingIcon)}
-          {rawChildren}
-          {renderIconSlot(trailingIcon)}
-        </span>
+  const content = (
+    <>
+      <span
+        className={cn(
+          "inline-flex items-center justify-center gap-[inherit]",
+          "transition-[opacity,filter,transform] duration-180 ease-snappy motion-reduce:transition-none",
+          loading ? "scale-95 opacity-0 blur-xs" : "scale-100 opacity-100 blur-0",
+        )}
+      >
+        {renderIconSlot(leadingIcon)}
+        {rawChildren}
+        {renderIconSlot(trailingIcon)}
+      </span>
 
-        <span
-          aria-hidden={!loading}
-          className={cn(
-            "pointer-events-none absolute inset-0 flex items-center justify-center",
-            "transition-[opacity,filter,transform] duration-180 ease-snappy motion-reduce:transition-none",
-            loading
-              ? "scale-100 opacity-100 blur-0"
-              : "scale-95 opacity-0 blur-xs"
-          )}
-        >
-          <svg
-            className={cn(loading && "animate-spinner")}
-            viewBox="0 0 24 24"
-            fill="none"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="3"
-            />
-            <path
-              className="opacity-90"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-            />
-          </svg>
-        </span>
-      </>
-    );
+      <span
+        aria-hidden={!loading}
+        className={cn(
+          "pointer-events-none absolute inset-0 flex items-center justify-center",
+          "transition-[opacity,filter,transform] duration-180 ease-snappy motion-reduce:transition-none",
+          loading ? "scale-100 opacity-100 blur-0" : "scale-95 opacity-0 blur-xs",
+        )}
+      >
+        <svg className={cn(loading && "animate-spinner")} viewBox="0 0 24 24" fill="none">
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="3"
+          />
+          <path
+            className="opacity-90"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
+        </svg>
+      </span>
+    </>
+  );
 
-    const defaultProps: useRender.ElementProps<"button"> &
-      Record<`data-${string}`, string | undefined> = {
-      type: resolvedRender ? undefined : type,
-      className: cn(buttonVariants({ variant, size: resolvedSize }), className),
-      disabled: isDisabled,
-      "aria-busy": loading || undefined,
-      "data-slot": "button",
-      "data-variant": variant ?? "primary",
-      "data-size": resolvedSize,
-      "data-loading": loading ? "" : undefined,
-      "data-active": active ? "" : undefined,
-      "data-disabled": isDisabled ? "" : undefined,
-      children: content,
-    };
+  const defaultProps: useRender.ElementProps<"button"> &
+    Record<`data-${string}`, string | undefined> = {
+    type: resolvedRender ? undefined : type,
+    className: cn(buttonVariants({ variant, size: resolvedSize }), className),
+    disabled: isDisabled,
+    "aria-busy": loading || undefined,
+    "data-slot": "button",
+    "data-variant": variant ?? "primary",
+    "data-size": resolvedSize,
+    "data-loading": loading ? "" : undefined,
+    "data-active": active ? "" : undefined,
+    "data-disabled": isDisabled ? "" : undefined,
+    children: content,
+  };
 
-    return useRender({
-      defaultTagName: "button",
-      render: resolvedRender,
-      ref: forwardedRef,
-      props: mergeProps<"button">(defaultProps, otherProps),
-    });
-  }
-);
+  return useRender({
+    defaultTagName: "button",
+    render: resolvedRender,
+    ref: forwardedRef,
+    props: mergeProps<"button">(defaultProps, otherProps),
+  });
+});

@@ -14,11 +14,11 @@ The `useWindowSize` hook listens to window `resize` and `orientationchange` even
 ## Usage
 
 ```tsx
-import { useWindowSize } from "@/hooks/useWindowSize"
+import { useWindowSize } from "@/hooks/useWindowSize";
 ```
 
 ```tsx
-const { width, height } = useWindowSize({ throttleMs: 100 })
+const { width, height } = useWindowSize({ throttleMs: 100 });
 ```
 
 ## Examples
@@ -28,13 +28,13 @@ const { width, height } = useWindowSize({ throttleMs: 100 })
 Pass `width` and `height` to components that require explicit pixel dimensions.
 
 ```tsx
-const { width, height } = useWindowSize()
+const { width, height } = useWindowSize();
 
 return (
   <div>
     Viewport: {width}px × {height}px
   </div>
-)
+);
 ```
 
 ### Throttled Updates and SSR Initial Dimensions
@@ -47,7 +47,7 @@ const { width, height } = useWindowSize({
   initialHeight: 720,
   throttleMs: 150,
   includeVisualViewport: true,
-})
+});
 ```
 
 ## API Reference

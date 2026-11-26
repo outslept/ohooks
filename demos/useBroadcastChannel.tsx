@@ -46,7 +46,6 @@ export function UseBroadcastChannelDemo() {
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Receiver subscription state"
@@ -65,7 +64,7 @@ export function UseBroadcastChannelDemo() {
                     selected
                       ? "bg-control text-foreground shadow-control"
                       : "text-muted-foreground pointer-hover:hover:text-foreground",
-                    "focus-visible:ring-1 focus-visible:ring-ring"
+                    "focus-visible:ring-1 focus-visible:ring-ring",
                   )}
                 >
                   {mode.label}
@@ -110,15 +109,11 @@ export function UseBroadcastChannelDemo() {
               <Badge size="compact" variant="code" className="tabular-nums">
                 #{lastPacket.seq}
               </Badge>
-              <span className="truncate font-medium text-foreground">
-                {lastPacket.text}
-              </span>
+              <span className="truncate font-medium text-foreground">{lastPacket.text}</span>
             </div>
           ) : (
             <span className="text-2xs text-muted-foreground">
-              {sender.isSupported
-                ? "Awaiting broadcast packet…"
-                : "BroadcastChannel unsupported"}
+              {sender.isSupported ? "Awaiting broadcast packet…" : "BroadcastChannel unsupported"}
             </span>
           )}
         </div>

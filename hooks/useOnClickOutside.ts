@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 export type ClickOutsideEvent = MouseEvent | TouchEvent | PointerEvent;
 
@@ -11,14 +9,16 @@ export interface UseOnClickOutsideOptions {
   /** Whether the outside click listener is active (default: `true`) */
   enabled?: boolean;
   /** DOM events to listen for on `document` (default: `['pointerdown']`) */
-  events?: ReadonlyArray<'mousedown' | 'mouseup' | 'touchstart' | 'touchend' | 'pointerdown' | 'click'>;
+  events?: ReadonlyArray<
+    "mousedown" | "mouseup" | "touchstart" | "touchend" | "pointerdown" | "click"
+  >;
   /** Listen during the capture phase (default: `true`) */
   capture?: boolean;
 }
 
 const DEFAULT_EVENTS: ReadonlyArray<
-  'mousedown' | 'mouseup' | 'touchstart' | 'touchend' | 'pointerdown' | 'click'
-> = ['pointerdown'];
+  "mousedown" | "mouseup" | "touchstart" | "touchend" | "pointerdown" | "click"
+> = ["pointerdown"];
 
 /**
  * Invokes a handler when a pointer, mouse, or touch interaction occurs outside one or more target elements (with Shadow DOM `composedPath` support).
@@ -36,25 +36,19 @@ const DEFAULT_EVENTS: ReadonlyArray<
  * ```
  */
 export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
-  target:
-    | EventListenerTarget<T>
-    | ReadonlyArray<EventListenerTarget<HTMLElement>>,
+  target: EventListenerTarget<T> | ReadonlyArray<EventListenerTarget<HTMLElement>>,
   handler: (event: ClickOutsideEvent) => void,
-  options: UseOnClickOutsideOptions = {}
+  options: UseOnClickOutsideOptions = {},
 ): void {
-  const {
-    enabled = true,
-    events = DEFAULT_EVENTS,
-    capture = true,
-  } = options;
+  const { enabled = true, events = DEFAULT_EVENTS, capture = true } = options;
 
   const handlerRef = useLatest(handler);
   const targetRef = useLatest(target);
   const eventsRef = useLatest(events);
-  const eventsKey = events.join(',');
+  const eventsKey = events.join(",");
 
   useEffect(() => {
-    if (!enabled || typeof document === 'undefined') {
+    if (!enabled || typeof document === "undefined") {
       return;
     }
 
@@ -68,13 +62,14 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
       }
 
       const rawTargets = targetRef.current;
-      const targetsArray: ReadonlyArray<EventListenerTarget<HTMLElement>> =
-        Array.isArray(rawTargets) ? rawTargets : [rawTargets];
+      const targetsArray: ReadonlyArray<EventListenerTarget<HTMLElement>> = Array.isArray(
+        rawTargets,
+      )
+        ? rawTargets
+        : [rawTargets];
 
       const composedPath =
-        typeof event.composedPath === 'function'
-          ? event.composedPath()
-          : undefined;
+        typeof event.composedPath === "function" ? event.composedPath() : undefined;
 
       for (const item of targetsArray) {
         const element = resolveTargetElement(item);

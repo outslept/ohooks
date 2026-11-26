@@ -14,13 +14,13 @@ The `useUpdateEffect` hook has the exact same signature as `useEffect`, but skip
 ## Usage
 
 ```tsx
-import { useUpdateEffect } from "@/hooks/useUpdateEffect"
+import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 ```
 
 ```tsx
 useUpdateEffect(() => {
-  saveDraft(content)
-}, [content])
+  saveDraft(content);
+}, [content]);
 ```
 
 ## Examples
@@ -30,13 +30,13 @@ useUpdateEffect(() => {
 Skip the initial render so loading pre-populated data does not immediately trigger a network save request.
 
 ```tsx
-const [title, setTitle] = useState(initialTitle)
+const [title, setTitle] = useState(initialTitle);
 
 useUpdateEffect(() => {
-  api.updateTitle(title)
-}, [title])
+  api.updateTitle(title);
+}, [title]);
 
-return <input value={title} onChange={(e) => setTitle(e.target.value)} />
+return <input value={title} onChange={(e) => setTitle(e.target.value)} />;
 ```
 
 ### Resetting Pagination When Filters Change
@@ -45,6 +45,6 @@ Reset the page number back to `1` whenever `category` changes, without resetting
 
 ```tsx
 useUpdateEffect(() => {
-  setPage(1)
-}, [category])
+  setPage(1);
+}, [category]);
 ```

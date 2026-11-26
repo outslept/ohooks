@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from "react";
 
 export interface UseDevicePixelRatioOptions {
   /** Fallback device pixel ratio used during SSR (default: `1`) */
@@ -6,10 +6,7 @@ export interface UseDevicePixelRatioOptions {
 }
 
 function subscribe(onStoreChange: () => void): () => void {
-  if (
-    typeof window === 'undefined' ||
-    typeof window.matchMedia !== 'function'
-  ) {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
     return () => {};
   }
 
@@ -19,8 +16,8 @@ function subscribe(onStoreChange: () => void): () => void {
     if (!mediaQueryList) {
       return;
     }
-    if (typeof mediaQueryList.removeEventListener === 'function') {
-      mediaQueryList.removeEventListener('change', handleChange);
+    if (typeof mediaQueryList.removeEventListener === "function") {
+      mediaQueryList.removeEventListener("change", handleChange);
     } else {
       mediaQueryList.removeListener(handleChange);
     }
@@ -32,8 +29,8 @@ function subscribe(onStoreChange: () => void): () => void {
     const dpr = window.devicePixelRatio || 1;
     mediaQueryList = window.matchMedia(`(resolution: ${dpr}dppx)`);
 
-    if (typeof mediaQueryList.addEventListener === 'function') {
-      mediaQueryList.addEventListener('change', handleChange);
+    if (typeof mediaQueryList.addEventListener === "function") {
+      mediaQueryList.addEventListener("change", handleChange);
     } else {
       mediaQueryList.addListener(handleChange);
     }
@@ -61,13 +58,11 @@ function subscribe(onStoreChange: () => void): () => void {
  * const dpr = useDevicePixelRatio({ defaultValue: 1 });
  * ```
  */
-export function useDevicePixelRatio(
-  options: UseDevicePixelRatioOptions = {},
-): number {
+export function useDevicePixelRatio(options: UseDevicePixelRatioOptions = {}): number {
   const { defaultValue = 1 } = options;
 
   const getSnapshot = useCallback((): number => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return defaultValue;
     }
     return window.devicePixelRatio || defaultValue;

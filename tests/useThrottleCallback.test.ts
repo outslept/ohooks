@@ -1,10 +1,10 @@
-import { useThrottleCallback } from '@/hooks/useThrottleCallback';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useThrottleCallback } from "@/hooks/useThrottleCallback";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useThrottleCallback', () => {
+describe("useThrottleCallback", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -13,15 +13,12 @@ describe('useThrottleCallback', () => {
     vi.useRealTimers();
   });
 
-  it('throttles with leading and trailing edges, supports cancel/flush, and cleans up on unmount', async () => {
+  it("throttles with leading and trailing edges, supports cancel/flush, and cleans up on unmount", async () => {
     const fn = vi.fn((n: number) => n * 2);
-    const { result, unmount } = await renderHook(() =>
-      useThrottleCallback(fn, 100),
-    );
+    const { result, unmount } = await renderHook(() => useThrottleCallback(fn, 100));
 
     expect(result.current(1)).toBe(2);
     expect(fn).toHaveBeenCalledTimes(1);
-
 
     expect(result.current.flush()).toBe(2);
     expect(fn).toHaveBeenCalledTimes(1);
@@ -43,7 +40,6 @@ describe('useThrottleCallback', () => {
     result.current.cancel();
     expect(result.current.isPending()).toBe(false);
 
-
     result.current(6);
     result.current(7);
     expect(result.current.isPending()).toBe(true);
@@ -52,7 +48,7 @@ describe('useThrottleCallback', () => {
     expect(fn).toHaveBeenLastCalledWith(6);
   });
 
-  it('respects leading: false and trailing: false options', async () => {
+  it("respects leading: false and trailing: false options", async () => {
     const leadingFalseFn = vi.fn((n: number) => n);
     const { result: leadingFalse } = await renderHook(() =>
       useThrottleCallback(leadingFalseFn, 100, {

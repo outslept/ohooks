@@ -14,14 +14,14 @@ The `useCookie` hook reads, updates, and removes a browser cookie reactively acr
 ## Usage
 
 ```tsx
-import { useCookie } from "@/hooks/useCookie"
+import { useCookie } from "@/hooks/useCookie";
 ```
 
 ```tsx
 const [token, setToken, deleteToken] = useCookie("auth_token", {
   path: "/",
   sameSite: "lax",
-})
+});
 ```
 
 ## Examples
@@ -35,7 +35,7 @@ const [theme, setTheme, resetTheme] = useCookie("theme", {
   defaultValue: "system",
   path: "/",
   maxAge: 60 * 60 * 24 * 365,
-})
+});
 
 return (
   <div>
@@ -44,7 +44,7 @@ return (
     <button onClick={() => setTheme("light")}>Light</button>
     <button onClick={() => resetTheme()}>Reset</button>
   </div>
-)
+);
 ```
 
 ### Overriding Attributes Per Write
@@ -56,7 +56,7 @@ const [session, setSession, clearSession] = useCookie("session_id", {
   path: "/",
   sameSite: "strict",
   secure: true,
-})
+});
 
 return (
   <div>
@@ -71,7 +71,7 @@ return (
     </button>
     <button onClick={() => clearSession()}>End session</button>
   </div>
-)
+);
 ```
 
 ## API Reference

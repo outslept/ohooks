@@ -1,5 +1,5 @@
-import { type RefCallback, useCallback, useEffect, useState } from 'react';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { type RefCallback, useCallback, useEffect, useState } from "react";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 export interface MeasureRect {
   /** Horizontal offset of the measured box in pixels */
@@ -27,10 +27,7 @@ export interface UseMeasureOptions {
   enabled?: boolean;
 }
 
-export type UseMeasureReturn<T extends Element = HTMLElement> = [
-  RefCallback<T>,
-  MeasureRect,
-];
+export type UseMeasureReturn<T extends Element = HTMLElement> = [RefCallback<T>, MeasureRect];
 
 const INITIAL_RECT: MeasureRect = {
   x: 0,
@@ -56,11 +53,8 @@ function areRectsEqual(a: MeasureRect, b: MeasureRect): boolean {
   );
 }
 
-function readInitialRect(
-  element: Element,
-  box: ResizeObserverBoxOptions,
-): MeasureRect {
-  if (box === 'border-box') {
+function readInitialRect(element: Element, box: ResizeObserverBoxOptions): MeasureRect {
+  if (box === "border-box") {
     if (element instanceof HTMLElement) {
       const width = element.offsetWidth;
       const height = element.offsetHeight;
@@ -88,20 +82,14 @@ function readInitialRect(
     };
   }
 
-  if (typeof window !== 'undefined' && element instanceof HTMLElement) {
+  if (typeof window !== "undefined" && element instanceof HTMLElement) {
     const style = window.getComputedStyle(element);
     const paddingLeft = parseFloat(style.paddingLeft) || 0;
     const paddingRight = parseFloat(style.paddingRight) || 0;
     const paddingTop = parseFloat(style.paddingTop) || 0;
     const paddingBottom = parseFloat(style.paddingBottom) || 0;
-    const width = Math.max(
-      0,
-      element.clientWidth - paddingLeft - paddingRight,
-    );
-    const height = Math.max(
-      0,
-      element.clientHeight - paddingTop - paddingBottom,
-    );
+    const width = Math.max(0, element.clientWidth - paddingLeft - paddingRight);
+    const height = Math.max(0, element.clientHeight - paddingTop - paddingBottom);
 
     return {
       x: paddingLeft,
@@ -143,7 +131,7 @@ function readInitialRect(
 export function useMeasure<T extends Element = HTMLElement>(
   options: UseMeasureOptions = {},
 ): UseMeasureReturn<T> {
-  const { box = 'content-box', enabled = true } = options;
+  const { box = "content-box", enabled = true } = options;
 
   const [element, setElement] = useState<T | null>(null);
   const [rect, setRect] = useState<MeasureRect>(INITIAL_RECT);
@@ -165,8 +153,8 @@ export function useMeasure<T extends Element = HTMLElement>(
     if (
       !enabled ||
       !element ||
-      typeof window === 'undefined' ||
-      typeof window.ResizeObserver !== 'function'
+      typeof window === "undefined" ||
+      typeof window.ResizeObserver !== "function"
     ) {
       return;
     }
@@ -181,14 +169,14 @@ export function useMeasure<T extends Element = HTMLElement>(
       let width = entry.contentRect.width;
       let height = entry.contentRect.height;
 
-      if (box === 'border-box' && entry.borderBoxSize?.length > 0) {
+      if (box === "border-box" && entry.borderBoxSize?.length > 0) {
         const boxSize = entry.borderBoxSize[0];
         if (boxSize) {
           width = boxSize.inlineSize;
           height = boxSize.blockSize;
         }
       } else if (
-        box === 'device-pixel-content-box' &&
+        box === "device-pixel-content-box" &&
         entry.devicePixelContentBoxSize?.length > 0
       ) {
         const boxSize = entry.devicePixelContentBoxSize[0];
@@ -205,7 +193,7 @@ export function useMeasure<T extends Element = HTMLElement>(
       }
 
       const nextRect: MeasureRect =
-        box === 'border-box'
+        box === "border-box"
           ? {
               x: 0,
               y: 0,

@@ -1,9 +1,4 @@
-import {
-  type Dispatch,
-  type SetStateAction,
-  useCallback,
-  useState,
-} from 'react';
+import { type Dispatch, type SetStateAction, useCallback, useState } from "react";
 
 /** Function that toggles a boolean state or sets it to an explicit boolean value. */
 export interface ToggleFn {
@@ -31,9 +26,7 @@ export function useToggle(
   const [value, setValue] = useState<boolean>(defaultValue);
 
   const toggle: ToggleFn = useCallback((nextValue?: unknown) => {
-    setValue((prev) =>
-      typeof nextValue === 'boolean' ? nextValue : !prev,
-    );
+    setValue((prev) => (typeof nextValue === "boolean" ? nextValue : !prev));
   }, []);
 
   return [value, toggle, setValue];

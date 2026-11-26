@@ -1,9 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useCallback, useEffect, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 export interface UseFullscreenOptions {
   /** Callback fired when fullscreen mode is entered */
@@ -46,7 +44,7 @@ interface VendorElement extends HTMLElement {
 }
 
 function getFullscreenElement(): Element | null {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return null;
   }
   const doc = document as VendorDocument;
@@ -60,20 +58,20 @@ function getFullscreenElement(): Element | null {
 }
 
 function checkIsSupported(): boolean {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return false;
   }
   const doc = document as VendorDocument;
   return Boolean(
     doc.fullscreenEnabled ||
-      doc.webkitFullscreenEnabled ||
-      doc.mozFullScreenEnabled ||
-      doc.msFullscreenEnabled
+    doc.webkitFullscreenEnabled ||
+    doc.mozFullScreenEnabled ||
+    doc.msFullscreenEnabled,
   );
 }
 
 function isTargetCurrentlyFullscreen(
-  target: EventListenerTarget<HTMLElement> | undefined
+  target: EventListenerTarget<HTMLElement> | undefined,
 ): boolean {
   const activeElement = getFullscreenElement();
   if (!activeElement) {
@@ -98,16 +96,17 @@ function isTargetCurrentlyFullscreen(
  */
 export function useFullscreen(
   target?: EventListenerTarget<HTMLElement>,
-  options: UseFullscreenOptions = {}
+  options: UseFullscreenOptions = {},
 ): UseFullscreenReturn {
   const optionsRef = useLatest(options);
   const isSupported = checkIsSupported();
 
   const [isFullscreen, setIsFullscreen] = useState<boolean>(() =>
-    isTargetCurrentlyFullscreen(target)
+    isTargetCurrentlyFullscreen(target),
   );
-  const [prevTarget, setPrevTarget] =
-    useState<EventListenerTarget<HTMLElement> | undefined>(target);
+  const [prevTarget, setPrevTarget] = useState<EventListenerTarget<HTMLElement> | undefined>(
+    target,
+  );
 
   if (prevTarget !== target) {
     setPrevTarget(target);
@@ -118,7 +117,7 @@ export function useFullscreen(
   }
 
   useEffect(() => {
-    if (typeof document === 'undefined') {
+    if (typeof document === "undefined") {
       return;
     }
 
@@ -137,10 +136,10 @@ export function useFullscreen(
     };
 
     const events = [
-      'fullscreenchange',
-      'webkitfullscreenchange',
-      'mozfullscreenchange',
-      'MSFullscreenChange',
+      "fullscreenchange",
+      "webkitfullscreenchange",
+      "mozfullscreenchange",
+      "MSFullscreenChange",
     ];
 
     for (const eventName of events) {
@@ -155,14 +154,11 @@ export function useFullscreen(
   }, [target, optionsRef]);
 
   const enter = useCallback(async (): Promise<void> => {
-    if (!isSupported || typeof document === 'undefined') {
+    if (!isSupported || typeof document === "undefined") {
       return;
     }
 
-    const element = resolveTargetElement(
-      target,
-      document.documentElement
-    ) as VendorElement | null;
+    const element = resolveTargetElement(target, document.documentElement) as VendorElement | null;
     if (!element) {
       return;
     }
@@ -174,7 +170,7 @@ export function useFullscreen(
         element.mozRequestFullScreen ??
         element.msRequestFullscreen;
 
-      if (typeof requestFn === 'function') {
+      if (typeof requestFn === "function") {
         await requestFn.call(element);
       }
     } catch (error) {
@@ -183,7 +179,7 @@ export function useFullscreen(
   }, [isSupported, target, optionsRef]);
 
   const exit = useCallback(async (): Promise<void> => {
-    if (!isSupported || typeof document === 'undefined') {
+    if (!isSupported || typeof document === "undefined") {
       return;
     }
 
@@ -205,7 +201,7 @@ export function useFullscreen(
         doc.mozCancelFullScreen ??
         doc.msExitFullscreen;
 
-      if (typeof exitFn === 'function') {
+      if (typeof exitFn === "function") {
         await exitFn.call(doc);
       }
     } catch (error) {

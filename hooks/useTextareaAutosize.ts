@@ -1,10 +1,8 @@
-import { useCallback, useEffect } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useCallback, useEffect } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 /** Configuration options for `useTextareaAutosize`. */
 export interface UseTextareaAutosizeOptions {
@@ -40,13 +38,13 @@ export interface UseTextareaAutosizeReturn {
 export function useTextareaAutosize(
   target: EventListenerTarget<HTMLTextAreaElement>,
   value?: string,
-  options: UseTextareaAutosizeOptions = {}
+  options: UseTextareaAutosizeOptions = {},
 ): UseTextareaAutosizeReturn {
   const { minHeight, maxHeight, onResize } = options;
   const onResizeRef = useLatest(onResize);
 
   const resize = useCallback(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
 
@@ -56,15 +54,15 @@ export function useTextareaAutosize(
     }
 
     const computedStyle = window.getComputedStyle(textarea);
-    const isBorderBox = computedStyle.boxSizing === 'border-box';
+    const isBorderBox = computedStyle.boxSizing === "border-box";
     const borderTop = parseFloat(computedStyle.borderTopWidth) || 0;
     const borderBottom = parseFloat(computedStyle.borderBottomWidth) || 0;
     const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
     const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
 
     const previousOverflow = textarea.style.overflowY;
-    textarea.style.height = 'auto';
-    textarea.style.overflowY = 'hidden';
+    textarea.style.height = "auto";
+    textarea.style.overflowY = "hidden";
 
     let nextHeight = textarea.scrollHeight;
 
@@ -86,9 +84,9 @@ export function useTextareaAutosize(
 
     textarea.style.height = `${nextHeight}px`;
     textarea.style.overflowY = shouldScroll
-      ? 'auto'
-      : previousOverflow === 'auto'
-        ? 'hidden'
+      ? "auto"
+      : previousOverflow === "auto"
+        ? "hidden"
         : previousOverflow;
 
     onResizeRef.current?.(nextHeight);
@@ -99,7 +97,7 @@ export function useTextareaAutosize(
   }, [value, resize]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
 
@@ -108,12 +106,12 @@ export function useTextareaAutosize(
       return;
     }
 
-    textarea.addEventListener('input', resize);
-    window.addEventListener('resize', resize);
+    textarea.addEventListener("input", resize);
+    window.addEventListener("resize", resize);
 
     return () => {
-      textarea.removeEventListener('input', resize);
-      window.removeEventListener('resize', resize);
+      textarea.removeEventListener("input", resize);
+      window.removeEventListener("resize", resize);
     };
   }, [target, resize]);
 

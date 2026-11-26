@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Lock, Sun, Unlock } from "lucide-react"
-import { cn } from "cn"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useWakeLock } from "@/hooks/useWakeLock"
+import { useState } from "react";
+import { Lock, Sun, Unlock } from "lucide-react";
+import { cn } from "cn";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useWakeLock } from "@/hooks/useWakeLock";
 
 const REACQUIRE_OPTIONS = [
   { label: "true", value: true },
   { label: "false", value: false },
-] as const
+] as const;
 
 export default function UseWakeLockDemo() {
-  const [enabled, setEnabled] = useState(false)
-  const [reacquireIdx, setReacquireIdx] = useState(0)
-  const reacquireOnVisible = REACQUIRE_OPTIONS[reacquireIdx].value
+  const [enabled, setEnabled] = useState(false);
+  const [reacquireIdx, setReacquireIdx] = useState(0);
+  const reacquireOnVisible = REACQUIRE_OPTIONS[reacquireIdx].value;
 
   const { isSupported, isLocked, error } = useWakeLock(enabled, {
     reacquireOnVisible,
-  })
+  });
 
   const statusKey = error
     ? "error"
@@ -27,24 +27,21 @@ export default function UseWakeLockDemo() {
       ? "unsupported"
       : isLocked
         ? "locked"
-        : "released"
+        : "released";
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div className="flex items-center gap-1.5">
-            <span className="font-mono text-2xs text-muted-foreground">
-              reacquire
-            </span>
+            <span className="font-mono text-2xs text-muted-foreground">reacquire</span>
             <div
               role="group"
               aria-label="Reacquire wake lock on visibility change"
               className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
             >
               {REACQUIRE_OPTIONS.map((opt, idx) => {
-                const active = idx === reacquireIdx
+                const active = idx === reacquireIdx;
                 return (
                   <button
                     key={opt.label}
@@ -54,12 +51,12 @@ export default function UseWakeLockDemo() {
                       "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs transition-colors",
                       active
                         ? "bg-control text-foreground shadow-control"
-                        : "text-muted-foreground hover:text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     {opt.label}
                   </button>
-                )
+                );
               })}
             </div>
           </div>
@@ -72,9 +69,7 @@ export default function UseWakeLockDemo() {
                 <Sun className="size-4 text-primary" />
                 <span>locked</span>
               </div>
-              <span className="text-2xs text-muted-foreground">
-                screen: awake
-              </span>
+              <span className="text-2xs text-muted-foreground">screen: awake</span>
             </>
           )}
 
@@ -83,9 +78,7 @@ export default function UseWakeLockDemo() {
               <span className="text-base font-semibold tracking-tight text-foreground">
                 released
               </span>
-              <span className="text-2xs text-muted-foreground">
-                screen: normal sleep
-              </span>
+              <span className="text-2xs text-muted-foreground">screen: normal sleep</span>
             </>
           )}
 
@@ -94,17 +87,13 @@ export default function UseWakeLockDemo() {
               <span className="text-base font-semibold tracking-tight text-muted-foreground">
                 unsupported
               </span>
-              <span className="text-2xs text-muted-foreground">
-                navigator.wakeLock unavailable
-              </span>
+              <span className="text-2xs text-muted-foreground">navigator.wakeLock unavailable</span>
             </>
           )}
 
           {statusKey === "error" && error && (
             <>
-              <span className="text-base font-semibold tracking-tight text-destructive">
-                error
-              </span>
+              <span className="text-base font-semibold tracking-tight text-destructive">error</span>
               <span className="max-w-full truncate text-2xs text-muted-foreground">
                 {error.message}
               </span>
@@ -145,5 +134,5 @@ export default function UseWakeLockDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

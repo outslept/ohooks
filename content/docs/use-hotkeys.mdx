@@ -14,13 +14,13 @@ The `useHotkeys` hook binds one or more keyboard shortcut combinations (such as 
 ## Usage
 
 ```tsx
-import { useHotkeys } from "@/hooks/useHotkeys"
+import { useHotkeys } from "@/hooks/useHotkeys";
 ```
 
 ```tsx
 useHotkeys("mod+k", () => {
-  setCommandPaletteOpen(true)
-})
+  setCommandPaletteOpen(true);
+});
 ```
 
 ## Examples
@@ -33,13 +33,13 @@ Set `preventDefault: true` and `enableOnFormTags: true` to intercept `Cmd+S` / `
 useHotkeys(
   "mod+s",
   () => {
-    saveDocument()
+    saveDocument();
   },
   {
     preventDefault: true,
     enableOnFormTags: true,
-  }
-)
+  },
+);
 ```
 
 ### Scoping Shortcuts to a Container Element
@@ -47,22 +47,22 @@ useHotkeys(
 Pass a `target` ref in the options object so the shortcut only triggers when focus is inside that container.
 
 ```tsx
-const editorRef = useRef<HTMLDivElement>(null)
+const editorRef = useRef<HTMLDivElement>(null);
 
 useHotkeys(
   ["mod+z", "mod+shift+z"],
   (event) => {
-    if (event.shiftKey) redo()
-    else undo()
+    if (event.shiftKey) redo();
+    else undo();
   },
-  { target: editorRef, preventDefault: true }
-)
+  { target: editorRef, preventDefault: true },
+);
 
 return (
   <div ref={editorRef} tabIndex={0}>
     Focusable editor area
   </div>
-)
+);
 ```
 
 ## API Reference

@@ -1,13 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
-import {
-  type EventListenerTarget,
-  useEventListener,
-} from './useEventListener';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { useThrottleCallback } from './useThrottleCallback';
-import { useUnmount } from './useUnmount';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect, useRef, useState } from "react";
+import { useEventCallback } from "./useEventCallback";
+import { type EventListenerTarget, useEventListener } from "./useEventListener";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
+import { useThrottleCallback } from "./useThrottleCallback";
+import { useUnmount } from "./useUnmount";
+import { resolveTargetElement } from "@/lib/utils";
 
 export interface ScrollDirections {
   /** Whether the element is currently scrolling left */
@@ -153,26 +150,25 @@ export function useElementScroll<T extends HTMLElement = HTMLElement>(
 
     const arrived: ScrollArrivedState = {
       top: y <= topOffset,
-      bottom:
-        y + element.clientHeight >=
-        element.scrollHeight - bottomOffset - 1,
+      bottom: y + element.clientHeight >= element.scrollHeight - bottomOffset - 1,
       left: x <= leftOffset,
-      right:
-        x + element.clientWidth >=
-        element.scrollWidth - rightOffset - 1,
+      right: x + element.clientWidth >= element.scrollWidth - rightOffset - 1,
     };
 
     prevScrollRef.current = { x, y };
 
     if (fromScrollEvent) {
       clearIdleTimer();
-      idleTimerRef.current = setTimeout(() => {
-        setState((prev) =>
-          prev.isScrolling
-            ? { ...prev, isScrolling: false, directions: INITIAL_DIRECTIONS }
-            : prev,
-        );
-      }, Math.max(0, idleDelayMs));
+      idleTimerRef.current = setTimeout(
+        () => {
+          setState((prev) =>
+            prev.isScrolling
+              ? { ...prev, isScrolling: false, directions: INITIAL_DIRECTIONS }
+              : prev,
+          );
+        },
+        Math.max(0, idleDelayMs),
+      );
     }
 
     const nextIsScrolling = fromScrollEvent ? true : state.isScrolling;
@@ -223,7 +219,7 @@ export function useElementScroll<T extends HTMLElement = HTMLElement>(
     }
   };
 
-  useEventListener('scroll', handleScroll, target, { passive: true });
+  useEventListener("scroll", handleScroll, target, { passive: true });
 
   useIsomorphicLayoutEffect(() => {
     measureScroll(false);
@@ -231,20 +227,18 @@ export function useElementScroll<T extends HTMLElement = HTMLElement>(
 
   useUnmount(clearIdleTimer);
 
-  const scrollTo = useEventCallback(
-    (xOrOptions: number | ScrollToOptions, y?: number) => {
-      const element = resolveTargetElement(target);
-      if (!element) {
-        return;
-      }
+  const scrollTo = useEventCallback((xOrOptions: number | ScrollToOptions, y?: number) => {
+    const element = resolveTargetElement(target);
+    if (!element) {
+      return;
+    }
 
-      if (typeof xOrOptions === 'number') {
-        element.scrollTo(xOrOptions, y ?? element.scrollTop);
-      } else {
-        element.scrollTo(xOrOptions);
-      }
-    },
-  );
+    if (typeof xOrOptions === "number") {
+      element.scrollTo(xOrOptions, y ?? element.scrollTop);
+    } else {
+      element.scrollTo(xOrOptions);
+    }
+  });
 
   return {
     x: state.x,

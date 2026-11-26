@@ -1,18 +1,16 @@
-import { useElementRef } from '@/hooks/useElementRef';
-import { describe, expect, it } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useElementRef } from "@/hooks/useElementRef";
+import { describe, expect, it } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
-describe('useElementRef', () => {
-  it('tracks attached, replaced, and detached DOM elements while keeping a stable callback ref', async () => {
-    const { result, rerender, act } = await renderHook(() =>
-      useElementRef<HTMLDivElement>(),
-    );
+describe("useElementRef", () => {
+  it("tracks attached, replaced, and detached DOM elements while keeping a stable callback ref", async () => {
+    const { result, rerender, act } = await renderHook(() => useElementRef<HTMLDivElement>());
 
     const [initialRef, initialEl] = result.current;
     expect(initialEl).toBeNull();
 
-    const firstDiv = document.createElement('div');
-    const secondDiv = document.createElement('div');
+    const firstDiv = document.createElement("div");
+    const secondDiv = document.createElement("div");
 
     await act(async () => {
       initialRef(firstDiv);

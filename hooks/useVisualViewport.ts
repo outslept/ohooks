@@ -1,4 +1,4 @@
-import { useCallback, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useRef, useSyncExternalStore } from "react";
 
 /** Reactive snapshot of `window.visualViewport` metrics. */
 export interface VisualViewportState {
@@ -35,10 +35,7 @@ function getServerSnapshot(): VisualViewportState {
   return SERVER_SNAPSHOT;
 }
 
-function isSameViewportState(
-  a: VisualViewportState,
-  b: VisualViewportState
-): boolean {
+function isSameViewportState(a: VisualViewportState, b: VisualViewportState): boolean {
   return (
     a.width === b.width &&
     a.height === b.height &&
@@ -52,7 +49,7 @@ function isSameViewportState(
 }
 
 function readViewportState(): VisualViewportState {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return SERVER_SNAPSHOT;
   }
 
@@ -83,27 +80,27 @@ function readViewportState(): VisualViewportState {
 }
 
 function subscribe(onStoreChange: () => void): () => void {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return () => {};
   }
 
   const vv = window.visualViewport;
   if (vv) {
-    vv.addEventListener('resize', onStoreChange, { passive: true });
-    vv.addEventListener('scroll', onStoreChange, { passive: true });
+    vv.addEventListener("resize", onStoreChange, { passive: true });
+    vv.addEventListener("scroll", onStoreChange, { passive: true });
 
     return () => {
-      vv.removeEventListener('resize', onStoreChange);
-      vv.removeEventListener('scroll', onStoreChange);
+      vv.removeEventListener("resize", onStoreChange);
+      vv.removeEventListener("scroll", onStoreChange);
     };
   }
 
-  window.addEventListener('resize', onStoreChange, { passive: true });
-  window.addEventListener('scroll', onStoreChange, { passive: true });
+  window.addEventListener("resize", onStoreChange, { passive: true });
+  window.addEventListener("scroll", onStoreChange, { passive: true });
 
   return () => {
-    window.removeEventListener('resize', onStoreChange);
-    window.removeEventListener('scroll', onStoreChange);
+    window.removeEventListener("resize", onStoreChange);
+    window.removeEventListener("scroll", onStoreChange);
   };
 }
 

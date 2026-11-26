@@ -1,80 +1,80 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { cn } from "cn"
-import { Plus, RotateCcw } from "lucide-react"
+import { useEffect, useRef, useState } from "react";
+import { cn } from "cn";
+import { Plus, RotateCcw } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useUnmount } from "@/hooks/useUnmount"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useUnmount } from "@/hooks/useUnmount";
 
 interface UnmountSnapshot {
-  step: number
-  runs: number
-  time: string
+  step: number;
+  runs: number;
+  time: string;
 }
 
 const MOUNT_OPTIONS = [
   { label: "mounted", value: true },
   { label: "unmounted", value: false },
-] as const
+] as const;
 
 function UnmountProbe({
   step,
   onFlushed,
 }: {
-  step: number
-  onFlushed: (capturedStep: number, time: string) => void
+  step: number;
+  onFlushed: (capturedStep: number, time: string) => void;
 }) {
-  const activeRef = useRef(false)
+  const activeRef = useRef(false);
 
   useEffect(() => {
-    activeRef.current = true
-  }, [])
+    activeRef.current = true;
+  }, []);
 
   useUnmount(() => {
-    activeRef.current = false
-    const capturedStep = step
+    activeRef.current = false;
+    const capturedStep = step;
     const time = new Date().toLocaleTimeString([], {
       hour12: false,
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-    })
+    });
 
     queueMicrotask(() => {
       if (!activeRef.current) {
-        onFlushed(capturedStep, time)
+        onFlushed(capturedStep, time);
       }
-    })
-  })
+    });
+  });
 
-  return null
+  return null;
 }
 
 export default function UseUnmountDemo() {
-  const [mountIdx, setMountIdx] = useState(0)
-  const isMounted = MOUNT_OPTIONS[mountIdx].value
+  const [mountIdx, setMountIdx] = useState(0);
+  const isMounted = MOUNT_OPTIONS[mountIdx].value;
 
-  const [step, setStep] = useState(0)
-  const [snapshot, setSnapshot] = useState<UnmountSnapshot | null>(null)
+  const [step, setStep] = useState(0);
+  const [snapshot, setSnapshot] = useState<UnmountSnapshot | null>(null);
 
   const handleFlushed = (capturedStep: number, time: string) => {
     setSnapshot((prev) => ({
       step: capturedStep,
       runs: (prev?.runs ?? 0) + 1,
       time,
-    }))
-  }
+    }));
+  };
 
   const handleReset = () => {
-    setMountIdx(0)
-    setStep(0)
-    setSnapshot(null)
-  }
+    setMountIdx(0);
+    setStep(0);
+    setSnapshot(null);
+  };
 
-  const canReset = !isMounted || step > 0 || snapshot !== null
+  const canReset = !isMounted || step > 0 || snapshot !== null;
 
   return (
     <Card className="w-full max-w-80">
@@ -82,14 +82,13 @@ export default function UseUnmountDemo() {
 
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Component mount state"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {MOUNT_OPTIONS.map((opt, idx) => {
-              const active = idx === mountIdx
+              const active = idx === mountIdx;
               return (
                 <button
                   key={opt.label}
@@ -99,12 +98,12 @@ export default function UseUnmountDemo() {
                     "rounded-[3px] px-2 py-0.5 font-mono text-2xs font-medium transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {opt.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -119,9 +118,7 @@ export default function UseUnmountDemo() {
                 {isMounted ? "mounted" : "unmounted"}
               </span>
               <Badge variant={isMounted ? "code" : "accent"} size="compact">
-                {isMounted
-                  ? `state: ${step}`
-                  : `flushed #${snapshot?.runs ?? 1}`}
+                {isMounted ? `state: ${step}` : `flushed #${snapshot?.runs ?? 1}`}
               </Badge>
             </div>
             <span className="text-2xs text-muted-foreground">
@@ -155,5 +152,5 @@ export default function UseUnmountDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

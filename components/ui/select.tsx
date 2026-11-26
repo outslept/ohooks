@@ -16,20 +16,17 @@ interface SelectHighlightContextValue {
   reportHover: (el: HTMLElement) => void;
 }
 
-const SelectHighlightContext =
-  React.createContext<SelectHighlightContextValue | null>(null);
+const SelectHighlightContext = React.createContext<SelectHighlightContextValue | null>(null);
 
-export interface SelectTriggerProps
-  extends React.ComponentPropsWithoutRef<typeof BaseSelect.Trigger> {
+export interface SelectTriggerProps extends React.ComponentPropsWithoutRef<
+  typeof BaseSelect.Trigger
+> {
   variant?: "bordered" | "borderless";
   size?: SizeStep;
 }
 
 const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
-  (
-    { className, children, variant = "bordered", size: sizeProp, ...props },
-    ref
-  ) => {
+  ({ className, children, variant = "bordered", size: sizeProp, ...props }, ref) => {
     const { size } = useSize(sizeProp);
     const isCompact = size === "compact";
 
@@ -60,7 +57,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
             "focus-visible:ring-2 focus-visible:ring-ring/20",
             "data-popup-open:text-foreground",
           ],
-          className
+          className,
         )}
         {...props}
       >
@@ -70,12 +67,13 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
         </BaseSelect.Icon>
       </BaseSelect.Trigger>
     );
-  }
+  },
 );
 SelectTrigger.displayName = "SelectTrigger";
 
-export interface SelectContentProps
-  extends React.ComponentPropsWithoutRef<typeof BaseSelect.Popup> {
+export interface SelectContentProps extends React.ComponentPropsWithoutRef<
+  typeof BaseSelect.Popup
+> {
   align?: BaseSelect.Positioner.Props["align"];
   side?: BaseSelect.Positioner.Props["side"];
   sideOffset?: BaseSelect.Positioner.Props["sideOffset"];
@@ -93,7 +91,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
       alignItemWithTrigger = false,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [highlight, setHighlight] = React.useState<{
       top: number;
@@ -113,10 +111,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
       setHighlight((prev) => ({ ...prev, visible: false }));
     }, []);
 
-    const contextValue = React.useMemo(
-      () => ({ reportHover }),
-      [reportHover]
-    );
+    const contextValue = React.useMemo(() => ({ reportHover }), [reportHover]);
 
     return (
       <BaseSelect.Portal>
@@ -138,7 +133,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
               "origin-(--transform-origin) transition-[transform,opacity] duration-150 ease-out-cubic",
               "data-starting-style:scale-95 data-starting-style:opacity-0",
               "data-ending-style:scale-95 data-ending-style:opacity-0",
-              className
+              className,
             )}
             {...props}
           >
@@ -160,7 +155,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
         </BaseSelect.Positioner>
       </BaseSelect.Portal>
     );
-  }
+  },
 );
 SelectContent.displayName = "SelectContent";
 
@@ -172,24 +167,20 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
     const isCompact = size === "compact";
     const highlightCtx = React.useContext(SelectHighlightContext);
 
-    const handleMouseMove = React.useCallback<
-      NonNullable<SelectItemProps["onMouseMove"]>
-    >(
+    const handleMouseMove = React.useCallback<NonNullable<SelectItemProps["onMouseMove"]>>(
       (e) => {
         highlightCtx?.reportHover(e.currentTarget);
         onMouseMove?.(e);
       },
-      [highlightCtx, onMouseMove]
+      [highlightCtx, onMouseMove],
     );
 
-    const handleFocus = React.useCallback<
-      NonNullable<SelectItemProps["onFocus"]>
-    >(
+    const handleFocus = React.useCallback<NonNullable<SelectItemProps["onFocus"]>>(
       (e) => {
         highlightCtx?.reportHover(e.currentTarget);
         onFocus?.(e);
       },
-      [highlightCtx, onFocus]
+      [highlightCtx, onFocus],
     );
 
     return (
@@ -204,26 +195,18 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
           "data-highlighted:text-accent-foreground",
           "data-selected:font-medium data-selected:text-foreground",
           "data-disabled:pointer-events-none data-disabled:opacity-40",
-          isCompact
-            ? "min-h-7 px-2 py-1 text-xs"
-            : "min-h-8 px-2.5 py-1.5 text-compact",
-          className
+          isCompact ? "min-h-7 px-2 py-1 text-xs" : "min-h-8 px-2.5 py-1.5 text-compact",
+          className,
         )}
         {...props}
       >
-        <BaseSelect.ItemText className="truncate">
-          {children}
-        </BaseSelect.ItemText>
+        <BaseSelect.ItemText className="truncate">{children}</BaseSelect.ItemText>
         <BaseSelect.ItemIndicator className="flex shrink-0 items-center justify-center text-foreground animate-in fade-in-0 zoom-in-75 duration-150">
-          <Check
-            className={
-              isCompact ? "size-3.5 stroke-[2.25]" : "size-4 stroke-[2.25]"
-            }
-          />
+          <Check className={isCompact ? "size-3.5 stroke-[2.25]" : "size-4 stroke-[2.25]"} />
         </BaseSelect.ItemIndicator>
       </BaseSelect.Item>
     );
-  }
+  },
 );
 SelectItem.displayName = "SelectItem";
 
@@ -236,7 +219,7 @@ const SelectGroupLabel = React.forwardRef<
     data-slot="select-group-label"
     className={cn(
       "px-2.5 pt-2 pb-1 text-[11px] font-medium tracking-wider text-muted-foreground/70 uppercase select-none",
-      className
+      className,
     )}
     {...props}
   />

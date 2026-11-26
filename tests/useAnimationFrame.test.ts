@@ -1,11 +1,8 @@
-import {
-  useAnimationFrame,
-  type AnimationFrameInfo,
-} from '@/hooks/useAnimationFrame';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useAnimationFrame, type AnimationFrameInfo } from "@/hooks/useAnimationFrame";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
-describe('useAnimationFrame', () => {
+describe("useAnimationFrame", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -15,7 +12,7 @@ describe('useAnimationFrame', () => {
     vi.useRealTimers();
   });
 
-  it('starts immediately by default and tracks deltaTime and elapsedTime across frames', async () => {
+  it("starts immediately by default and tracks deltaTime and elapsedTime across frames", async () => {
     const cb = vi.fn();
     const { result, act } = await renderHook(() => useAnimationFrame(cb));
 
@@ -43,11 +40,9 @@ describe('useAnimationFrame', () => {
     expect(second.elapsedTime).toBe(16);
   });
 
-  it('remains idle when immediate is false until start is called', async () => {
+  it("remains idle when immediate is false until start is called", async () => {
     const cb = vi.fn();
-    const { result, act } = await renderHook(() =>
-      useAnimationFrame(cb, { immediate: false }),
-    );
+    const { result, act } = await renderHook(() => useAnimationFrame(cb, { immediate: false }));
 
     expect(result.current.isActive).toBe(false);
 
@@ -72,11 +67,9 @@ describe('useAnimationFrame', () => {
     });
   });
 
-  it('ignores non-positive fpsLimit (0 or negative) and runs on every frame', async () => {
+  it("ignores non-positive fpsLimit (0 or negative) and runs on every frame", async () => {
     const cb = vi.fn();
-    const { act } = await renderHook(() =>
-      useAnimationFrame(cb, { fpsLimit: 0 }),
-    );
+    const { act } = await renderHook(() => useAnimationFrame(cb, { fpsLimit: 0 }));
 
     await act(async () => {
       vi.advanceTimersToNextFrame();
@@ -90,7 +83,7 @@ describe('useAnimationFrame', () => {
     });
   });
 
-  it('stops, restarts via start or toggle, and resets timing counters on restart', async () => {
+  it("stops, restarts via start or toggle, and resets timing counters on restart", async () => {
     const cb = vi.fn();
     const { result, act } = await renderHook(() => useAnimationFrame(cb));
 
@@ -125,8 +118,8 @@ describe('useAnimationFrame', () => {
     });
   });
 
-  it('cancels the pending animation frame on unmount', async () => {
-    const cancelSpy = vi.spyOn(window, 'cancelAnimationFrame');
+  it("cancels the pending animation frame on unmount", async () => {
+    const cancelSpy = vi.spyOn(window, "cancelAnimationFrame");
     const cb = vi.fn();
 
     const { unmount, act } = await renderHook(() => useAnimationFrame(cb));
@@ -145,9 +138,9 @@ describe('useAnimationFrame', () => {
     expect(cb).toHaveBeenCalledTimes(1);
   });
 
-  it('treats redundant start and stop calls as no-ops', async () => {
-    const rafSpy = vi.spyOn(window, 'requestAnimationFrame');
-    const cancelSpy = vi.spyOn(window, 'cancelAnimationFrame');
+  it("treats redundant start and stop calls as no-ops", async () => {
+    const rafSpy = vi.spyOn(window, "requestAnimationFrame");
+    const cancelSpy = vi.spyOn(window, "cancelAnimationFrame");
     const cb = vi.fn();
 
     const { result, act } = await renderHook(() => useAnimationFrame(cb));
@@ -181,7 +174,7 @@ describe('useAnimationFrame', () => {
     expect(cancelSpy.mock.calls.length).toBe(cancelCountAfterStop);
   });
 
-  it('stopping from inside the frame callback prevents scheduling the next frame', async () => {
+  it("stopping from inside the frame callback prevents scheduling the next frame", async () => {
     const cb = vi.fn();
     let stopLoop = () => {};
 

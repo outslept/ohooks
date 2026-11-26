@@ -14,11 +14,11 @@ The `useLatest` hook stores any value in a `RefObject` and keeps `.current` sync
 ## Usage
 
 ```tsx
-import { useLatest } from "@/hooks/useLatest"
+import { useLatest } from "@/hooks/useLatest";
 ```
 
 ```tsx
-const latestCallbackRef = useLatest(onEvent)
+const latestCallbackRef = useLatest(onEvent);
 ```
 
 ## Examples
@@ -28,19 +28,17 @@ const latestCallbackRef = useLatest(onEvent)
 Read `countRef.current` inside an interval or timeout so you do not need to recreate the timer every time `count` changes.
 
 ```tsx
-const [count, setCount] = useState(0)
-const countRef = useLatest(count)
+const [count, setCount] = useState(0);
+const countRef = useLatest(count);
 
 useEffect(() => {
   const id = setInterval(() => {
-    console.log("Latest count:", countRef.current)
-  }, 2000)
-  return () => clearInterval(id)
-}, [countRef])
+    console.log("Latest count:", countRef.current);
+  }, 2000);
+  return () => clearInterval(id);
+}, [countRef]);
 
-return (
-  <button onClick={() => setCount((c) => c + 1)}>Increment ({count})</button>
-)
+return <button onClick={() => setCount((c) => c + 1)}>Increment ({count})</button>;
 ```
 
 ### Wrapping Event Handlers for External Subscriptions
@@ -48,11 +46,11 @@ return (
 Store a prop callback in `useLatest` so an external library or WebSocket listener only subscribes once.
 
 ```tsx
-const onMessageRef = useLatest(onMessage)
+const onMessageRef = useLatest(onMessage);
 
 useEffect(() => {
-  const handler = (event: MessageEvent) => onMessageRef.current(event.data)
-  window.addEventListener("message", handler)
-  return () => window.removeEventListener("message", handler)
-}, [onMessageRef])
+  const handler = (event: MessageEvent) => onMessageRef.current(event.data);
+  window.addEventListener("message", handler);
+  return () => window.removeEventListener("message", handler);
+}, [onMessageRef]);
 ```

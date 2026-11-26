@@ -1,107 +1,106 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { cn } from "cn"
-import { Check, Loader2, Play, Square } from "lucide-react"
+import { useEffect, useRef, useState } from "react";
+import { cn } from "cn";
+import { Check, Loader2, Play, Square } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useSpinDelay } from "@/hooks/useSpinDelay"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useSpinDelay } from "@/hooks/useSpinDelay";
 
-const DURATION_OPTIONS = [180, 450, 900] as const
-const DELAY_MS = 350
-const MIN_DURATION_MS = 500
+const DURATION_OPTIONS = [180, 450, 900] as const;
+const DELAY_MS = 350;
+const MIN_DURATION_MS = 500;
 
 export default function UseSpinDelayDemo() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [duration, setDuration] = useState<number>(180)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const barRef = useRef<HTMLDivElement>(null)
-  const barAnimRef = useRef<Animation | null>(null)
+  const [isLoading, setIsLoading] = useState(false);
+  const [duration, setDuration] = useState<number>(180);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const barAnimRef = useRef<Animation | null>(null);
 
   const showSmartSpinner = useSpinDelay(isLoading, {
     delay: DELAY_MS,
     minDuration: MIN_DURATION_MS,
-  })
+  });
 
   const clearSimulationTimer = () => {
     if (timerRef.current !== null) {
-      clearTimeout(timerRef.current)
-      timerRef.current = null
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
-  }
+  };
 
   const animateBar = (ms: number) => {
-    const bar = barRef.current
-    if (!bar) return
-    barAnimRef.current?.cancel()
+    const bar = barRef.current;
+    if (!bar) return;
+    barAnimRef.current?.cancel();
     if (
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      return
+      return;
     }
-    barAnimRef.current = bar.animate(
-      [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }],
-      { duration: ms, easing: "linear" }
-    )
-  }
+    barAnimRef.current = bar.animate([{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], {
+      duration: ms,
+      easing: "linear",
+    });
+  };
 
   const simulateFetch = (durationMs = duration) => {
-    clearSimulationTimer()
-    setIsLoading(true)
-    animateBar(durationMs)
+    clearSimulationTimer();
+    setIsLoading(true);
+    animateBar(durationMs);
     timerRef.current = setTimeout(() => {
-      setIsLoading(false)
-      timerRef.current = null
-    }, durationMs)
-  }
+      setIsLoading(false);
+      timerRef.current = null;
+    }, durationMs);
+  };
 
   const toggleManualLoad = () => {
-    clearSimulationTimer()
-    barAnimRef.current?.cancel()
-    setIsLoading((prev) => !prev)
-  }
+    clearSimulationTimer();
+    barAnimRef.current?.cancel();
+    setIsLoading((prev) => !prev);
+  };
 
   useEffect(() => {
     return () => {
-      clearSimulationTimer()
-      barAnimRef.current?.cancel()
-    }
-  }, [])
+      clearSimulationTimer();
+      barAnimRef.current?.cancel();
+    };
+  }, []);
 
-  const thresholdPercent = Math.min(100, Math.round((DELAY_MS / 900) * 100))
+  const thresholdPercent = Math.min(100, Math.round((DELAY_MS / 900) * 100));
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Simulated request duration"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {DURATION_OPTIONS.map((ms) => {
-              const active = duration === ms
+              const active = duration === ms;
               return (
                 <button
                   key={ms}
                   type="button"
                   onClick={() => {
-                    setDuration(ms)
-                    simulateFetch(ms)
+                    setDuration(ms);
+                    simulateFetch(ms);
                   }}
                   className={cn(
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs font-medium tabular-nums transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {ms}ms
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -149,10 +148,7 @@ export default function UseSpinDelayDemo() {
 
           <div className="flex flex-col gap-1.5">
             <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-subtle">
-              <div
-                ref={barRef}
-                className="h-full w-full origin-left scale-x-0 bg-primary"
-              />
+              <div ref={barRef} className="h-full w-full origin-left scale-x-0 bg-primary" />
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute top-0 bottom-0 w-0.5 bg-foreground/40"
@@ -188,5 +184,5 @@ export default function UseSpinDelayDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

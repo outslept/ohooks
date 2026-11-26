@@ -1,16 +1,16 @@
 import {
   useControllableState,
   type UseControllableStateOptions,
-} from '@/hooks/useControllableState';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+} from "@/hooks/useControllableState";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
-describe('useControllableState', () => {
+describe("useControllableState", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('manages state internally when uncontrolled, supports batched functional updates, and skips equal values', async () => {
+  it("manages state internally when uncontrolled, supports batched functional updates, and skips equal values", async () => {
     const onChange = vi.fn();
     const { result, act } = await renderHook(() =>
       useControllableState<number>({
@@ -22,12 +22,10 @@ describe('useControllableState', () => {
     expect(result.current[0]).toBe(1);
     expect(result.current[2]).toBe(false);
 
-
     await act(async () => {
       result.current[1](1);
     });
     expect(onChange).not.toHaveBeenCalled();
-
 
     await act(async () => {
       result.current[1]((prev) => prev + 2);
@@ -40,7 +38,7 @@ describe('useControllableState', () => {
     expect(onChange).toHaveBeenNthCalledWith(2, 30);
   });
 
-  it('delegates state to parent when controlled and reflects updated value prop', async () => {
+  it("delegates state to parent when controlled and reflects updated value prop", async () => {
     const onChange = vi.fn();
     const { result, rerender, act } = await renderHook(
       (props?: { value: number }) =>
@@ -55,7 +53,6 @@ describe('useControllableState', () => {
     expect(result.current[0]).toBe(10);
     expect(result.current[2]).toBe(true);
 
-
     await act(async () => {
       result.current[1]((prev) => prev + 5);
     });
@@ -66,31 +63,29 @@ describe('useControllableState', () => {
     expect(result.current[0]).toBe(15);
   });
 
-  it('respects a custom shouldUpdate comparator', async () => {
+  it("respects a custom shouldUpdate comparator", async () => {
     const onChange = vi.fn();
     const { result, act } = await renderHook(() =>
       useControllableState<{ id: number; label: string }>({
-        defaultValue: { id: 1, label: 'initial' },
+        defaultValue: { id: 1, label: "initial" },
         onChange,
         shouldUpdate: (prev, next) => prev.id === next.id,
       }),
     );
 
-
     await act(async () => {
-      result.current[1]({ id: 1, label: 'changed-label' });
+      result.current[1]({ id: 1, label: "changed-label" });
     });
-    expect(result.current[0].label).toBe('initial');
+    expect(result.current[0].label).toBe("initial");
     expect(onChange).not.toHaveBeenCalled();
 
-
     await act(async () => {
-      result.current[1]({ id: 2, label: 'updated' });
+      result.current[1]({ id: 2, label: "updated" });
     });
-    expect(result.current[0]).toEqual({ id: 2, label: 'updated' });
+    expect(result.current[0]).toEqual({ id: 2, label: "updated" });
     expect(onChange).toHaveBeenCalledExactlyOnceWith({
       id: 2,
-      label: 'updated',
+      label: "updated",
     });
   });
 });

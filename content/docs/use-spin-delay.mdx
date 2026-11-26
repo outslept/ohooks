@@ -14,11 +14,11 @@ The `useSpinDelay` hook smooths loading states by waiting `delay` milliseconds b
 ## Usage
 
 ```tsx
-import { useSpinDelay } from "@/hooks/useSpinDelay"
+import { useSpinDelay } from "@/hooks/useSpinDelay";
 ```
 
 ```tsx
-const showSpinner = useSpinDelay(isFetching, { delay: 400, minDuration: 200 })
+const showSpinner = useSpinDelay(isFetching, { delay: 400, minDuration: 200 });
 ```
 
 ## Examples
@@ -28,20 +28,18 @@ const showSpinner = useSpinDelay(isFetching, { delay: 400, minDuration: 200 })
 Wrap your `isLoading` boolean with `useSpinDelay` before rendering a skeleton or spinner.
 
 ```tsx
-const [isLoading, setIsLoading] = useState(false)
+const [isLoading, setIsLoading] = useState(false);
 const showSpinner = useSpinDelay(isLoading, {
   delay: 300,
   minDuration: 400,
-})
+});
 
 return (
   <div>
-    <button onClick={() => setIsLoading((prev) => !prev)}>
-      Toggle loading
-    </button>
+    <button onClick={() => setIsLoading((prev) => !prev)}>Toggle loading</button>
     {showSpinner ? <p>Loading data...</p> : <p>Content ready</p>}
   </div>
-)
+);
 ```
 
 ### Customizing Thresholds for Instant Feedback vs. Background Sync
@@ -52,7 +50,7 @@ Use a shorter `delay` and longer `minDuration` for primary page transitions so t
 const showOverlay = useSpinDelay(isSaving, {
   delay: 150,
   minDuration: 500,
-})
+});
 ```
 
 ## API Reference

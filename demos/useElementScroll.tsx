@@ -1,62 +1,61 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from "lucide-react"
-import { cn } from "cn"
+import { useEffect, useRef, useState } from "react";
+import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from "lucide-react";
+import { cn } from "cn";
 
-import { useElementScroll } from "@/hooks/useElementScroll"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useElementScroll } from "@/hooks/useElementScroll";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const THROTTLE_OPTIONS = [
   { value: 0, label: "0ms" },
   { value: 80, label: "80ms" },
-] as const
+] as const;
 
-const TRACK_HEIGHT = 420
-const RULER_STEPS = [0, 70, 140, 210, 280, 350]
+const TRACK_HEIGHT = 420;
+const RULER_STEPS = [0, 70, 140, 210, 280, 350];
 
 export default function UseElementScrollDemo() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [throttleMs, setThrottleMs] = useState<number>(0)
-  const [maxScroll, setMaxScroll] = useState(292)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [throttleMs, setThrottleMs] = useState<number>(0);
+  const [maxScroll, setMaxScroll] = useState(292);
 
-  const { y, isScrolling, directions, arrived, scrollTo } = useElementScroll(
-    containerRef,
-    { throttleMs }
-  )
+  const { y, isScrolling, directions, arrived, scrollTo } = useElementScroll(containerRef, {
+    throttleMs,
+  });
 
   useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
+    const el = containerRef.current;
+    if (!el) return;
 
     const updateMaxScroll = () => {
-      setMaxScroll(Math.max(1, el.scrollHeight - el.clientHeight))
-    }
+      setMaxScroll(Math.max(1, el.scrollHeight - el.clientHeight));
+    };
 
-    updateMaxScroll()
+    updateMaxScroll();
 
-    const observer = new ResizeObserver(updateMaxScroll)
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
+    const observer = new ResizeObserver(updateMaxScroll);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const jumpTo = (fraction: number) => {
-    const el = containerRef.current
-    if (!el) return
-    const limit = Math.max(0, el.scrollHeight - el.clientHeight)
+    const el = containerRef.current;
+    if (!el) return;
+    const limit = Math.max(0, el.scrollHeight - el.clientHeight);
     const reduced =
       typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     scrollTo({
       top: Math.round(limit * fraction),
       behavior: reduced ? "auto" : "smooth",
-    })
-  }
+    });
+  };
 
-  const progress = Math.min(1, Math.max(0, y / maxScroll))
+  const progress = Math.min(1, Math.max(0, y / maxScroll));
 
   const statusLabel = isScrolling
     ? directions.bottom
@@ -68,7 +67,7 @@ export default function UseElementScrollDemo() {
       ? "TOP"
       : arrived.bottom
         ? "BOTTOM"
-        : "IDLE"
+        : "IDLE";
 
   return (
     <Card className="w-full max-w-80">
@@ -80,7 +79,7 @@ export default function UseElementScrollDemo() {
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {THROTTLE_OPTIONS.map((option) => {
-              const active = throttleMs === option.value
+              const active = throttleMs === option.value;
               return (
                 <button
                   key={option.value}
@@ -90,25 +89,19 @@ export default function UseElementScrollDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-3xs font-medium tabular-nums transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {option.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
 
         <div className="relative h-32 w-full overflow-hidden rounded-md border border-border-subtle bg-subtle/35">
-          <div
-            ref={containerRef}
-            className="h-full w-full overflow-y-auto overscroll-contain"
-          >
-            <div
-              className="relative w-full"
-              style={{ height: `${TRACK_HEIGHT}px` }}
-            >
+          <div ref={containerRef} className="h-full w-full overflow-y-auto overscroll-contain">
+            <div className="relative w-full" style={{ height: `${TRACK_HEIGHT}px` }}>
               {RULER_STEPS.map((step) => (
                 <div
                   key={step}
@@ -132,14 +125,9 @@ export default function UseElementScrollDemo() {
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-baseline gap-1 font-mono tabular-nums">
                   <span className="text-2xs text-muted-foreground">y:</span>
-                  <span className="text-sm font-semibold text-foreground">
-                    {Math.round(y)}px
-                  </span>
+                  <span className="text-sm font-semibold text-foreground">{Math.round(y)}px</span>
                 </div>
-                <Badge
-                  variant={isScrolling ? "accent" : "secondary"}
-                  size="compact"
-                >
+                <Badge variant={isScrolling ? "accent" : "secondary"} size="compact">
                   {statusLabel}
                 </Badge>
               </div>
@@ -189,5 +177,5 @@ export default function UseElementScrollDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

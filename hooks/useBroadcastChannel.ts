@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
-import { useLatest } from './useLatest';
+import { useEffect, useRef, useState } from "react";
+import { useEventCallback } from "./useEventCallback";
+import { useLatest } from "./useLatest";
 
 export interface UseBroadcastChannelOptions<T> {
   /** Whether the broadcast channel subscription is active (default: `true`) */
@@ -23,10 +23,7 @@ export interface UseBroadcastChannelReturn<T> {
 }
 
 function isBroadcastChannelSupported(): boolean {
-  return (
-    typeof window !== 'undefined' &&
-    typeof window.BroadcastChannel === 'function'
-  );
+  return typeof window !== "undefined" && typeof window.BroadcastChannel === "function";
 }
 
 /**
@@ -74,12 +71,12 @@ export function useBroadcastChannel<T = unknown>(
       onMessageErrorRef.current?.(event);
     };
 
-    channel.addEventListener('message', handleMessage);
-    channel.addEventListener('messageerror', handleMessageError);
+    channel.addEventListener("message", handleMessage);
+    channel.addEventListener("messageerror", handleMessageError);
 
     return () => {
-      channel.removeEventListener('message', handleMessage);
-      channel.removeEventListener('messageerror', handleMessageError);
+      channel.removeEventListener("message", handleMessage);
+      channel.removeEventListener("messageerror", handleMessageError);
       channel.close();
       channelRef.current = null;
     };

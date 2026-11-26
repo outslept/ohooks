@@ -1,11 +1,11 @@
-import { useList } from '@/hooks/useList';
-import { describe, expect, it } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useList } from "@/hooks/useList";
+import { describe, expect, it } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useList', () => {
-  it('defaults to an empty array and supports direct set action', async () => {
+describe("useList", () => {
+  it("defaults to an empty array and supports direct set action", async () => {
     const { result, act } = await renderHook(() => useList<number>());
     expect(result.current[0]).toEqual([]);
 
@@ -20,7 +20,7 @@ describe('useList', () => {
     expect(result.current[0]).toEqual([10, 20, 30]);
   });
 
-  it('supports push, updateAt, insertAt (with clamping), removeAt, filter, sort, clear, reset, and no-op guards', async () => {
+  it("supports push, updateAt, insertAt (with clamping), removeAt, filter, sort, clear, reset, and no-op guards", async () => {
     const { result, act } = await renderHook(() => useList(() => [3, 1]));
     expect(result.current[0]).toEqual([3, 1]);
 

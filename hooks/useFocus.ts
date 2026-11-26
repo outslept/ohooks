@@ -1,9 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useCallback, useEffect, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 export interface UseFocusOptions {
   /** Only mark as focused when the element matches `:focus-visible` (default: `false`) */
@@ -25,9 +23,9 @@ export interface UseFocusReturn {
 
 function checkIsTargetFocused<T extends HTMLElement>(
   target: EventListenerTarget<T>,
-  focusVisible: boolean
+  focusVisible: boolean,
 ): boolean {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return false;
   }
   const element = resolveTargetElement(target);
@@ -36,7 +34,7 @@ function checkIsTargetFocused<T extends HTMLElement>(
   }
   if (focusVisible) {
     try {
-      return element.matches(':focus-visible');
+      return element.matches(":focus-visible");
     } catch {
       return true;
     }
@@ -59,15 +57,14 @@ function checkIsTargetFocused<T extends HTMLElement>(
  */
 export function useFocus<T extends HTMLElement = HTMLElement>(
   target: EventListenerTarget<T>,
-  options: UseFocusOptions = {}
+  options: UseFocusOptions = {},
 ): UseFocusReturn {
   const { focusVisible = false, onFocus, onBlur } = options;
   const [isFocused, setIsFocused] = useState<boolean>(() =>
-    checkIsTargetFocused(target, focusVisible)
+    checkIsTargetFocused(target, focusVisible),
   );
   const [prevTarget, setPrevTarget] = useState<EventListenerTarget<T>>(target);
-  const [prevFocusVisible, setPrevFocusVisible] =
-    useState<boolean>(focusVisible);
+  const [prevFocusVisible, setPrevFocusVisible] = useState<boolean>(focusVisible);
 
   if (prevTarget !== target || prevFocusVisible !== focusVisible) {
     setPrevTarget(target);
@@ -86,7 +83,7 @@ export function useFocus<T extends HTMLElement = HTMLElement>(
       const element = resolveTargetElement(target);
       element?.focus(focusOptions);
     },
-    [target]
+    [target],
   );
 
   const blur = useCallback(() => {
@@ -95,7 +92,7 @@ export function useFocus<T extends HTMLElement = HTMLElement>(
   }, [target]);
 
   useEffect(() => {
-    if (typeof document === 'undefined') {
+    if (typeof document === "undefined") {
       return;
     }
 
@@ -107,11 +104,10 @@ export function useFocus<T extends HTMLElement = HTMLElement>(
     const handleFocus = (event: FocusEvent) => {
       if (focusVisible) {
         try {
-          if (!element.matches(':focus-visible')) {
+          if (!element.matches(":focus-visible")) {
             return;
           }
-        } catch {
-        }
+        } catch {}
       }
       setIsFocused(true);
       onFocusRef.current?.(event);
@@ -122,12 +118,12 @@ export function useFocus<T extends HTMLElement = HTMLElement>(
       onBlurRef.current?.(event);
     };
 
-    element.addEventListener('focus', handleFocus);
-    element.addEventListener('blur', handleBlur);
+    element.addEventListener("focus", handleFocus);
+    element.addEventListener("blur", handleBlur);
 
     return () => {
-      element.removeEventListener('focus', handleFocus);
-      element.removeEventListener('blur', handleBlur);
+      element.removeEventListener("focus", handleFocus);
+      element.removeEventListener("blur", handleBlur);
     };
   }, [target, focusVisible, onFocusRef, onBlurRef]);
 

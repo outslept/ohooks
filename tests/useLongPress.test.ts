@@ -1,10 +1,7 @@
-import { useLongPress, type UseLongPressOptions } from '@/hooks/useLongPress';
-import type {
-  MouseEvent as ReactMouseEvent,
-  PointerEvent as ReactPointerEvent,
-} from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useLongPress, type UseLongPressOptions } from "@/hooks/useLongPress";
+import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -12,7 +9,7 @@ function createPointerEvent(
   overrides: Partial<ReactPointerEvent<HTMLElement>> = {},
 ): ReactPointerEvent<HTMLElement> {
   return {
-    pointerType: 'mouse',
+    pointerType: "mouse",
     button: 0,
     clientX: 10,
     clientY: 10,
@@ -20,12 +17,12 @@ function createPointerEvent(
   } as ReactPointerEvent<HTMLElement>;
 }
 
-describe('useLongPress', () => {
+describe("useLongPress", () => {
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('triggers after threshold, allows movement within moveThreshold, suppresses only the first subsequent click, and cleans up on unmount', async () => {
+  it("triggers after threshold, allows movement within moveThreshold, suppresses only the first subsequent click, and cleans up on unmount", async () => {
     vi.useFakeTimers();
     const callback = vi.fn();
     const onStart = vi.fn();
@@ -43,12 +40,8 @@ describe('useLongPress', () => {
     );
 
     await act(async () => {
-      result.current.onPointerDown(
-        createPointerEvent({ clientX: 10, clientY: 10 }),
-      );
-      result.current.onPointerMove(
-        createPointerEvent({ clientX: 13, clientY: 14 }),
-      );
+      result.current.onPointerDown(createPointerEvent({ clientX: 10, clientY: 10 }));
+      result.current.onPointerMove(createPointerEvent({ clientX: 13, clientY: 14 }));
       vi.advanceTimersByTime(300);
     });
     expect(onStart).toHaveBeenCalledTimes(1);
@@ -84,29 +77,24 @@ describe('useLongPress', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('cancels on early release, excess movement, pointer cancel, or pointer leave (when cancelOnLeave is true)', async () => {
+  it("cancels on early release, excess movement, pointer cancel, or pointer leave (when cancelOnLeave is true)", async () => {
     vi.useFakeTimers();
     const callback = vi.fn();
     const onCancel = vi.fn();
 
-    const { result, rerender, act } = await renderHook(
-      (props?: UseLongPressOptions<HTMLElement>) =>
-        useLongPress(callback, {
-          threshold: 300,
-          moveThreshold: 10,
-          cancelOnLeave: true,
-          onCancel,
-          ...props,
-        }),
+    const { result, rerender, act } = await renderHook((props?: UseLongPressOptions<HTMLElement>) =>
+      useLongPress(callback, {
+        threshold: 300,
+        moveThreshold: 10,
+        cancelOnLeave: true,
+        onCancel,
+        ...props,
+      }),
     );
 
     await act(async () => {
-      result.current.onPointerDown(
-        createPointerEvent({ clientX: 0, clientY: 0 }),
-      );
-      result.current.onPointerMove(
-        createPointerEvent({ clientX: 25, clientY: 0 }),
-      );
+      result.current.onPointerDown(createPointerEvent({ clientX: 0, clientY: 0 }));
+      result.current.onPointerMove(createPointerEvent({ clientX: 25, clientY: 0 }));
       vi.advanceTimersByTime(300);
     });
     expect(onCancel).toHaveBeenCalledTimes(1);
@@ -145,7 +133,7 @@ describe('useLongPress', () => {
     expect(preventDefault).not.toHaveBeenCalled();
   });
 
-  it('ignores non-primary mouse buttons and events rejected by filterEvents', async () => {
+  it("ignores non-primary mouse buttons and events rejected by filterEvents", async () => {
     vi.useFakeTimers();
     const callback = vi.fn();
     const onStart = vi.fn();
@@ -159,12 +147,8 @@ describe('useLongPress', () => {
     );
 
     await act(async () => {
-      result.current.onPointerDown(
-        createPointerEvent({ button: 2, clientX: 50 }),
-      );
-      result.current.onPointerDown(
-        createPointerEvent({ button: 0, clientX: 0 }),
-      );
+      result.current.onPointerDown(createPointerEvent({ button: 2, clientX: 50 }));
+      result.current.onPointerDown(createPointerEvent({ button: 0, clientX: 0 }));
       vi.advanceTimersByTime(300);
     });
 

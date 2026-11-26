@@ -14,11 +14,11 @@ The `useFirstMountState` hook returns a boolean indicating whether the component
 ## Usage
 
 ```tsx
-import { useFirstMountState } from "@/hooks/useFirstMountState"
+import { useFirstMountState } from "@/hooks/useFirstMountState";
 ```
 
 ```tsx
-const isFirstMount = useFirstMountState()
+const isFirstMount = useFirstMountState();
 ```
 
 ## Examples
@@ -28,15 +28,15 @@ const isFirstMount = useFirstMountState()
 Check `isFirstMount` to render the initial UI without transition classes and enable animations only on subsequent state changes.
 
 ```tsx
-const isFirstMount = useFirstMountState()
-const [activeTab, setActiveTab] = useState("overview")
+const isFirstMount = useFirstMountState();
+const [activeTab, setActiveTab] = useState("overview");
 
 return (
   <div className={isFirstMount ? "" : "animate-fade-in"}>
     <p>Current tab: {activeTab}</p>
     <button onClick={() => setActiveTab("settings")}>Settings</button>
   </div>
-)
+);
 ```
 
 ### Distinguishing Mount from Updates
@@ -44,7 +44,7 @@ return (
 Combine `isFirstMount` with state or props to log or react differently after the first render.
 
 ```tsx
-const isFirstMount = useFirstMountState()
+const isFirstMount = useFirstMountState();
 
-return <span>{isFirstMount ? "Initial render" : "Updated render"}</span>
+return <span>{isFirstMount ? "Initial render" : "Updated render"}</span>;
 ```

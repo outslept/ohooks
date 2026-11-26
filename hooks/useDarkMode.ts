@@ -1,14 +1,12 @@
-import { useCallback } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useHydrated } from './useHydrated';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { useLocalStorage } from './useLocalStorage';
-import { useMediaQuery } from './useMediaQuery';
-import { resolveTargetElement } from '@/lib/utils';
+import { useCallback } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useHydrated } from "./useHydrated";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
+import { useLocalStorage } from "./useLocalStorage";
+import { useMediaQuery } from "./useMediaQuery";
+import { resolveTargetElement } from "@/lib/utils";
 
-export type ColorSchemePreference = 'light' | 'dark' | 'system';
+export type ColorSchemePreference = "light" | "dark" | "system";
 
 export interface UseDarkModeOptions {
   /** Fallback dark mode state used during SSR and before hydration (default: `false`) */
@@ -42,7 +40,7 @@ export interface UseDarkModeReturn {
   resetToSystem: () => void;
 }
 
-const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
+const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)";
 
 /**
  * Manages dark mode state with system preference detection, `localStorage` persistence, and automatic DOM class toggling.
@@ -56,13 +54,11 @@ const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
  * const { isDarkMode, preference, toggle, resetToSystem } = useDarkMode();
  * ```
  */
-export function useDarkMode(
-  options: UseDarkModeOptions = {}
-): UseDarkModeReturn {
+export function useDarkMode(options: UseDarkModeOptions = {}): UseDarkModeReturn {
   const {
     defaultValue = false,
-    storageKey = 'color-scheme-preference',
-    darkClassName = 'dark',
+    storageKey = "color-scheme-preference",
+    darkClassName = "dark",
     applyDarkClass = true,
     target,
     initializeWithValue = false,
@@ -73,36 +69,32 @@ export function useDarkMode(
     defaultValue,
   });
 
-  const [preference, setPreference] = useLocalStorage<ColorSchemePreference>(
-    storageKey,
-    'system',
-    { initializeWithValue }
-  );
+  const [preference, setPreference] = useLocalStorage<ColorSchemePreference>(storageKey, "system", {
+    initializeWithValue,
+  });
 
-  const resolvedDarkMode =
-    preference === 'system' ? isSystemDark : preference === 'dark';
+  const resolvedDarkMode = preference === "system" ? isSystemDark : preference === "dark";
 
-  const isDarkMode =
-    initializeWithValue || isHydrated ? resolvedDarkMode : defaultValue;
+  const isDarkMode = initializeWithValue || isHydrated ? resolvedDarkMode : defaultValue;
 
   const enable = useCallback(() => {
-    setPreference('dark');
+    setPreference("dark");
   }, [setPreference]);
 
   const disable = useCallback(() => {
-    setPreference('light');
+    setPreference("light");
   }, [setPreference]);
 
   const toggle = useCallback(() => {
-    setPreference(resolvedDarkMode ? 'light' : 'dark');
+    setPreference(resolvedDarkMode ? "light" : "dark");
   }, [resolvedDarkMode, setPreference]);
 
   const resetToSystem = useCallback(() => {
-    setPreference('system');
+    setPreference("system");
   }, [setPreference]);
 
   useIsomorphicLayoutEffect(() => {
-    if (!applyDarkClass || !darkClassName || typeof document === 'undefined') {
+    if (!applyDarkClass || !darkClassName || typeof document === "undefined") {
       return;
     }
 

@@ -14,12 +14,12 @@ The `useDocumentVisibility` hook subscribes to the `visibilitychange` event via 
 ## Usage
 
 ```tsx
-import { useDocumentVisibility } from "@/hooks/useDocumentVisibility"
+import { useDocumentVisibility } from "@/hooks/useDocumentVisibility";
 ```
 
 ```tsx
-const visibility = useDocumentVisibility()
-const isHidden = visibility === "hidden"
+const visibility = useDocumentVisibility();
+const isHidden = visibility === "hidden";
 ```
 
 ## Examples
@@ -29,16 +29,16 @@ const isHidden = visibility === "hidden"
 Check whether `visibility === "hidden"` to pause video playback, animations, or background polling while the user is away from the tab.
 
 ```tsx
-const visibility = useDocumentVisibility()
-const videoRef = useRef<HTMLVideoElement>(null)
+const visibility = useDocumentVisibility();
+const videoRef = useRef<HTMLVideoElement>(null);
 
 useEffect(() => {
   if (visibility === "hidden") {
-    videoRef.current?.pause()
+    videoRef.current?.pause();
   }
-}, [visibility])
+}, [visibility]);
 
-return <video ref={videoRef} src="/demo.mp4" controls />
+return <video ref={videoRef} src="/demo.mp4" controls />;
 ```
 
 ### Refreshing Data When Returning to the Tab
@@ -46,11 +46,11 @@ return <video ref={videoRef} src="/demo.mp4" controls />
 Run an effect when `visibility` transitions back to `"visible"` to fetch fresh data.
 
 ```tsx
-const visibility = useDocumentVisibility()
+const visibility = useDocumentVisibility();
 
 useEffect(() => {
   if (visibility === "visible") {
-    refetchNotifications()
+    refetchNotifications();
   }
-}, [visibility])
+}, [visibility]);
 ```

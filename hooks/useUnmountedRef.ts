@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 /**
  * Returns a read-only ref whose `current` value is `true` after the component has unmounted.

@@ -54,7 +54,7 @@ export function UseCookieDemo() {
                   selected
                     ? "bg-control text-foreground shadow-control"
                     : "text-muted-foreground pointer-hover:hover:text-foreground",
-                  "focus-visible:ring-1 focus-visible:ring-ring"
+                  "focus-visible:ring-1 focus-visible:ring-ring",
                 )}
               >
                 {tier}

@@ -14,11 +14,11 @@ The `useElementScroll` hook monitors a scrollable element's `x` and `y` scroll o
 ## Usage
 
 ```tsx
-import { useElementScroll } from "@/hooks/useElementScroll"
+import { useElementScroll } from "@/hooks/useElementScroll";
 ```
 
 ```tsx
-const { y, isScrolling, arrived, scrollTo } = useElementScroll(containerRef)
+const { y, isScrolling, arrived, scrollTo } = useElementScroll(containerRef);
 ```
 
 ## Examples
@@ -28,22 +28,18 @@ const { y, isScrolling, arrived, scrollTo } = useElementScroll(containerRef)
 Check `arrived.bottom` together with an `offset.bottom` threshold to load more items when the user nears the bottom of a list.
 
 ```tsx
-const listRef = useRef<HTMLDivElement>(null)
+const listRef = useRef<HTMLDivElement>(null);
 const { arrived } = useElementScroll(listRef, {
   offset: { bottom: 40 },
-})
+});
 
 useEffect(() => {
   if (arrived.bottom) {
-    loadNextPage()
+    loadNextPage();
   }
-}, [arrived.bottom])
+}, [arrived.bottom]);
 
-return (
-  <div ref={listRef} style={{ height: 320, overflowY: "auto" }}>
-    
-  </div>
-)
+return <div ref={listRef} style={{ height: 320, overflowY: "auto" }}></div>;
 ```
 
 ### Scroll-to-Top Button inside a Container
@@ -51,21 +47,17 @@ return (
 Use `y` to show a button after scrolling down and `scrollTo` to smoothly return to the top.
 
 ```tsx
-const containerRef = useRef<HTMLDivElement>(null)
+const containerRef = useRef<HTMLDivElement>(null);
 const { y, scrollTo } = useElementScroll(containerRef, {
   behavior: "smooth",
-})
+});
 
 return (
   <div>
-    <div ref={containerRef} style={{ height: 240, overflowY: "auto" }}>
-      
-    </div>
-    {y > 100 && (
-      <button onClick={() => scrollTo({ y: 0 })}>Back to top</button>
-    )}
+    <div ref={containerRef} style={{ height: 240, overflowY: "auto" }}></div>
+    {y > 100 && <button onClick={() => scrollTo({ y: 0 })}>Back to top</button>}
   </div>
-)
+);
 ```
 
 ## API Reference
@@ -74,19 +66,13 @@ return (
 
 Configuration options for scroll tracking, offsets, and scroll behavior.
 
-<AutoTypeTable
-  path="./hooks/useElementScroll.ts"
-  name="UseElementScrollOptions"
-/>
+<AutoTypeTable path="./hooks/useElementScroll.ts" name="UseElementScrollOptions" />
 
 ### `UseElementScrollReturn`
 
 Scroll coordinates, direction flags, arrival state, and control helpers returned by the hook.
 
-<AutoTypeTable
-  path="./hooks/useElementScroll.ts"
-  name="UseElementScrollReturn"
-/>
+<AutoTypeTable path="./hooks/useElementScroll.ts" name="UseElementScrollReturn" />
 
 ### `ScrollDirections`
 

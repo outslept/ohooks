@@ -14,11 +14,11 @@ The `useKeyPress` hook listens for `keydown` and `keyup` events (and resets auto
 ## Usage
 
 ```tsx
-import { useKeyPress } from "@/hooks/useKeyPress"
+import { useKeyPress } from "@/hooks/useKeyPress";
 ```
 
 ```tsx
-const isShiftPressed = useKeyPress("shift")
+const isShiftPressed = useKeyPress("shift");
 ```
 
 ## Examples
@@ -28,15 +28,14 @@ const isShiftPressed = useKeyPress("shift")
 Pass a key chord (such as `'mod+k'` or `'shift+enter'`) or an array of keys (`['ArrowUp', 'w']`) to track whether any matching key is held down.
 
 ```tsx
-const isMovingUp = useKeyPress(["ArrowUp", "w"])
-const isSprintHeld = useKeyPress("shift")
+const isMovingUp = useKeyPress(["ArrowUp", "w"]);
+const isSprintHeld = useKeyPress("shift");
 
 return (
   <p>
-    Moving up: {isMovingUp ? "Yes" : "No"} | Sprinting:{" "}
-    {isSprintHeld ? "Yes" : "No"}
+    Moving up: {isMovingUp ? "Yes" : "No"} | Sprinting: {isSprintHeld ? "Yes" : "No"}
   </p>
-)
+);
 ```
 
 ### Custom Key Predicate Function
@@ -44,12 +43,9 @@ return (
 Pass a predicate function `(event: KeyboardEvent) => boolean` for custom key matching logic, such as detecting any numeric digit key.
 
 ```tsx
-const isDigitPressed = useKeyPress(
-  (event) => /^[0-9]$/.test(event.key),
-  { preventDefault: true }
-)
+const isDigitPressed = useKeyPress((event) => /^[0-9]$/.test(event.key), { preventDefault: true });
 
-return <p>Digit key held: {isDigitPressed ? "Yes" : "No"}</p>
+return <p>Digit key held: {isDigitPressed ? "Yes" : "No"}</p>;
 ```
 
 ## API Reference

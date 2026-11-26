@@ -1,32 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "cn"
+import { useState } from "react";
+import { cn } from "cn";
 
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useThrottleValue } from "@/hooks/useThrottleValue"
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useThrottleValue } from "@/hooks/useThrottleValue";
 
-const WAIT_OPTIONS = [100, 250, 500] as const
+const WAIT_OPTIONS = [100, 250, 500] as const;
 
 export default function UseThrottleValueDemo() {
-  const [waitIdx, setWaitIdx] = useState(1)
-  const wait = WAIT_OPTIONS[waitIdx]
+  const [waitIdx, setWaitIdx] = useState(1);
+  const wait = WAIT_OPTIONS[waitIdx];
 
-  const [value, setValue] = useState(50)
-  const [throttledValue] = useThrottleValue(value, wait)
+  const [value, setValue] = useState(50);
+  const [throttledValue] = useThrottleValue(value, wait);
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Throttle wait interval"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {WAIT_OPTIONS.map((ms, idx) => {
-              const active = idx === waitIdx
+              const active = idx === waitIdx;
               return (
                 <button
                   key={ms}
@@ -36,12 +35,12 @@ export default function UseThrottleValueDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs font-medium tabular-nums transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {ms}ms
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -65,9 +64,7 @@ export default function UseThrottleValueDemo() {
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between font-mono text-3xs tracking-wider text-primary uppercase">
               <span>Throttled ({wait}ms)</span>
-              <span className="font-semibold tabular-nums">
-                {throttledValue}%
-              </span>
+              <span className="font-semibold tabular-nums">{throttledValue}%</span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-subtle">
               <div
@@ -95,5 +92,5 @@ export default function UseThrottleValueDemo() {
         <span className="font-mono text-2xs text-muted-foreground">100%</span>
       </CardFooter>
     </Card>
-  )
+  );
 }

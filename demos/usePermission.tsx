@@ -1,37 +1,33 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { cn } from "cn"
-import { ShieldCheck } from "lucide-react"
-import {
-  usePermission,
-  type ExtendedPermissionName,
-} from "@/hooks/usePermission"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useEffect, useRef, useState } from "react";
+import { cn } from "cn";
+import { ShieldCheck } from "lucide-react";
+import { usePermission, type ExtendedPermissionName } from "@/hooks/usePermission";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const PERMISSIONS: readonly {
-  id: ExtendedPermissionName
-  label: string
+  id: ExtendedPermissionName;
+  label: string;
 }[] = [
   { id: "geolocation", label: "geo" },
   { id: "notifications", label: "notify" },
   { id: "camera", label: "camera" },
   { id: "microphone", label: "mic" },
-]
+];
 
 export default function UsePermissionDemo() {
-  const [selected, setSelected] =
-    useState<ExtendedPermissionName>("geolocation")
-  const [isRequesting, setIsRequesting] = useState(false)
-  const status = usePermission(selected)
-  const frameRef = useRef<HTMLDivElement>(null)
-  const isFirstRender = useRef(true)
+  const [selected, setSelected] = useState<ExtendedPermissionName>("geolocation");
+  const [isRequesting, setIsRequesting] = useState(false);
+  const status = usePermission(selected);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
+      isFirstRender.current = false;
+      return;
     }
 
     if (
@@ -43,14 +39,14 @@ export default function UsePermissionDemo() {
           { transform: "scale3d(0.97, 0.97, 1)", opacity: 0.75 },
           { transform: "scale3d(1, 1, 1)", opacity: 1 },
         ],
-        { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" }
-      )
+        { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+      );
     }
-  }, [selected, status])
+  }, [selected, status]);
 
   const requestPermission = async () => {
-    if (typeof window === "undefined" || isRequesting) return
-    setIsRequesting(true)
+    if (typeof window === "undefined" || isRequesting) return;
+    setIsRequesting(true);
 
     try {
       if (selected === "geolocation" && "geolocation" in navigator) {
@@ -58,11 +54,11 @@ export default function UsePermissionDemo() {
           navigator.geolocation.getCurrentPosition(
             () => resolve(),
             () => resolve(),
-            { timeout: 4000 }
-          )
-        })
+            { timeout: 4000 },
+          );
+        });
       } else if (selected === "notifications" && "Notification" in window) {
-        await Notification.requestPermission()
+        await Notification.requestPermission();
       } else if (
         (selected === "camera" || selected === "microphone") &&
         navigator.mediaDevices?.getUserMedia
@@ -70,28 +66,26 @@ export default function UsePermissionDemo() {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: selected === "camera",
           audio: selected === "microphone",
-        })
-        stream.getTracks().forEach((track) => track.stop())
+        });
+        stream.getTracks().forEach((track) => track.stop());
       }
     } catch {
     } finally {
-      setIsRequesting(false)
+      setIsRequesting(false);
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
-
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="Permission descriptor"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {PERMISSIONS.map((item) => {
-              const isSelected = selected === item.id
+              const isSelected = selected === item.id;
               return (
                 <button
                   key={item.id}
@@ -101,12 +95,12 @@ export default function UsePermissionDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs transition-all",
                     isSelected
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {item.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -135,5 +129,5 @@ export default function UsePermissionDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

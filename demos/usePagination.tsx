@@ -1,25 +1,20 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { cn } from "cn"
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react"
-import { usePagination } from "@/hooks/usePagination"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useEffect, useRef, useState } from "react";
+import { cn } from "cn";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { usePagination } from "@/hooks/usePagination";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
-const TOTAL_ITEMS = 95
-const PAGE_SIZES = [5, 10, 20] as const
+const TOTAL_ITEMS = 95;
+const PAGE_SIZES = [5, 10, 20] as const;
 
 export default function UsePaginationDemo() {
-  const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(10)
-  const readoutRef = useRef<HTMLDivElement>(null)
-  const isFirstRender = useRef(true)
+  const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(10);
+  const readoutRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   const {
     page,
@@ -39,12 +34,12 @@ export default function UsePaginationDemo() {
     pageSize,
     siblingCount: 1,
     boundaryCount: 1,
-  })
+  });
 
   useEffect(() => {
     if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
+      isFirstRender.current = false;
+      return;
     }
 
     if (
@@ -56,24 +51,22 @@ export default function UsePaginationDemo() {
           { transform: "scale3d(0.97, 0.97, 1)", opacity: 0.7 },
           { transform: "scale3d(1, 1, 1)", opacity: 1 },
         ],
-        { duration: 180, easing: "cubic-bezier(0.23, 1, 0.32, 1)" }
-      )
+        { duration: 180, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+      );
     }
-  }, [page, pageSize])
+  }, [page, pageSize]);
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
-
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="Items per page"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {PAGE_SIZES.map((size) => {
-              const isSelected = pageSize === size
+              const isSelected = pageSize === size;
               return (
                 <button
                   key={size}
@@ -83,16 +76,15 @@ export default function UsePaginationDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs tabular-nums transition-all",
                     isSelected
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {size}/p
                 </button>
-              )
+              );
             })}
           </div>
         </div>
-
 
         <div
           ref={readoutRef}
@@ -126,12 +118,12 @@ export default function UsePaginationDemo() {
                     "inline-flex size-6 items-center justify-center rounded-sm border font-mono text-xs tabular-nums transition-all active:scale-[0.97]",
                     item === page
                       ? "border-primary/40 bg-primary/10 font-semibold text-primary"
-                      : "border-border-subtle bg-card text-muted-foreground shadow-control hover:text-foreground"
+                      : "border-border-subtle bg-card text-muted-foreground shadow-control hover:text-foreground",
                   )}
                 >
                   {item}
                 </button>
-              )
+              ),
             )}
           </div>
         </div>
@@ -185,5 +177,5 @@ export default function UsePaginationDemo() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

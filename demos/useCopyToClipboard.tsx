@@ -15,9 +15,7 @@ const RESET_OPTIONS = [
 ] as const;
 
 export function UseCopyToClipboardDemo() {
-  const [text, setText] = React.useState(
-    "npx shadcn@latest add useCopyToClipboard"
-  );
+  const [text, setText] = React.useState("npx shadcn@latest add useCopyToClipboard");
   const [resetInterval, setResetInterval] = React.useState<number>(1500);
   const [copyPulse, setCopyPulse] = React.useState(0);
 
@@ -45,14 +43,11 @@ export function UseCopyToClipboardDemo() {
     }
 
     animRef.current = el.animate(
-      [
-        { transform: "scale3d(1, 1, 1)" },
-        { transform: "scale3d(0, 1, 1)" },
-      ],
+      [{ transform: "scale3d(1, 1, 1)" }, { transform: "scale3d(0, 1, 1)" }],
       {
         duration: resetInterval,
         easing: "linear",
-      }
+      },
     );
 
     return () => {
@@ -87,7 +82,7 @@ export function UseCopyToClipboardDemo() {
                     selected
                       ? "bg-control text-foreground shadow-control"
                       : "text-muted-foreground pointer-hover:hover:text-foreground",
-                    "focus-visible:ring-1 focus-visible:ring-ring"
+                    "focus-visible:ring-1 focus-visible:ring-ring",
                   )}
                 >
                   {option.label}
@@ -107,12 +102,8 @@ export function UseCopyToClipboardDemo() {
 
         <div className="relative flex h-11 items-center justify-between gap-2 overflow-hidden rounded-md border border-border-subtle bg-subtle/35 px-3 font-mono text-xs">
           <div className="flex min-w-0 items-center gap-1.5">
-            <span className="shrink-0 text-2xs text-muted-foreground">
-              buffer:
-            </span>
-            <span className="truncate font-medium text-foreground">
-              {copiedText ?? "null"}
-            </span>
+            <span className="shrink-0 text-2xs text-muted-foreground">buffer:</span>
+            <span className="truncate font-medium text-foreground">{copiedText ?? "null"}</span>
           </div>
 
           <Badge

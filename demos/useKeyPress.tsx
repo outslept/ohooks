@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "cn"
-import { useKeyPress } from "@/hooks/useKeyPress"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState } from "react";
+import { cn } from "cn";
+import { useKeyPress } from "@/hooks/useKeyPress";
+import { Card, CardContent } from "@/components/ui/card";
 
 const PREVENT_OPTIONS = [
   { label: "preventDefault", value: true },
   { label: "default", value: false },
-] as const
+] as const;
 
 export default function UseKeyPressDemo() {
-  const [preventDefault, setPreventDefault] = useState<boolean>(true)
+  const [preventDefault, setPreventDefault] = useState<boolean>(true);
 
-  const isShift = useKeyPress("shift")
-  const isEnter = useKeyPress("Enter", { preventDefault })
-  const isUp = useKeyPress(["ArrowUp", "w"], { preventDefault })
+  const isShift = useKeyPress("shift");
+  const isEnter = useKeyPress("Enter", { preventDefault });
+  const isUp = useKeyPress(["ArrowUp", "w"], { preventDefault });
 
   const keys = [
     {
@@ -39,9 +39,9 @@ export default function UseKeyPressDemo() {
       eventKey: "ArrowUp",
       active: isUp,
     },
-  ]
+  ];
 
-  const activeCount = Number(isShift) + Number(isEnter) + Number(isUp)
+  const activeCount = Number(isShift) + Number(isEnter) + Number(isUp);
 
   const dispatchKey = (type: "keydown" | "keyup", key: string) => {
     window.dispatchEvent(
@@ -50,23 +50,21 @@ export default function UseKeyPressDemo() {
         shiftKey: key === "Shift" ? type === "keydown" : isShift,
         bubbles: true,
         cancelable: true,
-      })
-    )
-  }
+      }),
+    );
+  };
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
-
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="Prevent default behavior"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {PREVENT_OPTIONS.map((option) => {
-              const active = preventDefault === option.value
+              const active = preventDefault === option.value;
               return (
                 <button
                   key={option.label}
@@ -76,16 +74,15 @@ export default function UseKeyPressDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {option.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
-
 
         <div className="grid grid-cols-3 gap-2 rounded-md border border-border-subtle bg-subtle/35 p-2.5">
           {keys.map((k) => (
@@ -93,13 +90,13 @@ export default function UseKeyPressDemo() {
               key={k.id}
               type="button"
               onPointerDown={(e) => {
-                e.preventDefault()
-                dispatchKey("keydown", k.eventKey)
+                e.preventDefault();
+                dispatchKey("keydown", k.eventKey);
               }}
               onPointerUp={() => dispatchKey("keyup", k.eventKey)}
               onPointerLeave={() => {
                 if (k.active) {
-                  dispatchKey("keyup", k.eventKey)
+                  dispatchKey("keyup", k.eventKey);
                 }
               }}
               onPointerCancel={() => dispatchKey("keyup", k.eventKey)}
@@ -112,12 +109,10 @@ export default function UseKeyPressDemo() {
                 "flex flex-col items-center justify-center rounded-md border px-2 py-3 select-none transition-[transform,border-color,background-color,color] duration-150 ease-out motion-reduce:transition-none",
                 k.active
                   ? "border-primary bg-primary/10 text-primary"
-                  : "border-border-subtle bg-card text-foreground shadow-control hover:bg-subtle/80"
+                  : "border-border-subtle bg-card text-foreground shadow-control hover:bg-subtle/80",
               )}
             >
-              <span className="font-mono text-xs font-semibold tabular-nums">
-                {k.label}
-              </span>
+              <span className="font-mono text-xs font-semibold tabular-nums">{k.label}</span>
               <span className="mt-1 font-mono text-2xs text-muted-foreground tabular-nums">
                 {k.active ? "pressed" : k.sub}
               </span>
@@ -125,7 +120,6 @@ export default function UseKeyPressDemo() {
           ))}
         </div>
       </CardContent>
-
 
       <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
         <div className="flex flex-col gap-0.5 px-3 py-2">
@@ -146,5 +140,5 @@ export default function UseKeyPressDemo() {
         </div>
       </div>
     </Card>
-  )
+  );
 }

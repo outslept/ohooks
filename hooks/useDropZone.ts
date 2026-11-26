@@ -5,13 +5,11 @@ import {
   useEffect,
   useRef,
   useState,
-} from 'react';
-import { useEventCallback } from './useEventCallback';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+} from "react";
+import { useEventCallback } from "./useEventCallback";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 export interface UseDropZoneOptions {
   /** Accepted MIME types or file extensions (e.g., `'image/*,.pdf'` or `['image/png', '.jpg']`) */
@@ -25,10 +23,7 @@ export interface UseDropZoneOptions {
   /** Callback invoked when valid files are dropped */
   onDrop?: (files: File[], event: DragEvent | ReactDragEvent) => void;
   /** Callback invoked when dropped files fail MIME/extension or `multiple` validation */
-  onDropRejected?: (
-    rejectedFiles: File[],
-    event: DragEvent | ReactDragEvent
-  ) => void;
+  onDropRejected?: (rejectedFiles: File[], event: DragEvent | ReactDragEvent) => void;
   /** Callback invoked when a dragged item enters the drop zone */
   onDragEnter?: (event: DragEvent | ReactDragEvent) => void;
   /** Callback invoked while a dragged item moves over the drop zone */
@@ -59,23 +54,20 @@ export interface UseDropZoneReturn {
   clearFiles: () => void;
   /** Prop getter for binding drag-and-drop handlers directly onto a JSX element */
   getRootProps: <T extends HTMLElement = HTMLElement>(
-    userProps?: HTMLAttributes<T>
+    userProps?: HTMLAttributes<T>,
   ) => DropZoneRootProps;
 }
 
-function normalizeAcceptList(
-  accept?: string | readonly string[]
-): string[] {
+function normalizeAcceptList(accept?: string | readonly string[]): string[] {
   if (!accept) return [];
-  const rawList =
-    typeof accept === 'string' ? accept.split(',') : Array.from(accept);
+  const rawList = typeof accept === "string" ? accept.split(",") : Array.from(accept);
   return rawList.map((item) => item.trim().toLowerCase()).filter(Boolean);
 }
 
 function matchesMimeOrExtension(
   mimeType: string,
   fileName: string,
-  acceptRules: readonly string[]
+  acceptRules: readonly string[],
 ): boolean {
   if (acceptRules.length === 0) {
     return true;
@@ -85,14 +77,14 @@ function matchesMimeOrExtension(
   const normalizedName = fileName.toLowerCase();
 
   for (const rule of acceptRules) {
-    if (rule === '*' || rule === '*/*') {
+    if (rule === "*" || rule === "*/*") {
       return true;
     }
-    if (rule.startsWith('.')) {
+    if (rule.startsWith(".")) {
       if (normalizedName.endsWith(rule)) {
         return true;
       }
-    } else if (rule.endsWith('/*')) {
+    } else if (rule.endsWith("/*")) {
       const baseType = rule.slice(0, -2);
       if (normalizedMime.startsWith(`${baseType}/`)) {
         return true;
@@ -108,13 +100,11 @@ function matchesMimeOrExtension(
 function isDataTransferInvalid(
   dataTransfer: DataTransfer | null,
   acceptRules: readonly string[],
-  multiple: boolean
+  multiple: boolean,
 ): boolean {
   if (!dataTransfer) return false;
 
-  const items = Array.from(dataTransfer.items ?? []).filter(
-    (item) => item.kind === 'file'
-  );
+  const items = Array.from(dataTransfer.items ?? []).filter((item) => item.kind === "file");
 
   if (items.length === 0) {
     return false;
@@ -130,19 +120,17 @@ function isDataTransferInvalid(
 
   return items.some((item) => {
     if (!item.type) {
-      const hasOnlyExtensionRules = acceptRules.every((r) =>
-        r.startsWith('.')
-      );
+      const hasOnlyExtensionRules = acceptRules.every((r) => r.startsWith("."));
       return !hasOnlyExtensionRules;
     }
-    return !matchesMimeOrExtension(item.type, '', acceptRules);
+    return !matchesMimeOrExtension(item.type, "", acceptRules);
   });
 }
 
 function partitionFiles(
   fileList: FileList | null | undefined,
   acceptRules: readonly string[],
-  multiple: boolean
+  multiple: boolean,
 ): { accepted: File[]; rejected: File[] } {
   if (!fileList || fileList.length === 0) {
     return { accepted: [], rejected: [] };
@@ -185,14 +173,14 @@ function partitionFiles(
  */
 export function useDropZone(
   target?: EventListenerTarget<HTMLElement> | UseDropZoneOptions,
-  options?: UseDropZoneOptions
+  options?: UseDropZoneOptions,
 ): UseDropZoneReturn {
   const isFirstArgOptions =
-    typeof target === 'object' &&
+    typeof target === "object" &&
     target !== null &&
-    !('current' in target) &&
-    !('addEventListener' in target) &&
-    !('nodeType' in target);
+    !("current" in target) &&
+    !("addEventListener" in target) &&
+    !("nodeType" in target);
 
   const resolvedTarget = isFirstArgOptions
     ? undefined
@@ -225,77 +213,63 @@ export function useDropZone(
     setFiles([]);
   }, []);
 
-  const handleDragEnter = useEventCallback(
-    (event: DragEvent | ReactDragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
+  const handleDragEnter = useEventCallback((event: DragEvent | ReactDragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-      if (optionsRef.current.disabled) {
-        return;
-      }
-
-      dragCounterRef.current += 1;
-
-      if (dragCounterRef.current === 1) {
-        const acceptRules = normalizeAcceptList(optionsRef.current.accept);
-        const allowMultiple = optionsRef.current.multiple ?? true;
-        const invalid = isDataTransferInvalid(
-          event.dataTransfer,
-          acceptRules,
-          allowMultiple
-        );
-
-        setIsOver(true);
-        setIsInvalid(invalid);
-        optionsRef.current.onDragEnter?.(event);
-      }
+    if (optionsRef.current.disabled) {
+      return;
     }
-  );
 
-  const handleDragOver = useEventCallback(
-    (event: DragEvent | ReactDragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
+    dragCounterRef.current += 1;
 
-      if (optionsRef.current.disabled) {
-        return;
-      }
-
-      if (event.dataTransfer) {
-        const acceptRules = normalizeAcceptList(optionsRef.current.accept);
-        const allowMultiple = optionsRef.current.multiple ?? true;
-        const invalid = isDataTransferInvalid(
-          event.dataTransfer,
-          acceptRules,
-          allowMultiple
-        );
-        event.dataTransfer.dropEffect = invalid ? 'none' : 'copy';
-        setIsInvalid(invalid);
-      }
+    if (dragCounterRef.current === 1) {
+      const acceptRules = normalizeAcceptList(optionsRef.current.accept);
+      const allowMultiple = optionsRef.current.multiple ?? true;
+      const invalid = isDataTransferInvalid(event.dataTransfer, acceptRules, allowMultiple);
 
       setIsOver(true);
-      optionsRef.current.onDragOver?.(event);
+      setIsInvalid(invalid);
+      optionsRef.current.onDragEnter?.(event);
     }
-  );
+  });
 
-  const handleDragLeave = useEventCallback(
-    (event: DragEvent | ReactDragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
+  const handleDragOver = useEventCallback((event: DragEvent | ReactDragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-      if (optionsRef.current.disabled) {
-        return;
-      }
-
-      dragCounterRef.current = Math.max(0, dragCounterRef.current - 1);
-
-      if (dragCounterRef.current === 0) {
-        setIsOver(false);
-        setIsInvalid(false);
-        optionsRef.current.onDragLeave?.(event);
-      }
+    if (optionsRef.current.disabled) {
+      return;
     }
-  );
+
+    if (event.dataTransfer) {
+      const acceptRules = normalizeAcceptList(optionsRef.current.accept);
+      const allowMultiple = optionsRef.current.multiple ?? true;
+      const invalid = isDataTransferInvalid(event.dataTransfer, acceptRules, allowMultiple);
+      event.dataTransfer.dropEffect = invalid ? "none" : "copy";
+      setIsInvalid(invalid);
+    }
+
+    setIsOver(true);
+    optionsRef.current.onDragOver?.(event);
+  });
+
+  const handleDragLeave = useEventCallback((event: DragEvent | ReactDragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (optionsRef.current.disabled) {
+      return;
+    }
+
+    dragCounterRef.current = Math.max(0, dragCounterRef.current - 1);
+
+    if (dragCounterRef.current === 0) {
+      setIsOver(false);
+      setIsInvalid(false);
+      optionsRef.current.onDragLeave?.(event);
+    }
+  });
 
   const handleDrop = useEventCallback((event: DragEvent | ReactDragEvent) => {
     event.preventDefault();
@@ -315,7 +289,7 @@ export function useDropZone(
     const { accepted, rejected } = partitionFiles(
       event.dataTransfer?.files,
       acceptRules,
-      allowMultiple
+      allowMultiple,
     );
 
     if (rejected.length > 0) {
@@ -344,16 +318,16 @@ export function useDropZone(
     const onLeave = (e: DragEvent) => handleDragLeave(e);
     const onDropEvent = (e: DragEvent) => handleDrop(e);
 
-    element.addEventListener('dragenter', onEnter);
-    element.addEventListener('dragover', onOver);
-    element.addEventListener('dragleave', onLeave);
-    element.addEventListener('drop', onDropEvent);
+    element.addEventListener("dragenter", onEnter);
+    element.addEventListener("dragover", onOver);
+    element.addEventListener("dragleave", onLeave);
+    element.addEventListener("drop", onDropEvent);
 
     return () => {
-      element.removeEventListener('dragenter', onEnter);
-      element.removeEventListener('dragover', onOver);
-      element.removeEventListener('dragleave', onLeave);
-      element.removeEventListener('drop', onDropEvent);
+      element.removeEventListener("dragenter", onEnter);
+      element.removeEventListener("dragover", onOver);
+      element.removeEventListener("dragleave", onLeave);
+      element.removeEventListener("drop", onDropEvent);
     };
   }, [
     resolvedTarget,
@@ -367,7 +341,7 @@ export function useDropZone(
   ]);
 
   useEffect(() => {
-    if (!preventDefaultForUnhandled || typeof window === 'undefined') {
+    if (!preventDefaultForUnhandled || typeof window === "undefined") {
       return;
     }
 
@@ -375,18 +349,18 @@ export function useDropZone(
       event.preventDefault();
     };
 
-    window.addEventListener('dragover', preventDefault);
-    window.addEventListener('drop', preventDefault);
+    window.addEventListener("dragover", preventDefault);
+    window.addEventListener("drop", preventDefault);
 
     return () => {
-      window.removeEventListener('dragover', preventDefault);
-      window.removeEventListener('drop', preventDefault);
+      window.removeEventListener("dragover", preventDefault);
+      window.removeEventListener("drop", preventDefault);
     };
   }, [preventDefaultForUnhandled]);
 
   const getRootProps = useCallback(
     <T extends HTMLElement = HTMLElement>(
-      userProps: HTMLAttributes<T> = {}
+      userProps: HTMLAttributes<T> = {},
     ): DropZoneRootProps => ({
       ...userProps,
       onDragEnter: (event: ReactDragEvent<HTMLElement>) => {
@@ -406,7 +380,7 @@ export function useDropZone(
         handleDrop(event);
       },
     }),
-    [handleDragEnter, handleDragOver, handleDragLeave, handleDrop]
+    [handleDragEnter, handleDragOver, handleDragLeave, handleDrop],
   );
 
   return {

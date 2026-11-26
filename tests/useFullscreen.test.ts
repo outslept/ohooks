@@ -1,35 +1,35 @@
-import { useFullscreen } from '@/hooks/useFullscreen';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useFullscreen } from "@/hooks/useFullscreen";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
-describe('useFullscreen', () => {
+describe("useFullscreen", () => {
   afterEach(() => {
     vi.restoreAllMocks();
-    document.body.innerHTML = '';
+    document.body.innerHTML = "";
   });
 
-  it('enters, exits, and toggles fullscreen on target and invokes lifecycle callbacks', async () => {
-    const box = document.createElement('div');
-    const otherBox = document.createElement('div');
+  it("enters, exits, and toggles fullscreen on target and invokes lifecycle callbacks", async () => {
+    const box = document.createElement("div");
+    const otherBox = document.createElement("div");
     document.body.append(box, otherBox);
 
     let currentFsElement: Element | null = null;
-    Object.defineProperty(document, 'fullscreenEnabled', {
+    Object.defineProperty(document, "fullscreenEnabled", {
       value: true,
       configurable: true,
     });
-    Object.defineProperty(document, 'fullscreenElement', {
+    Object.defineProperty(document, "fullscreenElement", {
       get: () => currentFsElement,
       configurable: true,
     });
 
     box.requestFullscreen = async () => {
       currentFsElement = box;
-      document.dispatchEvent(new Event('fullscreenchange'));
+      document.dispatchEvent(new Event("fullscreenchange"));
     };
     document.exitFullscreen = async () => {
       currentFsElement = null;
-      document.dispatchEvent(new Event('fullscreenchange'));
+      document.dispatchEvent(new Event("fullscreenchange"));
     };
 
     const onEnter = vi.fn();
@@ -55,15 +55,13 @@ describe('useFullscreen', () => {
     expect(result.current.isFullscreen).toBe(false);
     expect(onExit).toHaveBeenCalledTimes(1);
 
-
     currentFsElement = otherBox;
     await act(async () => {
       await result.current.exit();
     });
     expect(currentFsElement).toBe(otherBox);
 
-
-    const requestError = new Error('Fullscreen blocked');
+    const requestError = new Error("Fullscreen blocked");
     box.requestFullscreen = async () => {
       throw requestError;
     };
@@ -74,7 +72,7 @@ describe('useFullscreen', () => {
 
     await unmount();
     currentFsElement = box;
-    document.dispatchEvent(new Event('fullscreenchange'));
+    document.dispatchEvent(new Event("fullscreenchange"));
     expect(onEnter).toHaveBeenCalledTimes(1);
   });
 });

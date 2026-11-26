@@ -1,5 +1,5 @@
-import { useCallback, useSyncExternalStore } from 'react';
-import { useEventCallback } from './useEventCallback';
+import { useCallback, useSyncExternalStore } from "react";
+import { useEventCallback } from "./useEventCallback";
 
 export interface CookieAttributes {
   /** Cookie path scope (default: `'/'`) */
@@ -13,7 +13,7 @@ export interface CookieAttributes {
   /** Whether the cookie should only be transmitted over HTTPS */
   secure?: boolean;
   /** Cross-site request forgery protection mode */
-  sameSite?: 'strict' | 'lax' | 'none';
+  sameSite?: "strict" | "lax" | "none";
 }
 
 export interface UseCookieOptions extends CookieAttributes {
@@ -21,25 +21,25 @@ export interface UseCookieOptions extends CookieAttributes {
   defaultValue?: string | null;
 }
 
-type WindowWithCookieStore = Omit<Window, 'cookieStore'> & {
+type WindowWithCookieStore = Omit<Window, "cookieStore"> & {
   readonly cookieStore?: EventTarget | undefined;
 };
 
-const CUSTOM_COOKIE_EVENT = 'custom-cookie-change';
+const CUSTOM_COOKIE_EVENT = "custom-cookie-change";
 
 function readCookieFromDocument(name: string): string | null {
-  if (typeof document === 'undefined' || !document.cookie) {
+  if (typeof document === "undefined" || !document.cookie) {
     return null;
   }
 
   const encodedName = encodeURIComponent(name);
-  const cookies = document.cookie.split('; ');
+  const cookies = document.cookie.split("; ");
 
   for (const part of cookies) {
-    const eqIdx = part.indexOf('=');
+    const eqIdx = part.indexOf("=");
     const rawKey = eqIdx === -1 ? part : part.slice(0, eqIdx);
     if (rawKey === encodedName) {
-      const rawVal = eqIdx === -1 ? '' : part.slice(eqIdx + 1);
+      const rawVal = eqIdx === -1 ? "" : part.slice(eqIdx + 1);
       try {
         return decodeURIComponent(rawVal);
       } catch {
@@ -51,20 +51,14 @@ function readCookieFromDocument(name: string): string | null {
   return null;
 }
 
-function writeCookieToDocument(
-  name: string,
-  value: string,
-  attrs: CookieAttributes
-): void {
-  if (typeof document === 'undefined') {
+function writeCookieToDocument(name: string, value: string, attrs: CookieAttributes): void {
+  if (typeof document === "undefined") {
     return;
   }
 
-  const segments: string[] = [
-    `${encodeURIComponent(name)}=${encodeURIComponent(value)}`,
-  ];
+  const segments: string[] = [`${encodeURIComponent(name)}=${encodeURIComponent(value)}`];
 
-  const path = attrs.path ?? '/';
+  const path = attrs.path ?? "/";
   if (path) {
     segments.push(`path=${path}`);
   }
@@ -79,36 +73,36 @@ function writeCookieToDocument(
 
   if (attrs.expires !== undefined) {
     const expiresDate =
-      typeof attrs.expires === 'number'
+      typeof attrs.expires === "number"
         ? new Date(Date.now() + attrs.expires * 86_400_000)
         : attrs.expires;
     segments.push(`expires=${expiresDate.toUTCString()}`);
   }
 
   if (attrs.secure) {
-    segments.push('secure');
+    segments.push("secure");
   }
 
   if (attrs.sameSite) {
     segments.push(`samesite=${attrs.sameSite}`);
   }
 
-  document.cookie = segments.join('; ');
+  document.cookie = segments.join("; ");
 }
 
 function subscribe(onStoreChange: () => void): () => void {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return () => {};
   }
 
   const cookieStore = (window as WindowWithCookieStore).cookieStore;
 
   window.addEventListener(CUSTOM_COOKIE_EVENT, onStoreChange);
-  cookieStore?.addEventListener('change', onStoreChange);
+  cookieStore?.addEventListener("change", onStoreChange);
 
   return () => {
     window.removeEventListener(CUSTOM_COOKIE_EVENT, onStoreChange);
-    cookieStore?.removeEventListener('change', onStoreChange);
+    cookieStore?.removeEventListener("change", onStoreChange);
   };
 }
 
@@ -130,7 +124,7 @@ function subscribe(onStoreChange: () => void): () => void {
  */
 export function useCookie(
   name: string,
-  options: UseCookieOptions = {}
+  options: UseCookieOptions = {},
 ): [
   string | null,
   (value: string, attrs?: CookieAttributes) => void,
@@ -139,7 +133,7 @@ export function useCookie(
   const { defaultValue = null, ...defaultAttrs } = options;
 
   const getSnapshot = useCallback((): string | null => {
-    if (typeof document === 'undefined') {
+    if (typeof document === "undefined") {
       return defaultValue;
     }
     return readCookieFromDocument(name) ?? defaultValue;
@@ -151,27 +145,25 @@ export function useCookie(
 
   const value = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  const setCookie = useEventCallback(
-    (nextValue: string, overrideAttrs?: CookieAttributes) => {
-      if (typeof document === 'undefined') {
-        return;
-      }
-
-      writeCookieToDocument(name, nextValue, {
-        ...defaultAttrs,
-        ...overrideAttrs,
-      });
-
-      window.dispatchEvent(new Event(CUSTOM_COOKIE_EVENT));
-    }
-  );
-
-  const deleteCookie = useEventCallback((overrideAttrs?: CookieAttributes) => {
-    if (typeof document === 'undefined') {
+  const setCookie = useEventCallback((nextValue: string, overrideAttrs?: CookieAttributes) => {
+    if (typeof document === "undefined") {
       return;
     }
 
-    writeCookieToDocument(name, '', {
+    writeCookieToDocument(name, nextValue, {
+      ...defaultAttrs,
+      ...overrideAttrs,
+    });
+
+    window.dispatchEvent(new Event(CUSTOM_COOKIE_EVENT));
+  });
+
+  const deleteCookie = useEventCallback((overrideAttrs?: CookieAttributes) => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    writeCookieToDocument(name, "", {
       ...defaultAttrs,
       ...overrideAttrs,
       maxAge: 0,

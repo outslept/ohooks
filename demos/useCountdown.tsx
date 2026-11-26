@@ -1,30 +1,30 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { PauseIcon, PlayIcon, RotateCcwIcon } from "lucide-react"
+import { useState } from "react";
+import { PauseIcon, PlayIcon, RotateCcwIcon } from "lucide-react";
 
-import { useCountdown } from "@/hooks/useCountdown"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import {cn} from "cn"
+import { useCountdown } from "@/hooks/useCountdown";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { cn } from "cn";
 
-const COUNT_START = 15
+const COUNT_START = 15;
 const INTERVAL_OPTIONS = [
   { value: 1000, label: "1000ms" },
   { value: 200, label: "200ms" },
-] as const
+] as const;
 
 export default function UseCountdownDemo() {
-  const [intervalMs, setIntervalMs] = useState<number>(1000)
+  const [intervalMs, setIntervalMs] = useState<number>(1000);
   const { count, isRunning, start, pause, reset } = useCountdown({
     countStart: COUNT_START,
     countStop: 0,
     intervalMs,
-  })
+  });
 
-  const progress = count / COUNT_START
-  const isComplete = count === 0
+  const progress = count / COUNT_START;
+  const isComplete = count === 0;
 
   return (
     <Card className="w-full max-w-80">
@@ -36,7 +36,7 @@ export default function UseCountdownDemo() {
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {INTERVAL_OPTIONS.map((option) => {
-              const active = intervalMs === option.value
+              const active = intervalMs === option.value;
               return (
                 <button
                   key={option.value}
@@ -46,12 +46,12 @@ export default function UseCountdownDemo() {
                     " rounded-[3px] px-1.5 py-0.5 font-mono text-3xs font-medium tabular-nums transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {option.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -63,9 +63,7 @@ export default function UseCountdownDemo() {
             </span>
 
             <Badge
-              variant={
-                isRunning ? "default" : isComplete ? "accent" : "outline"
-              }
+              variant={isRunning ? "default" : isComplete ? "accent" : "outline"}
               className="font-mono uppercase"
             >
               {isRunning ? "Running" : isComplete ? "Done" : "Paused"}
@@ -76,7 +74,7 @@ export default function UseCountdownDemo() {
             <div
               className={cn(
                 "h-full w-full origin-left transition-transform duration-150 ease-out motion-reduce:transition-none",
-                isRunning ? "bg-success" : "bg-primary"
+                isRunning ? "bg-success" : "bg-primary",
               )}
               style={{
                 transform: `scale3d(${progress}, 1, 1)`,
@@ -136,5 +134,5 @@ export default function UseCountdownDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

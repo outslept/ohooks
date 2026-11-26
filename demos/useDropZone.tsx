@@ -1,94 +1,91 @@
-"use client"
+"use client";
 
-import { type DragEvent as ReactDragEvent, useState } from "react"
-import { FileCodeIcon, ImageIcon, RotateCcwIcon, UploadIcon } from "lucide-react"
-import { cn } from "cn"
+import { type DragEvent as ReactDragEvent, useState } from "react";
+import { FileCodeIcon, ImageIcon, RotateCcwIcon, UploadIcon } from "lucide-react";
+import { cn } from "cn";
 
-import { useDropZone } from "@/hooks/useDropZone"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useDropZone } from "@/hooks/useDropZone";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
-type AcceptFilter = "*/*" | "image/*"
+type AcceptFilter = "*/*" | "image/*";
 
 const ACCEPT_OPTIONS: { value: AcceptFilter; label: string }[] = [
   { value: "*/*", label: "*/*" },
   { value: "image/*", label: "image/*" },
-]
+];
 
 export default function UseDropZoneDemo() {
-  const [accept, setAccept] = useState<AcceptFilter>("image/*")
-  const [rejectedName, setRejectedName] = useState<string | null>(null)
+  const [accept, setAccept] = useState<AcceptFilter>("image/*");
+  const [rejectedName, setRejectedName] = useState<string | null>(null);
 
   const { isOver, isInvalid, files, clearFiles, getRootProps } = useDropZone({
     accept,
     multiple: true,
     onDrop: () => {
-      setRejectedName(null)
+      setRejectedName(null);
     },
     onDropRejected: (rejected) => {
-      setRejectedName(rejected[0]?.name ?? "file")
+      setRejectedName(rejected[0]?.name ?? "file");
     },
-  })
+  });
 
-  const rootProps = getRootProps()
+  const rootProps = getRootProps();
 
   const simulateDrop = (name: string, type: string, sizeBytes: number) => {
-    if (typeof DataTransfer === "undefined") return
-    const dt = new DataTransfer()
-    const content = new Uint8Array(sizeBytes)
-    dt.items.add(new File([content], name, { type }))
+    if (typeof DataTransfer === "undefined") return;
+    const dt = new DataTransfer();
+    const content = new Uint8Array(sizeBytes);
+    dt.items.add(new File([content], name, { type }));
 
     rootProps.onDrop({
       preventDefault() {},
       stopPropagation() {},
       dataTransfer: dt,
-    } as unknown as ReactDragEvent<HTMLElement>)
-  }
+    } as unknown as ReactDragEvent<HTMLElement>);
+  };
 
   const handleClear = () => {
-    clearFiles()
-    setRejectedName(null)
-  }
+    clearFiles();
+    setRejectedName(null);
+  };
 
-  const latestFile = files[files.length - 1]
-  const hasDanger = isInvalid || rejectedName !== null
+  const latestFile = files[files.length - 1];
+  const hasDanger = isInvalid || rejectedName !== null;
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
-
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="Accepted MIME filter"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {ACCEPT_OPTIONS.map((option) => {
-              const active = accept === option.value
+              const active = accept === option.value;
               return (
                 <button
                   key={option.value}
                   type="button"
                   onClick={() => {
-                    setAccept(option.value)
-                    setRejectedName(null)
+                    setAccept(option.value);
+                    setRejectedName(null);
                   }}
                   className={cn(
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-3xs font-medium transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {option.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
-
 
         <div
           {...rootProps}
@@ -98,20 +95,15 @@ export default function UseDropZoneDemo() {
               ? "border-destructive/50 bg-destructive/5"
               : isOver
                 ? "scale-[1.01] border-primary bg-primary/5"
-                : "border-border bg-subtle/35"
+                : "border-border bg-subtle/35",
           )}
         >
           {isOver ? (
             <>
-              <Badge
-                variant={isInvalid ? "destructive" : "accent"}
-                size="compact"
-              >
+              <Badge variant={isInvalid ? "destructive" : "accent"} size="compact">
                 {isInvalid ? "Invalid MIME" : "Release to Drop"}
               </Badge>
-              <span className="font-mono text-2xs text-muted-foreground">
-                accept: {accept}
-              </span>
+              <span className="font-mono text-2xs text-muted-foreground">accept: {accept}</span>
             </>
           ) : rejectedName ? (
             <>
@@ -123,9 +115,7 @@ export default function UseDropZoneDemo() {
                   {rejectedName}
                 </span>
               </div>
-              <span className="font-mono text-2xs text-muted-foreground">
-                requires {accept}
-              </span>
+              <span className="font-mono text-2xs text-muted-foreground">requires {accept}</span>
             </>
           ) : latestFile ? (
             <>
@@ -140,8 +130,8 @@ export default function UseDropZoneDemo() {
                 )}
               </div>
               <span className="font-mono text-2xs text-muted-foreground tabular-nums">
-                {latestFile.type || "unknown"} ·{" "}
-                {Math.max(1, Math.round(latestFile.size / 1024))} KB
+                {latestFile.type || "unknown"} · {Math.max(1, Math.round(latestFile.size / 1024))}{" "}
+                KB
               </span>
             </>
           ) : (
@@ -152,9 +142,7 @@ export default function UseDropZoneDemo() {
                   DROP FILES HERE
                 </span>
               </div>
-              <span className="font-mono text-2xs text-muted-foreground">
-                accept: {accept}
-              </span>
+              <span className="font-mono text-2xs text-muted-foreground">accept: {accept}</span>
             </>
           )}
         </div>
@@ -190,5 +178,5 @@ export default function UseDropZoneDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

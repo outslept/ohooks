@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useLatest } from './useLatest';
+import { useEffect } from "react";
+import { useLatest } from "./useLatest";
 
 /**
  * Runs a callback repeatedly at a specified millisecond interval, pausing when `delay` is `null`.
@@ -15,10 +15,7 @@ import { useLatest } from './useLatest';
  * }, isPolling ? 5000 : null);
  * ```
  */
-export function useInterval(
-  callback: () => void,
-  delay: number | null,
-): void {
+export function useInterval(callback: () => void, delay: number | null): void {
   const savedCallback = useLatest(callback);
 
   useEffect(() => {

@@ -14,16 +14,16 @@ The `useLongPress` hook returns pointer and click event handlers that invoke a c
 ## Usage
 
 ```tsx
-import { useLongPress } from "@/hooks/useLongPress"
+import { useLongPress } from "@/hooks/useLongPress";
 ```
 
 ```tsx
 const longPressProps = useLongPress(
   () => {
-    openContextMenu()
+    openContextMenu();
   },
-  { threshold: 500 }
-)
+  { threshold: 500 },
+);
 ```
 
 ## Examples
@@ -35,16 +35,16 @@ Spread the returned handlers onto a button that also has a normal `onClick`—if
 ```tsx
 const longPressProps = useLongPress(
   () => {
-    enterSelectionMode()
+    enterSelectionMode();
   },
-  { threshold: 600 }
-)
+  { threshold: 600 },
+);
 
 return (
   <button {...longPressProps} onClick={() => openItem()}>
     Tap to open, hold to select
   </button>
-)
+);
 ```
 
 ### Lifecycle Callbacks (`onStart`, `onFinish`, `onCancel`)
@@ -52,11 +52,11 @@ return (
 Track press progress and distinguish completed long presses from cancelled ones using `onStart`, `onFinish`, and `onCancel`.
 
 ```tsx
-const [pressing, setPressing] = useState(false)
+const [pressing, setPressing] = useState(false);
 
 const handlers = useLongPress(
   () => {
-    deleteItem()
+    deleteItem();
   },
   {
     threshold: 800,
@@ -64,14 +64,10 @@ const handlers = useLongPress(
     onStart: () => setPressing(true),
     onFinish: () => setPressing(false),
     onCancel: () => setPressing(false),
-  }
-)
+  },
+);
 
-return (
-  <button {...handlers}>
-    {pressing ? "Keep holding to delete..." : "Hold to delete"}
-  </button>
-)
+return <button {...handlers}>{pressing ? "Keep holding to delete..." : "Hold to delete"}</button>;
 ```
 
 ## API Reference

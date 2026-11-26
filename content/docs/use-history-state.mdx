@@ -14,11 +14,11 @@ The `useHistoryState` hook manages a state value alongside bounded `past` and `f
 ## Usage
 
 ```tsx
-import { useHistoryState } from "@/hooks/useHistoryState"
+import { useHistoryState } from "@/hooks/useHistoryState";
 ```
 
 ```tsx
-const { state, set, undo, redo, canUndo, canRedo } = useHistoryState("")
+const { state, set, undo, redo, canUndo, canRedo } = useHistoryState("");
 ```
 
 ## Examples
@@ -28,8 +28,7 @@ const { state, set, undo, redo, canUndo, canRedo } = useHistoryState("")
 Use `canUndo` and `canRedo` to enable or disable toolbar buttons as the user edits state.
 
 ```tsx
-const { state, set, undo, redo, clear, canUndo, canRedo } =
-  useHistoryState("Initial note")
+const { state, set, undo, redo, clear, canUndo, canRedo } = useHistoryState("Initial note");
 
 return (
   <div>
@@ -44,7 +43,7 @@ return (
       <button onClick={clear}>Reset history</button>
     </div>
   </div>
-)
+);
 ```
 
 ### Limiting History Capacity
@@ -52,22 +51,16 @@ return (
 Pass a `capacity` argument to cap the maximum number of undo snapshots retained in memory.
 
 ```tsx
-const { state, set, past, future } = useHistoryState(
-  { x: 0, y: 0 },
-  20
-)
+const { state, set, past, future } = useHistoryState({ x: 0, y: 0 }, 20);
 
 return (
   <div>
     <p>
-      Position: ({state.x}, {state.y}) — {past.length} undo / {future.length}{" "}
-      redo steps
+      Position: ({state.x}, {state.y}) — {past.length} undo / {future.length} redo steps
     </p>
-    <button onClick={() => set((prev) => ({ x: prev.x + 10, y: prev.y }))}>
-      Move right
-    </button>
+    <button onClick={() => set((prev) => ({ x: prev.x + 10, y: prev.y }))}>Move right</button>
   </div>
-)
+);
 ```
 
 ## API Reference
@@ -76,7 +69,4 @@ return (
 
 Current state, history stacks, and undo/redo controls returned by the hook.
 
-<AutoTypeTable
-  path="./hooks/useHistoryState.ts"
-  name="UseHistoryStateReturn"
-/>
+<AutoTypeTable path="./hooks/useHistoryState.ts" name="UseHistoryStateReturn" />

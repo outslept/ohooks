@@ -14,11 +14,11 @@ The `useScript` hook injects an external `<script>` tag into `document.body` (or
 ## Usage
 
 ```tsx
-import { useScript } from "@/hooks/useScript"
+import { useScript } from "@/hooks/useScript";
 ```
 
 ```tsx
-const status = useScript("https://js.stripe.com/v3/")
+const status = useScript("https://js.stripe.com/v3/");
 ```
 
 ## Examples
@@ -28,12 +28,12 @@ const status = useScript("https://js.stripe.com/v3/")
 Check `status === "ready"` before initializing or rendering components that depend on the global script.
 
 ```tsx
-const status = useScript("https://checkout.stripe.com/checkout.js")
+const status = useScript("https://checkout.stripe.com/checkout.js");
 
-if (status === "loading") return <p>Loading payment SDK...</p>
-if (status === "error") return <p role="alert">Failed to load payment SDK.</p>
+if (status === "loading") return <p>Loading payment SDK...</p>;
+if (status === "error") return <p role="alert">Failed to load payment SDK.</p>;
 
-return <button disabled={status !== "ready"}>Pay now</button>
+return <button disabled={status !== "ready"}>Pay now</button>;
 ```
 
 ### Conditional Loading and Cleanup on Unmount
@@ -41,23 +41,20 @@ return <button disabled={status !== "ready"}>Pay now</button>
 Pass `null` (or `shouldPreventLoad: true`) to defer loading until needed, and `removeOnUnmount: true` to remove the `<script>` tag when the last consumer unmounts.
 
 ```tsx
-const [enabled, setEnabled] = useState(false)
+const [enabled, setEnabled] = useState(false);
 
-const status = useScript(
-  enabled ? "https://example.com/analytics.js" : null,
-  {
-    id: "custom-analytics",
-    removeOnUnmount: true,
-    attrs: { "data-site-id": "my-site" },
-  }
-)
+const status = useScript(enabled ? "https://example.com/analytics.js" : null, {
+  id: "custom-analytics",
+  removeOnUnmount: true,
+  attrs: { "data-site-id": "my-site" },
+});
 
 return (
   <div>
     <button onClick={() => setEnabled(true)}>Enable analytics</button>
     <p>Script status: {status}</p>
   </div>
-)
+);
 ```
 
 ## API Reference

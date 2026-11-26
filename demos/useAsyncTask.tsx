@@ -5,13 +5,7 @@ import { Loader2, Play, RotateCcw, Square } from "lucide-react";
 import { useAsyncTask } from "@/hooks/useAsyncTask";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { cn } from "cn";
 
 interface TaskPayload {
@@ -31,36 +25,35 @@ export function UseAsyncTaskDemo() {
 
   const shouldFail = MODE_OPTIONS[modeIdx].shouldFail;
 
-  const { run, abort, reset, status, data, error, isIdle, isPending } =
-    useAsyncTask(
-      async ({ signal }, fail: boolean): Promise<TaskPayload> => {
-        await new Promise<void>((resolve, reject) => {
-          const timer = setTimeout(resolve, 1500);
-          signal.addEventListener(
-            "abort",
-            () => {
-              clearTimeout(timer);
-              reject(new DOMException("Aborted", "AbortError"));
-            },
-            { once: true }
-          );
-        });
+  const { run, abort, reset, status, data, error, isIdle, isPending } = useAsyncTask(
+    async ({ signal }, fail: boolean): Promise<TaskPayload> => {
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(resolve, 1500);
+        signal.addEventListener(
+          "abort",
+          () => {
+            clearTimeout(timer);
+            reject(new DOMException("Aborted", "AbortError"));
+          },
+          { once: true },
+        );
+      });
 
-        if (fail) {
-          throw new Error("503 Service Unavailable");
-        }
-
-        return {
-          id: Math.floor(Math.random() * 900 + 100),
-          timestamp: new Date().toLocaleTimeString([], {
-            hour12: false,
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          }),
-        };
+      if (fail) {
+        throw new Error("503 Service Unavailable");
       }
-    );
+
+      return {
+        id: Math.floor(Math.random() * 900 + 100),
+        timestamp: new Date().toLocaleTimeString([], {
+          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }),
+      };
+    },
+  );
 
   const fillBar = isPending && activeRunId === runId;
 
@@ -108,7 +101,7 @@ export function UseAsyncTaskDemo() {
                     selected
                       ? "bg-control text-foreground shadow-control"
                       : "text-muted-foreground pointer-hover:hover:text-foreground",
-                    "focus-visible:ring-1 focus-visible:ring-ring"
+                    "focus-visible:ring-1 focus-visible:ring-ring",
                   )}
                 >
                   {option.label}
@@ -126,7 +119,7 @@ export function UseAsyncTaskDemo() {
             className={cn(
               "absolute top-1.5 left-1.5 size-2 border-t-[1.5px] border-l-[1.5px] transition-[opacity,border-color] duration-200 ease-out",
               cornerColorClass,
-              isPending ? "opacity-90" : "opacity-35"
+              isPending ? "opacity-90" : "opacity-35",
             )}
           />
           <span
@@ -134,7 +127,7 @@ export function UseAsyncTaskDemo() {
             className={cn(
               "absolute top-1.5 right-1.5 size-2 border-t-[1.5px] border-r-[1.5px] transition-[opacity,border-color] duration-200 ease-out",
               cornerColorClass,
-              isPending ? "opacity-90" : "opacity-35"
+              isPending ? "opacity-90" : "opacity-35",
             )}
           />
           <span
@@ -142,7 +135,7 @@ export function UseAsyncTaskDemo() {
             className={cn(
               "absolute bottom-1.5 left-1.5 size-2 border-b-[1.5px] border-l-[1.5px] transition-[opacity,border-color] duration-200 ease-out",
               cornerColorClass,
-              isPending ? "opacity-90" : "opacity-35"
+              isPending ? "opacity-90" : "opacity-35",
             )}
           />
           <span
@@ -150,7 +143,7 @@ export function UseAsyncTaskDemo() {
             className={cn(
               "absolute bottom-1.5 right-1.5 size-2 border-r-[1.5px] border-b-[1.5px] transition-[opacity,border-color] duration-200 ease-out",
               cornerColorClass,
-              isPending ? "opacity-90" : "opacity-35"
+              isPending ? "opacity-90" : "opacity-35",
             )}
           />
 
@@ -174,9 +167,7 @@ export function UseAsyncTaskDemo() {
                 <Badge size="compact" variant="secondary" className="font-mono">
                   STANDBY
                 </Badge>
-                <span className="text-2xs text-muted-foreground">
-                  Ready to dispatch
-                </span>
+                <span className="text-2xs text-muted-foreground">Ready to dispatch</span>
               </>
             )}
 
@@ -186,9 +177,7 @@ export function UseAsyncTaskDemo() {
                   <Loader2 className="size-3.5 animate-spinner text-foreground" />
                   <span>Running…</span>
                 </div>
-                <span className="text-2xs text-muted-foreground">
-                  1500ms · AbortController
-                </span>
+                <span className="text-2xs text-muted-foreground">1500ms · AbortController</span>
               </>
             )}
 
@@ -202,9 +191,7 @@ export function UseAsyncTaskDemo() {
                     200 OK
                   </Badge>
                 </div>
-                <span className="text-2xs text-muted-foreground">
-                  Resolved at {data.timestamp}
-                </span>
+                <span className="text-2xs text-muted-foreground">Resolved at {data.timestamp}</span>
               </>
             )}
 
@@ -213,9 +200,7 @@ export function UseAsyncTaskDemo() {
                 <Badge size="compact" variant="destructive" className="font-mono">
                   503 ERROR
                 </Badge>
-                <span className="text-2xs text-muted-foreground">
-                  {error.message}
-                </span>
+                <span className="text-2xs text-muted-foreground">{error.message}</span>
               </>
             )}
 
@@ -224,9 +209,7 @@ export function UseAsyncTaskDemo() {
                 <Badge size="compact" variant="warning" className="font-mono">
                   ABORTED
                 </Badge>
-                <span className="text-2xs text-muted-foreground">
-                  AbortSignal triggered
-                </span>
+                <span className="text-2xs text-muted-foreground">AbortSignal triggered</span>
               </>
             )}
           </div>
@@ -247,11 +230,7 @@ export function UseAsyncTaskDemo() {
             Signal
           </span>
           <span className="mt-0.5 font-mono text-xs font-medium text-foreground tabular-nums">
-            {status === "aborted"
-              ? "aborted"
-              : isPending
-                ? "active"
-                : "idle"}
+            {status === "aborted" ? "aborted" : isPending ? "active" : "idle"}
           </span>
         </div>
       </div>

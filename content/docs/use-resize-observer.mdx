@@ -14,14 +14,14 @@ The `useResizeObserver` hook observes a target DOM element via `ResizeObserver`,
 ## Usage
 
 ```tsx
-import { useResizeObserver } from "@/hooks/useResizeObserver"
+import { useResizeObserver } from "@/hooks/useResizeObserver";
 ```
 
 ```tsx
-const boxRef = useRef<HTMLDivElement>(null)
+const boxRef = useRef<HTMLDivElement>(null);
 useResizeObserver(boxRef, (entry) => {
-  console.log(entry.contentRect.width)
-})
+  console.log(entry.contentRect.width);
+});
 ```
 
 ## Examples
@@ -31,17 +31,17 @@ useResizeObserver(boxRef, (entry) => {
 Omit the callback argument (or pass an options object as the second argument) to read the reactive `ResizeObserverEntry` directly from the return value.
 
 ```tsx
-const panelRef = useRef<HTMLDivElement>(null)
-const entry = useResizeObserver(panelRef, { box: "content-box" })
+const panelRef = useRef<HTMLDivElement>(null);
+const entry = useResizeObserver(panelRef, { box: "content-box" });
 
-const width = entry?.contentRect.width ?? 0
-const height = entry?.contentRect.height ?? 0
+const width = entry?.contentRect.width ?? 0;
+const height = entry?.contentRect.height ?? 0;
 
 return (
   <div ref={panelRef}>
     Size: {Math.round(width)}px × {Math.round(height)}px
   </div>
-)
+);
 ```
 
 ### Callback-Only Mode for Imperative Updates
@@ -49,17 +49,17 @@ return (
 Pass a callback function as the second argument to handle resize events imperatively (such as resizing a chart or canvas) without re-rendering the component on every pixel change.
 
 ```tsx
-const canvasContainerRef = useRef<HTMLDivElement>(null)
+const canvasContainerRef = useRef<HTMLDivElement>(null);
 
 useResizeObserver(
   canvasContainerRef,
   (entry) => {
-    resizeChartInstance(entry.contentRect.width, entry.contentRect.height)
+    resizeChartInstance(entry.contentRect.width, entry.contentRect.height);
   },
-  { box: "border-box" }
-)
+  { box: "border-box" },
+);
 
-return <div ref={canvasContainerRef} />
+return <div ref={canvasContainerRef} />;
 ```
 
 ## API Reference
@@ -68,7 +68,4 @@ return <div ref={canvasContainerRef} />
 
 Configuration options for observed box model and observer activation.
 
-<AutoTypeTable
-  path="./hooks/useResizeObserver.ts"
-  name="UseResizeObserverOptions"
-/>
+<AutoTypeTable path="./hooks/useResizeObserver.ts" name="UseResizeObserverOptions" />

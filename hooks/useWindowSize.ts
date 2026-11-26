@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useEventCallback } from './useEventCallback';
-import { useEventListener } from './useEventListener';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { useThrottleCallback } from './useThrottleCallback';
+import { useState } from "react";
+import { useEventCallback } from "./useEventCallback";
+import { useEventListener } from "./useEventListener";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
+import { useThrottleCallback } from "./useThrottleCallback";
 
 /** Viewport inner width and height in pixels. */
 export interface WindowSize {
@@ -36,9 +36,7 @@ export interface UseWindowSizeOptions {
  * const { width, height } = useWindowSize({ throttleMs: 100 });
  * ```
  */
-export function useWindowSize(
-  options: UseWindowSizeOptions = {},
-): WindowSize {
+export function useWindowSize(options: UseWindowSizeOptions = {}): WindowSize {
   const {
     initialWidth = 0,
     initialHeight = 0,
@@ -47,7 +45,7 @@ export function useWindowSize(
   } = options;
 
   const readSize = (): WindowSize => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return { width: initialWidth, height: initialHeight };
     }
     return {
@@ -57,9 +55,7 @@ export function useWindowSize(
   };
 
   const [windowSize, setWindowSize] = useState<WindowSize>(() =>
-    initializeWithValue
-      ? readSize()
-      : { width: initialWidth, height: initialHeight },
+    initializeWithValue ? readSize() : { width: initialWidth, height: initialHeight },
   );
 
   const updateSize = useEventCallback(() => {
@@ -82,7 +78,7 @@ export function useWindowSize(
     }
   };
 
-  useEventListener('resize', handleResize);
+  useEventListener("resize", handleResize);
 
   useIsomorphicLayoutEffect(() => {
     updateSize();

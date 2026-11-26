@@ -14,13 +14,13 @@ The `useDebounceCallback` hook returns a stable, debounced version of a callback
 ## Usage
 
 ```tsx
-import { useDebounceCallback } from "@/hooks/useDebounceCallback"
+import { useDebounceCallback } from "@/hooks/useDebounceCallback";
 ```
 
 ```tsx
 const handleSearch = useDebounceCallback((query: string) => {
-  fetchResults(query)
-}, 300)
+  fetchResults(query);
+}, 300);
 ```
 
 ## Examples
@@ -32,18 +32,13 @@ Configure `leading: true` to invoke immediately on the first call, or set `maxWa
 ```tsx
 const saveDraft = useDebounceCallback(
   (content: string) => {
-    api.saveDraft(content)
+    api.saveDraft(content);
   },
   1000,
-  { leading: false, trailing: true, maxWait: 5000 }
-)
+  { leading: false, trailing: true, maxWait: 5000 },
+);
 
-return (
-  <textarea
-    onChange={(e) => saveDraft(e.target.value)}
-    placeholder="Type your draft..."
-  />
-)
+return <textarea onChange={(e) => saveDraft(e.target.value)} placeholder="Type your draft..." />;
 ```
 
 ### Flushing and Cancelling Pending Calls
@@ -52,18 +47,15 @@ Call `.flush()` to immediately execute a pending invocation (for example, on for
 
 ```tsx
 const debouncedSave = useDebounceCallback((value: string) => {
-  api.save(value)
-}, 500)
+  api.save(value);
+}, 500);
 
 return (
   <div>
-    <input
-      onChange={(e) => debouncedSave(e.target.value)}
-      onBlur={() => debouncedSave.flush()}
-    />
+    <input onChange={(e) => debouncedSave(e.target.value)} onBlur={() => debouncedSave.flush()} />
     <button onClick={() => debouncedSave.cancel()}>Cancel pending save</button>
   </div>
-)
+);
 ```
 
 ## API Reference

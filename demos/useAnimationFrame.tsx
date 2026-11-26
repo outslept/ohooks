@@ -3,13 +3,7 @@
 import * as React from "react";
 import { Pause, Play, RotateCcw } from "lucide-react";
 import { useAnimationFrame } from "@/hooks/useAnimationFrame";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { cn } from "cn";
 
 const TICKS = Array.from({ length: 60 }, (_, i) => i);
@@ -32,7 +26,7 @@ export function UseAnimationFrameDemo() {
       setDeltaTime(dt);
       setFrames((prev) => prev + 1);
     },
-    { immediate: true, fpsLimit }
+    { immediate: true, fpsLimit },
   );
 
   const handleReset = () => {
@@ -43,9 +37,7 @@ export function UseAnimationFrameDemo() {
   };
 
   const totalSeconds = time / 1000;
-  const wholeSeconds = Math.floor(totalSeconds)
-    .toString()
-    .padStart(2, "0");
+  const wholeSeconds = Math.floor(totalSeconds).toString().padStart(2, "0");
   const centiseconds = Math.floor((time % 1000) / 10)
     .toString()
     .padStart(2, "0");
@@ -76,7 +68,7 @@ export function UseAnimationFrameDemo() {
                     selected
                       ? "bg-control text-foreground shadow-control"
                       : "text-muted-foreground pointer-hover:hover:text-foreground",
-                    "focus-visible:ring-1 focus-visible:ring-ring"
+                    "focus-visible:ring-1 focus-visible:ring-ring",
                   )}
                 >
                   {option.label}
@@ -89,11 +81,7 @@ export function UseAnimationFrameDemo() {
 
       <CardContent className="flex flex-col items-center justify-center py-6">
         <div className="relative flex size-36 items-center justify-center">
-          <svg
-            viewBox="0 0 144 144"
-            className="size-full overflow-visible"
-            aria-hidden="true"
-          >
+          <svg viewBox="0 0 144 144" className="size-full overflow-visible" aria-hidden="true">
             {TICKS.map((tick) => {
               const angle = tick * 6;
               const isMajor = tick % 5 === 0;
@@ -115,7 +103,7 @@ export function UseAnimationFrameDemo() {
                       ? "stroke-foreground"
                       : isMajor
                         ? "stroke-border-hover"
-                        : "stroke-border"
+                        : "stroke-border",
                   )}
                 />
               );
@@ -137,7 +125,7 @@ export function UseAnimationFrameDemo() {
                 r="2.5"
                 className={cn(
                   "transition-colors duration-150",
-                  isActive ? "fill-foreground" : "fill-muted-foreground"
+                  isActive ? "fill-foreground" : "fill-muted-foreground",
                 )}
               />
             </g>
@@ -145,12 +133,8 @@ export function UseAnimationFrameDemo() {
 
           <div className="absolute inset-0 flex flex-col items-center justify-center select-none">
             <div className="flex items-baseline font-mono tracking-tight tabular-nums">
-              <span className="text-2xl font-semibold text-foreground">
-                {wholeSeconds}
-              </span>
-              <span className="text-sm font-medium text-muted-foreground">
-                .{centiseconds}s
-              </span>
+              <span className="text-2xl font-semibold text-foreground">{wholeSeconds}</span>
+              <span className="text-sm font-medium text-muted-foreground">.{centiseconds}s</span>
             </div>
             <span className="mt-0.5 font-mono text-3xs tracking-widest text-muted-foreground uppercase">
               {isActive && fps > 0 ? `${fps} FPS` : "PAUSED"}
@@ -188,7 +172,7 @@ export function UseAnimationFrameDemo() {
             "transition-[color,border-color,transform] duration-150 ease-out",
             "pointer-hover:hover:border-border-hover",
             "active:scale-[0.99]",
-            "focus-visible:border-border-focus focus-visible:ring-2 focus-visible:ring-ring"
+            "focus-visible:border-border-focus focus-visible:ring-2 focus-visible:ring-ring",
           )}
         >
           {isActive ? (
@@ -213,7 +197,7 @@ export function UseAnimationFrameDemo() {
             "transition-[color,border-color,transform] duration-150 ease-out",
             "pointer-hover:hover:border-border-hover pointer-hover:hover:text-foreground",
             "active:scale-[0.99]",
-            "focus-visible:border-border-focus focus-visible:ring-2 focus-visible:ring-ring"
+            "focus-visible:border-border-focus focus-visible:ring-2 focus-visible:ring-ring",
           )}
         >
           <RotateCcw className="size-3" />

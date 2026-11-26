@@ -120,21 +120,16 @@
 
   --shadow-2xs: 0 1px 1px 0 oklch(0.15 0.01 264 / 0.03);
   --shadow-xs:
-    0 1px 2px 0 oklch(0.15 0.01 264 / 0.04),
-    0 1px 1px -0.5px oklch(0.15 0.01 264 / 0.03);
+    0 1px 2px 0 oklch(0.15 0.01 264 / 0.04), 0 1px 1px -0.5px oklch(0.15 0.01 264 / 0.03);
   --shadow-control:
-    0 1px 2px 0 oklch(0.15 0.01 264 / 0.045),
-    0 0 0 0.5px oklch(0.15 0.01 264 / 0.02);
+    0 1px 2px 0 oklch(0.15 0.01 264 / 0.045), 0 0 0 0.5px oklch(0.15 0.01 264 / 0.02);
   --shadow-pill-active:
-    0 1px 2px 0 oklch(0.15 0.01 264 / 0.06),
-    0 0 0 1px oklch(0.15 0.01 264 / 0.04);
+    0 1px 2px 0 oklch(0.15 0.01 264 / 0.06), 0 0 0 1px oklch(0.15 0.01 264 / 0.04);
   --shadow-floating:
-    0 12px 32px -4px oklch(0.15 0.01 264 / 0.08),
-    0 4px 12px -2px oklch(0.15 0.01 264 / 0.05);
+    0 12px 32px -4px oklch(0.15 0.01 264 / 0.08), 0 4px 12px -2px oklch(0.15 0.01 264 / 0.05);
 
   --code-line-number: oklch(0.55 0.01 264 / 0.55);
 }
-
 
 .dark {
   --surface-subtle: oklch(0.112 0.004 264);
@@ -182,23 +177,15 @@
   --outline-inset: oklch(0.98 0.004 264 / 0.08);
 
   --shadow-2xs: 0 1px 1px 0 oklch(0 0 0 / 0.35);
-  --shadow-xs:
-    0 1px 3px 0 oklch(0 0 0 / 0.45),
-    0 1px 2px -1px oklch(0 0 0 / 0.35);
-  --shadow-control:
-    inset 0 1px 0 0 oklch(1 0 0 / 0.04),
-    0 1px 2px 0 oklch(0 0 0 / 0.4);
-  --shadow-pill-active:
-    inset 0 1px 0 0 oklch(1 0 0 / 0.07),
-    0 1px 2px 0 oklch(0 0 0 / 0.35);
+  --shadow-xs: 0 1px 3px 0 oklch(0 0 0 / 0.45), 0 1px 2px -1px oklch(0 0 0 / 0.35);
+  --shadow-control: inset 0 1px 0 0 oklch(1 0 0 / 0.04), 0 1px 2px 0 oklch(0 0 0 / 0.4);
+  --shadow-pill-active: inset 0 1px 0 0 oklch(1 0 0 / 0.07), 0 1px 2px 0 oklch(0 0 0 / 0.35);
   --shadow-floating:
-    inset 0 1px 0 0 oklch(1 0 0 / 0.05),
-    0 16px 40px -6px oklch(0 0 0 / 0.65),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.05), 0 16px 40px -6px oklch(0 0 0 / 0.65),
     0 6px 16px -4px oklch(0 0 0 / 0.45);
 
   --code-line-number: oklch(0.58 0.01 264 / 0.45);
 }
-
 
 @theme inline {
   --color-background: var(--surface-background);
@@ -260,7 +247,6 @@
   --color-fd-ring: var(--ring-focus);
 }
 
-
 @layer base {
   * {
     @apply border-border;
@@ -275,7 +261,6 @@ html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
-
 
 @property --scroll-fade-top {
   syntax: "<length>";
@@ -383,7 +368,6 @@ html > body[data-scroll-locked] {
     scroll-fade-x-watcher linear both;
   animation-timeline: scroll(self block), scroll(self inline);
 }
-
 
 [data-slot="code-block"] pre {
   margin: 0 !important;

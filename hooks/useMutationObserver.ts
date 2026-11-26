@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 export interface UseMutationObserverOptions extends MutationObserverInit {
   /** Whether the mutation observer is active (default: `true`) */
@@ -34,7 +32,7 @@ const DEFAULT_OPTIONS: MutationObserverInit = {
 export function useMutationObserver(
   target: EventListenerTarget<Node>,
   callback: MutationCallback,
-  options: UseMutationObserverOptions = DEFAULT_OPTIONS
+  options: UseMutationObserverOptions = DEFAULT_OPTIONS,
 ): void {
   const {
     enabled = true,
@@ -49,10 +47,10 @@ export function useMutationObserver(
 
   const callbackRef = useLatest(callback);
   const attributeFilterRef = useLatest(attributeFilter);
-  const attributeFilterKey = attributeFilter ? attributeFilter.join(',') : '';
+  const attributeFilterKey = attributeFilter ? attributeFilter.join(",") : "";
 
   useEffect(() => {
-    if (!enabled || typeof MutationObserver === 'undefined') {
+    if (!enabled || typeof MutationObserver === "undefined") {
       return;
     }
 
@@ -67,16 +65,10 @@ export function useMutationObserver(
       currentAttributeFilter !== undefined || attributeOldValue === true;
     const hasImplicitCharacterData = characterDataOldValue === true;
 
-    const resolvedAttributes =
-      attributes ?? (hasImplicitAttributes ? true : undefined);
-    const resolvedCharacterData =
-      characterData ?? (hasImplicitCharacterData ? true : undefined);
+    const resolvedAttributes = attributes ?? (hasImplicitAttributes ? true : undefined);
+    const resolvedCharacterData = characterData ?? (hasImplicitCharacterData ? true : undefined);
 
-    if (
-      !resolvedAttributes &&
-      !childList &&
-      !resolvedCharacterData
-    ) {
+    if (!resolvedAttributes && !childList && !resolvedCharacterData) {
       return;
     }
 
@@ -85,19 +77,11 @@ export function useMutationObserver(
     });
 
     const init: MutationObserverInit = {
-      ...(resolvedAttributes !== undefined
-        ? { attributes: resolvedAttributes }
-        : {}),
-      ...(currentAttributeFilter !== undefined
-        ? { attributeFilter: currentAttributeFilter }
-        : {}),
+      ...(resolvedAttributes !== undefined ? { attributes: resolvedAttributes } : {}),
+      ...(currentAttributeFilter !== undefined ? { attributeFilter: currentAttributeFilter } : {}),
       ...(attributeOldValue !== undefined ? { attributeOldValue } : {}),
-      ...(resolvedCharacterData !== undefined
-        ? { characterData: resolvedCharacterData }
-        : {}),
-      ...(characterDataOldValue !== undefined
-        ? { characterDataOldValue }
-        : {}),
+      ...(resolvedCharacterData !== undefined ? { characterData: resolvedCharacterData } : {}),
+      ...(characterDataOldValue !== undefined ? { characterDataOldValue } : {}),
       ...(childList !== undefined ? { childList } : {}),
       ...(subtree !== undefined ? { subtree } : {}),
     };

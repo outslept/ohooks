@@ -14,11 +14,11 @@ The `useMediaQuery` hook subscribes to `window.matchMedia(query)` using `useSync
 ## Usage
 
 ```tsx
-import { useMediaQuery } from "@/hooks/useMediaQuery"
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 ```
 
 ```tsx
-const isDesktop = useMediaQuery("(min-width: 1024px)")
+const isDesktop = useMediaQuery("(min-width: 1024px)");
 ```
 
 ## Examples
@@ -28,17 +28,16 @@ const isDesktop = useMediaQuery("(min-width: 1024px)")
 Combine viewport queries with accessibility media queries such as `prefers-reduced-motion`.
 
 ```tsx
-const isMobile = useMediaQuery("(max-width: 767px)")
-const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
+const isMobile = useMediaQuery("(max-width: 767px)");
+const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
 return (
   <div>
     <p>Layout: {isMobile ? "Mobile" : "Desktop"}</p>
     <p>Animations: {prefersReducedMotion ? "Reduced" : "Full"}</p>
   </div>
-)
+);
 ```
-
 
 ## API Reference
 

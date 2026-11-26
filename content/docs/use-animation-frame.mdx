@@ -14,15 +14,13 @@ The `useAnimationFrame` hook runs a callback on every `requestAnimationFrame` ti
 ## Usage
 
 ```tsx
-import { useAnimationFrame } from "@/hooks/useAnimationFrame"
+import { useAnimationFrame } from "@/hooks/useAnimationFrame";
 ```
 
 ```tsx
-const { isActive, start, stop, toggle } = useAnimationFrame(
-  ({ deltaTime, elapsedTime }) => {
-    updatePosition(deltaTime)
-  }
-)
+const { isActive, start, stop, toggle } = useAnimationFrame(({ deltaTime, elapsedTime }) => {
+  updatePosition(deltaTime);
+});
 ```
 
 ## Examples
@@ -34,10 +32,10 @@ Use `fpsLimit` to cap how often the callback runs per second while keeping smoot
 ```tsx
 useAnimationFrame(
   ({ deltaTime }) => {
-    renderCanvas(deltaTime)
+    renderCanvas(deltaTime);
   },
-  { fpsLimit: 30 }
-)
+  { fpsLimit: 30 },
+);
 ```
 
 ### Manual Start
@@ -47,10 +45,10 @@ Set `immediate: false` to keep the loop paused on mount and start it on user int
 ```tsx
 const { isActive, toggle } = useAnimationFrame(
   ({ elapsedTime }) => {
-    setProgress(elapsedTime)
+    setProgress(elapsedTime);
   },
-  { immediate: false }
-)
+  { immediate: false },
+);
 ```
 
 ## API Reference

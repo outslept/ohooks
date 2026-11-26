@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 /** Loading status of an external `<script>` tag. */
-export type ScriptStatus = 'idle' | 'loading' | 'ready' | 'error';
+export type ScriptStatus = "idle" | "loading" | "ready" | "error";
 
 /** Configuration options for `useScript`. */
 export interface UseScriptOptions {
@@ -16,7 +16,7 @@ export interface UseScriptOptions {
   /** Set the `defer` attribute on the `<script>` tag (default: `false`). */
   defer?: boolean;
   /** CORS setting for the `<script>` element. */
-  crossOrigin?: 'anonymous' | 'use-credentials' | '';
+  crossOrigin?: "anonymous" | "use-credentials" | "";
   /** Subresource Integrity (`integrity`) hash. */
   integrity?: string;
   /** Script `type` attribute (e.g. `'module'`). */
@@ -31,31 +31,25 @@ const scriptConsumerCounts = new Map<string, number>();
 const scriptStatusCache = new Map<string, ScriptStatus>();
 
 function findExistingScript(src: string): HTMLScriptElement | null {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return null;
   }
-  const scripts = document.getElementsByTagName('script');
+  const scripts = document.getElementsByTagName("script");
   for (let i = 0; i < scripts.length; i += 1) {
     const script = scripts[i];
-    if (
-      script &&
-      (script.getAttribute('src') === src || script.src === src)
-    ) {
+    if (script && (script.getAttribute("src") === src || script.src === src)) {
       return script;
     }
   }
   return null;
 }
 
-function resolveScriptStatus(
-  src: string | null,
-  shouldPreventLoad: boolean
-): ScriptStatus {
+function resolveScriptStatus(src: string | null, shouldPreventLoad: boolean): ScriptStatus {
   if (!src || shouldPreventLoad) {
-    return 'idle';
+    return "idle";
   }
-  if (typeof document === 'undefined') {
-    return 'loading';
+  if (typeof document === "undefined") {
+    return "loading";
   }
   const cached = scriptStatusCache.get(src);
   if (cached) {
@@ -63,12 +57,10 @@ function resolveScriptStatus(
   }
   const existing = findExistingScript(src);
   if (existing) {
-    const attrStatus = existing.getAttribute(
-      'data-status'
-    ) as ScriptStatus | null;
-    return attrStatus ?? 'ready';
+    const attrStatus = existing.getAttribute("data-status") as ScriptStatus | null;
+    return attrStatus ?? "ready";
   }
-  return 'loading';
+  return "loading";
 }
 
 /**
@@ -84,10 +76,7 @@ function resolveScriptStatus(
  * const status = useScript('https://js.stripe.com/v3/');
  * ```
  */
-export function useScript(
-  src: string | null,
-  options: UseScriptOptions = {}
-): ScriptStatus {
+export function useScript(src: string | null, options: UseScriptOptions = {}): ScriptStatus {
   const {
     shouldPreventLoad = false,
     removeOnUnmount = false,
@@ -102,7 +91,7 @@ export function useScript(
   } = options;
 
   const [status, setStatus] = useState<ScriptStatus>(() =>
-    resolveScriptStatus(src, shouldPreventLoad)
+    resolveScriptStatus(src, shouldPreventLoad),
   );
 
   const [prevSrc, setPrevSrc] = useState(src);
@@ -114,7 +103,7 @@ export function useScript(
   }
 
   useEffect(() => {
-    if (!src || shouldPreventLoad || typeof document === 'undefined') {
+    if (!src || shouldPreventLoad || typeof document === "undefined") {
       return;
     }
 
@@ -124,7 +113,7 @@ export function useScript(
     let script = findExistingScript(src);
 
     if (!script) {
-      script = document.createElement('script');
+      script = document.createElement("script");
       script.src = src;
       script.async = async;
       script.defer = defer;
@@ -135,38 +124,35 @@ export function useScript(
       if (noModule !== undefined) script.noModule = noModule;
       if (referrerPolicy !== undefined) script.referrerPolicy = referrerPolicy;
 
-      script.setAttribute('data-status', 'loading');
-      scriptStatusCache.set(src, 'loading');
+      script.setAttribute("data-status", "loading");
+      scriptStatusCache.set(src, "loading");
       document.body.appendChild(script);
     } else {
-      const existingAttrStatus = script.getAttribute(
-        'data-status'
-      ) as ScriptStatus | null;
-      const resolvedStatus =
-        existingAttrStatus ?? scriptStatusCache.get(src) ?? 'ready';
-      script.setAttribute('data-status', resolvedStatus);
+      const existingAttrStatus = script.getAttribute("data-status") as ScriptStatus | null;
+      const resolvedStatus = existingAttrStatus ?? scriptStatusCache.get(src) ?? "ready";
+      script.setAttribute("data-status", resolvedStatus);
       scriptStatusCache.set(src, resolvedStatus);
     }
 
     const handleScriptLoad = () => {
-      script?.setAttribute('data-status', 'ready');
-      scriptStatusCache.set(src, 'ready');
-      setStatus('ready');
+      script?.setAttribute("data-status", "ready");
+      scriptStatusCache.set(src, "ready");
+      setStatus("ready");
     };
 
     const handleScriptError = () => {
-      script?.setAttribute('data-status', 'error');
-      scriptStatusCache.set(src, 'error');
-      setStatus('error');
+      script?.setAttribute("data-status", "error");
+      scriptStatusCache.set(src, "error");
+      setStatus("error");
     };
 
-    script.addEventListener('load', handleScriptLoad);
-    script.addEventListener('error', handleScriptError);
+    script.addEventListener("load", handleScriptLoad);
+    script.addEventListener("error", handleScriptError);
 
     return () => {
       if (script) {
-        script.removeEventListener('load', handleScriptLoad);
-        script.removeEventListener('error', handleScriptError);
+        script.removeEventListener("load", handleScriptLoad);
+        script.removeEventListener("error", handleScriptError);
       }
 
       const remaining = (scriptConsumerCounts.get(src) ?? 1) - 1;

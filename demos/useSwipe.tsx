@@ -1,66 +1,54 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react"
-import { cn } from "cn"
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  Move,
-  RotateCcw,
-} from "lucide-react"
+import { useRef, useState } from "react";
+import { cn } from "cn";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Move, RotateCcw } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { type SwipeDirection, useSwipe } from "@/hooks/useSwipe"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { type SwipeDirection, useSwipe } from "@/hooks/useSwipe";
 
-const THRESHOLD_OPTIONS = [25, 50, 80] as const
+const THRESHOLD_OPTIONS = [25, 50, 80] as const;
 
 export default function UseSwipeDemo() {
-  const padRef = useRef<HTMLDivElement>(null)
-  const [threshold, setThreshold] = useState<number>(50)
-  const [lastSwipe, setLastSwipe] = useState<SwipeDirection>("none")
-  const [swipeCount, setSwipeCount] = useState(0)
+  const padRef = useRef<HTMLDivElement>(null);
+  const [threshold, setThreshold] = useState<number>(50);
+  const [lastSwipe, setLastSwipe] = useState<SwipeDirection>("none");
+  const [swipeCount, setSwipeCount] = useState(0);
 
   const { isSwiping, direction, lengthX, lengthY } = useSwipe(padRef, {
     threshold,
     preventDefault: true,
     onSwipeEnd: (state) => {
       if (state.direction !== "none") {
-        setLastSwipe(state.direction)
-        setSwipeCount((c) => c + 1)
+        setLastSwipe(state.direction);
+        setSwipeCount((c) => c + 1);
       }
     },
-  })
+  });
 
-  const activeDir = isSwiping ? direction : lastSwipe
+  const activeDir = isSwiping ? direction : lastSwipe;
 
-  const offsetX = isSwiping
-    ? Math.max(-36, Math.min(36, Math.round(-lengthX * 0.4)))
-    : 0
-  const offsetY = isSwiping
-    ? Math.max(-18, Math.min(18, Math.round(-lengthY * 0.4)))
-    : 0
+  const offsetX = isSwiping ? Math.max(-36, Math.min(36, Math.round(-lengthX * 0.4))) : 0;
+  const offsetY = isSwiping ? Math.max(-18, Math.min(18, Math.round(-lengthY * 0.4))) : 0;
 
   const handleReset = () => {
-    setLastSwipe("none")
-    setSwipeCount(0)
-  }
+    setLastSwipe("none");
+    setSwipeCount(0);
+  };
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Swipe distance threshold"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {THRESHOLD_OPTIONS.map((px) => {
-              const active = threshold === px
+              const active = threshold === px;
               return (
                 <button
                   key={px}
@@ -70,12 +58,12 @@ export default function UseSwipeDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs font-medium tabular-nums transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {px}px
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -102,7 +90,7 @@ export default function UseSwipeDemo() {
                   : "border-border-subtle bg-card/85 text-muted-foreground",
                 isSwiping
                   ? "transition-none"
-                  : "transition-transform duration-200 ease-out motion-reduce:transition-none"
+                  : "transition-transform duration-200 ease-out motion-reduce:transition-none",
               )}
               style={{
                 transform: `translate3d(${offsetX}px, ${offsetY}px, 0)`,
@@ -156,5 +144,5 @@ export default function UseSwipeDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

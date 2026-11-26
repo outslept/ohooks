@@ -14,11 +14,11 @@ The `useElementRef` hook returns a `[ref, element]` tuple where `ref` is a stabl
 ## Usage
 
 ```tsx
-import { useElementRef } from "@/hooks/useElementRef"
+import { useElementRef } from "@/hooks/useElementRef";
 ```
 
 ```tsx
-const [ref, element] = useElementRef<HTMLDivElement>()
+const [ref, element] = useElementRef<HTMLDivElement>();
 ```
 
 ## Examples
@@ -28,13 +28,13 @@ const [ref, element] = useElementRef<HTMLDivElement>()
 Unlike `useRef`, `useElementRef` triggers a re-render when the node attaches so dependent `useEffect` hooks always receive the live element.
 
 ```tsx
-const [open, setOpen] = useState(false)
-const [panelRef, panelElement] = useElementRef<HTMLDivElement>()
+const [open, setOpen] = useState(false);
+const [panelRef, panelElement] = useElementRef<HTMLDivElement>();
 
 useEffect(() => {
-  if (!panelElement) return
-  panelElement.focus()
-}, [panelElement])
+  if (!panelElement) return;
+  panelElement.focus();
+}, [panelElement]);
 
 return (
   <div>
@@ -45,7 +45,7 @@ return (
       </div>
     )}
   </div>
-)
+);
 ```
 
 ### Composing with Other DOM Hooks
@@ -53,11 +53,11 @@ return (
 Pass `element` directly to hooks or APIs that accept `Element | null` so subscriptions attach as soon as the node mounts.
 
 ```tsx
-const [containerRef, container] = useElementRef<HTMLDivElement>()
+const [containerRef, container] = useElementRef<HTMLDivElement>();
 
 return (
   <div ref={containerRef}>
     <p>Mounted: {container ? "Yes" : "No"}</p>
   </div>
-)
+);
 ```

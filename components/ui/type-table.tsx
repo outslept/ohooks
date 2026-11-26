@@ -52,12 +52,7 @@ function renderInlineCode(node: React.ReactNode): React.ReactNode {
   });
 }
 
-export function TypeTable({
-  type,
-  title,
-  className,
-  ...props
-}: TypeTableProps) {
+export function TypeTable({ type, title, className, ...props }: TypeTableProps) {
   const entries = Object.entries(type);
 
   if (entries.length === 0) {
@@ -69,7 +64,7 @@ export function TypeTable({
       data-slot="type-table"
       className={cn(
         "not-prose my-6 overflow-hidden rounded-xl border border-border-subtle bg-subtle/50 p-1",
-        className
+        className,
       )}
       {...props}
     >
@@ -98,30 +93,26 @@ export function TypeTable({
 }
 
 function TypeRow({ name, field }: { name: string; field: TypeNode }) {
-  const hasFullType =
-    Boolean(field.typeDescription) && field.typeDescription !== field.type;
-  const hasParameters = Boolean(
-    field.parameters && field.parameters.length > 0
-  );
+  const hasFullType = Boolean(field.typeDescription) && field.typeDescription !== field.type;
+  const hasParameters = Boolean(field.parameters && field.parameters.length > 0);
   const hasReturns = Boolean(field.returns);
   const hasExpandableDetails = hasFullType || hasParameters || hasReturns;
 
-  const isOptional =
-    field.optional !== undefined ? field.optional : field.required === false;
+  const isOptional = field.optional !== undefined ? field.optional : field.required === false;
 
   return (
     <div
       data-slot="type-row"
       className={cn(
         "grid grid-cols-1 gap-2 px-4 py-3.5 sm:grid-cols-[minmax(160px,28%)_1fr] sm:gap-6",
-        "transition-colors duration-150 ease-out pointer-hover:hover:bg-subtle/25"
+        "transition-colors duration-150 ease-out pointer-hover:hover:bg-subtle/25",
       )}
     >
       <div className="flex flex-wrap items-start gap-1.5 sm:pt-0.5">
         <code
           className={cn(
             "font-mono text-xs font-medium tracking-tight text-foreground",
-            field.deprecated && "text-muted-foreground line-through"
+            field.deprecated && "text-muted-foreground line-through",
           )}
         >
           {name}
@@ -156,7 +147,7 @@ function TypeRow({ name, field }: { name: string; field: TypeNode }) {
               className={cn(
                 "inline-flex max-w-full items-center rounded-xs border border-border-subtle bg-subtle/70 px-1.5 py-0.5 font-mono text-2xs wrap-break-word text-foreground underline decoration-border-hover underline-offset-2",
                 "transition-[border-color,background-color] duration-150 ease-out pointer-hover:hover:border-border-hover pointer-hover:hover:bg-subtle",
-                "active:scale-[0.98] motion-reduce:transition-none"
+                "active:scale-[0.98] motion-reduce:transition-none",
               )}
             >
               {field.type}
@@ -169,12 +160,8 @@ function TypeRow({ name, field }: { name: string; field: TypeNode }) {
 
           {field.default !== undefined && (
             <span className="inline-flex items-center gap-1 rounded-xs border border-border-subtle bg-control px-1.5 py-0.5 font-mono text-2xs">
-              <span className="text-3xs text-muted-foreground select-none">
-                default:
-              </span>
-              <span className="font-medium text-foreground">
-                {field.default}
-              </span>
+              <span className="text-3xs text-muted-foreground select-none">default:</span>
+              <span className="font-medium text-foreground">{field.default}</span>
             </span>
           )}
         </div>
@@ -193,13 +180,11 @@ function TypeRow({ name, field }: { name: string; field: TypeNode }) {
                 "transition-[color,background-color,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]",
                 "pointer-hover:hover:bg-subtle/80 pointer-hover:hover:text-foreground",
                 "active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100",
-                "focus-visible:ring-2 focus-visible:ring-ring"
+                "focus-visible:ring-2 focus-visible:ring-ring",
               )}
             >
               <span>
-                {hasParameters
-                  ? `Parameters (${field.parameters!.length})`
-                  : "Signature details"}
+                {hasParameters ? `Parameters (${field.parameters!.length})` : "Signature details"}
               </span>
               <ChevronDown
                 aria-hidden="true"
@@ -214,7 +199,7 @@ function TypeRow({ name, field }: { name: string; field: TypeNode }) {
                 "transition-[grid-template-rows,opacity] duration-220 ease-[cubic-bezier(0.23,1,0.32,1)]",
                 "data-[starting-style]:grid-rows-[0fr] data-[starting-style]:opacity-0",
                 "data-[ending-style]:grid-rows-[0fr] data-[ending-style]:opacity-0 data-[ending-style]:duration-160",
-                "motion-reduce:transition-none"
+                "motion-reduce:transition-none",
               )}
             >
               <div className="min-h-0">

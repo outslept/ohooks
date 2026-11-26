@@ -14,14 +14,14 @@ The `useDropZone` hook manages drag-and-drop file uploads, tracks nested drag-en
 ## Usage
 
 ```tsx
-import { useDropZone } from "@/hooks/useDropZone"
+import { useDropZone } from "@/hooks/useDropZone";
 ```
 
 ```tsx
 const { isOver, files, getRootProps } = useDropZone({
   accept: "image/*",
   onDrop: (accepted) => console.log(accepted),
-})
+});
 ```
 
 ## Examples
@@ -35,9 +35,9 @@ const { isOver, files, getRootProps } = useDropZone({
   accept: ["image/*", ".pdf"],
   multiple: true,
   onDrop: (accepted, rejected) => {
-    console.log("Accepted:", accepted, "Rejected:", rejected)
+    console.log("Accepted:", accepted, "Rejected:", rejected);
   },
-})
+});
 
 return (
   <div
@@ -50,7 +50,7 @@ return (
     <p>{isOver ? "Release to drop files" : "Drag images or PDFs here"}</p>
     {files && <p>{files.length} file(s) selected</p>}
   </div>
-)
+);
 ```
 
 ### Attaching to an Existing `RefObject`
@@ -58,20 +58,20 @@ return (
 Pass `target` in the options object to attach drag listeners directly to an existing element ref.
 
 ```tsx
-const dropRef = useRef<HTMLDivElement>(null)
+const dropRef = useRef<HTMLDivElement>(null);
 
 const { isOver, clearFiles } = useDropZone({
   target: dropRef,
   accept: ".csv",
   multiple: false,
-})
+});
 
 return (
   <div ref={dropRef}>
     <p>{isOver ? "Drop CSV file" : "Drop a single CSV file here"}</p>
     <button onClick={clearFiles}>Reset</button>
   </div>
-)
+);
 ```
 
 ## API Reference

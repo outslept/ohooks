@@ -14,10 +14,10 @@ The `useHydrated` hook uses `useSyncExternalStore` to return `false` during serv
 ## Usage
 
 ```tsx
-import { useHydrated } from "@/hooks/useHydrated"
+import { useHydrated } from "@/hooks/useHydrated";
 ```
 
 ```tsx
-const isHydrated = useHydrated()
-if (!isHydrated) return <Skeleton />
+const isHydrated = useHydrated();
+if (!isHydrated) return <Skeleton />;
 ```

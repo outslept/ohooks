@@ -1,4 +1,4 @@
-import { useMemo, useSyncExternalStore } from 'react';
+import { useMemo, useSyncExternalStore } from "react";
 
 const getServerSnapshot = (): string | null => null;
 
@@ -8,11 +8,7 @@ function createObjectUrlStore(source: Blob | MediaSource | null | undefined) {
   return {
     getSnapshot: (): string | null => currentUrl,
     subscribe: (notify: () => void): (() => void) => {
-      if (
-        !source ||
-        typeof URL === 'undefined' ||
-        typeof URL.createObjectURL !== 'function'
-      ) {
+      if (!source || typeof URL === "undefined" || typeof URL.createObjectURL !== "function") {
         currentUrl = null;
         return () => {};
       }
@@ -23,7 +19,7 @@ function createObjectUrlStore(source: Blob | MediaSource | null | undefined) {
 
       return () => {
         currentUrl = null;
-        if (typeof URL.revokeObjectURL === 'function') {
+        if (typeof URL.revokeObjectURL === "function") {
           URL.revokeObjectURL(url);
         }
       };
@@ -44,14 +40,8 @@ function createObjectUrlStore(source: Blob | MediaSource | null | undefined) {
  * // {previewUrl && <img src={previewUrl} alt="Preview" />}
  * ```
  */
-export function useObjectUrl(
-  source: Blob | MediaSource | null | undefined,
-): string | null {
+export function useObjectUrl(source: Blob | MediaSource | null | undefined): string | null {
   const store = useMemo(() => createObjectUrlStore(source), [source]);
 
-  return useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    getServerSnapshot,
-  );
+  return useSyncExternalStore(store.subscribe, store.getSnapshot, getServerSnapshot);
 }

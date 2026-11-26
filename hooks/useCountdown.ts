@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useBoolean } from './useBoolean';
-import { useEventCallback } from './useEventCallback';
-import { useInterval } from './useInterval';
-import { useLatest } from './useLatest';
+import { useState } from "react";
+import { useBoolean } from "./useBoolean";
+import { useEventCallback } from "./useEventCallback";
+import { useInterval } from "./useInterval";
+import { useLatest } from "./useLatest";
 
 export interface UseCountdownOptions {
   /** Starting count value */
@@ -50,9 +50,7 @@ export interface UseCountdownReturn {
  * });
  * ```
  */
-export function useCountdown(
-  options: UseCountdownOptions,
-): UseCountdownReturn {
+export function useCountdown(options: UseCountdownOptions): UseCountdownReturn {
   const {
     countStart,
     countStop = 0,
@@ -64,11 +62,7 @@ export function useCountdown(
   } = options;
 
   const [count, setCount] = useState<number>(countStart);
-  const {
-    value: isRunning,
-    setTrue: startRunning,
-    setFalse: stopRunning,
-  } = useBoolean(autoStart);
+  const { value: isRunning, setTrue: startRunning, setFalse: stopRunning } = useBoolean(autoStart);
 
   const onTickRef = useLatest(onTick);
   const onCompleteRef = useLatest(onComplete);
@@ -102,9 +96,7 @@ export function useCountdown(
     setCount(nextCount);
     onTickRef.current?.(nextCount);
 
-    const reachedEnd = isIncrement
-      ? nextCount >= countStop
-      : nextCount <= countStop;
+    const reachedEnd = isIncrement ? nextCount >= countStop : nextCount <= countStop;
 
     if (reachedEnd) {
       stopRunning();

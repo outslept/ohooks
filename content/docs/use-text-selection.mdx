@@ -14,11 +14,11 @@ The `useTextSelection` hook listens to `selectionchange`, `mouseup`, `keyup`, `s
 ## Usage
 
 ```tsx
-import { useTextSelection } from "@/hooks/useTextSelection"
+import { useTextSelection } from "@/hooks/useTextSelection";
 ```
 
 ```tsx
-const { text, rect } = useTextSelection()
+const { text, rect } = useTextSelection();
 ```
 
 ## Examples
@@ -28,8 +28,8 @@ const { text, rect } = useTextSelection()
 Scope selection tracking to an article container and position a floating action bar using `rect`.
 
 ```tsx
-const articleRef = useRef<HTMLElement>(null)
-const { text, rect } = useTextSelection(articleRef)
+const articleRef = useRef<HTMLElement>(null);
+const { text, rect } = useTextSelection(articleRef);
 
 return (
   <article ref={articleRef}>
@@ -48,7 +48,7 @@ return (
       </div>
     )}
   </article>
-)
+);
 ```
 
 ### Inspecting Selection Ranges
@@ -56,13 +56,13 @@ return (
 Access `ranges` and `selection` when you need to inspect or manipulate the underlying DOM `Range` objects.
 
 ```tsx
-const { text, ranges } = useTextSelection()
+const { text, ranges } = useTextSelection();
 
 return (
   <p>
     Selected characters: {text.length} ({ranges.length} range(s))
   </p>
-)
+);
 ```
 
 ## API Reference

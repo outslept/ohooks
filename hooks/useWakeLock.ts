@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useLatest } from './useLatest';
+import { useEffect, useState } from "react";
+import { useLatest } from "./useLatest";
 
 /** Configuration options for `useWakeLock`. */
 export interface UseWakeLockOptions {
@@ -21,22 +21,22 @@ export interface UseWakeLockReturn {
 
 interface WakeLockSentinelLike extends EventTarget {
   readonly released: boolean;
-  readonly type: 'screen';
+  readonly type: "screen";
   release: () => Promise<void>;
 }
 
-type NavigatorWithWakeLock = Omit<Navigator, 'wakeLock'> & {
+type NavigatorWithWakeLock = Omit<Navigator, "wakeLock"> & {
   readonly wakeLock?:
     | {
-        request: (type: 'screen') => Promise<WakeLockSentinelLike>;
+        request: (type: "screen") => Promise<WakeLockSentinelLike>;
       }
     | undefined;
 };
 
 function isWakeLockSupported(): boolean {
   return (
-    typeof navigator !== 'undefined' &&
-    'wakeLock' in navigator &&
+    typeof navigator !== "undefined" &&
+    "wakeLock" in navigator &&
     Boolean((navigator as NavigatorWithWakeLock).wakeLock)
   );
 }
@@ -54,10 +54,7 @@ function isWakeLockSupported(): boolean {
  * const { isLocked, isSupported } = useWakeLock(isPlayingVideo);
  * ```
  */
-export function useWakeLock(
-  enabled = true,
-  options: UseWakeLockOptions = {}
-): UseWakeLockReturn {
+export function useWakeLock(enabled = true, options: UseWakeLockOptions = {}): UseWakeLockReturn {
   const { reacquireOnVisible = true, onError } = options;
 
   const [isLocked, setIsLocked] = useState<boolean>(false);
@@ -73,7 +70,7 @@ export function useWakeLock(
   }
 
   useEffect(() => {
-    if (!enabled || !isWakeLockSupported() || typeof document === 'undefined') {
+    if (!enabled || !isWakeLockSupported() || typeof document === "undefined") {
       return;
     }
 
@@ -88,11 +85,7 @@ export function useWakeLock(
     };
 
     const acquire = async (): Promise<void> => {
-      if (
-        isCancelled ||
-        sentinel !== null ||
-        document.visibilityState !== 'visible'
-      ) {
+      if (isCancelled || sentinel !== null || document.visibilityState !== "visible") {
         return;
       }
 
@@ -102,19 +95,18 @@ export function useWakeLock(
       }
 
       try {
-        const acquired = await wakeLockApi.request('screen');
+        const acquired = await wakeLockApi.request("screen");
         if (isCancelled) {
           await acquired.release();
           return;
         }
         sentinel = acquired;
-        sentinel.addEventListener('release', handleRelease);
+        sentinel.addEventListener("release", handleRelease);
         setError(null);
         setIsLocked(!acquired.released);
       } catch (err) {
         if (!isCancelled) {
-          const normalized =
-            err instanceof Error ? err : new Error(String(err));
+          const normalized = err instanceof Error ? err : new Error(String(err));
           setError(normalized);
           setIsLocked(false);
           onErrorRef.current?.(normalized);
@@ -125,29 +117,22 @@ export function useWakeLock(
     void acquire();
 
     const handleVisibilityChange = (): void => {
-      if (
-        reacquireOnVisible &&
-        document.visibilityState === 'visible' &&
-        sentinel === null
-      ) {
+      if (reacquireOnVisible && document.visibilityState === "visible" && sentinel === null) {
         void acquire();
       }
     };
 
     if (reacquireOnVisible) {
-      document.addEventListener('visibilitychange', handleVisibilityChange);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
     }
 
     return () => {
       isCancelled = true;
       if (reacquireOnVisible) {
-        document.removeEventListener(
-          'visibilitychange',
-          handleVisibilityChange
-        );
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
       }
       if (sentinel) {
-        sentinel.removeEventListener('release', handleRelease);
+        sentinel.removeEventListener("release", handleRelease);
         void sentinel.release().catch(() => {});
         sentinel = null;
       }

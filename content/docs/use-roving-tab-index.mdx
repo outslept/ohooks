@@ -14,11 +14,11 @@ The `useRovingTabIndex` hook implements the WAI-ARIA roving `tabIndex` pattern f
 ## Usage
 
 ```tsx
-import { useRovingTabIndex } from "@/hooks/useRovingTabIndex"
+import { useRovingTabIndex } from "@/hooks/useRovingTabIndex";
 ```
 
 ```tsx
-const { getItemProps } = useRovingTabIndex({ orientation: "horizontal" })
+const { getItemProps } = useRovingTabIndex({ orientation: "horizontal" });
 
 return (
   <div role="toolbar">
@@ -28,7 +28,7 @@ return (
       </button>
     ))}
   </div>
-)
+);
 ```
 
 ## Examples
@@ -41,14 +41,14 @@ Pass `{ disabled: true }` to `getItemProps` so arrow keys automatically skip dis
 const { activeIndex, getItemProps } = useRovingTabIndex({
   orientation: "horizontal",
   loop: true,
-})
+});
 
 const actions = [
   { label: "Cut", disabled: false },
   { label: "Copy", disabled: false },
   { label: "Paste", disabled: true },
   { label: "Delete", disabled: false },
-]
+];
 
 return (
   <div role="toolbar" aria-label="Text actions">
@@ -62,7 +62,7 @@ return (
       </button>
     ))}
   </div>
-)
+);
 ```
 
 ### Vertical Menu List
@@ -73,7 +73,7 @@ Set `orientation: "vertical"` to navigate items using `ArrowUp` and `ArrowDown`.
 const { getItemProps, focusItem } = useRovingTabIndex({
   orientation: "vertical",
   defaultIndex: 0,
-})
+});
 
 return (
   <div>
@@ -88,7 +88,7 @@ return (
       ))}
     </ul>
   </div>
-)
+);
 ```
 
 ## API Reference
@@ -97,10 +97,7 @@ return (
 
 Configuration options for orientation, looping, and controlled/uncontrolled active index.
 
-<AutoTypeTable
-  path="./hooks/useRovingTabIndex.ts"
-  name="UseRovingTabIndexOptions"
-/>
+<AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="UseRovingTabIndexOptions" />
 
 ### `RovingItemOptions`
 
@@ -112,16 +109,10 @@ Per-item options passed to `getItemProps(index, options)`.
 
 Props returned by `getItemProps` to spread onto each focusable item element.
 
-<AutoTypeTable
-  path="./hooks/useRovingTabIndex.ts"
-  name="RovingTabIndexItemProps"
-/>
+<AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="RovingTabIndexItemProps" />
 
 ### `UseRovingTabIndexReturn`
 
 Active index state and helper methods returned by the hook.
 
-<AutoTypeTable
-  path="./hooks/useRovingTabIndex.ts"
-  name="UseRovingTabIndexReturn"
-/>
+<AutoTypeTable path="./hooks/useRovingTabIndex.ts" name="UseRovingTabIndexReturn" />

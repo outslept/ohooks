@@ -1,14 +1,8 @@
-import { useBoolean } from './useBoolean';
-import {
-  type EventListenerTarget,
-  useEventListener,
-} from './useEventListener';
-import { matchesHotkey } from './useHotkeys';
+import { useBoolean } from "./useBoolean";
+import { type EventListenerTarget, useEventListener } from "./useEventListener";
+import { matchesHotkey } from "./useHotkeys";
 
-export type KeyPressFilter =
-  | string
-  | ReadonlyArray<string>
-  | ((event: KeyboardEvent) => boolean);
+export type KeyPressFilter = string | ReadonlyArray<string> | ((event: KeyboardEvent) => boolean);
 
 export interface UseKeyPressOptions {
   /** Target element, document, or window to listen on (default: `window`) */
@@ -17,11 +11,8 @@ export interface UseKeyPressOptions {
   preventDefault?: boolean;
 }
 
-function matchesKeyFilter(
-  filter: KeyPressFilter,
-  event: KeyboardEvent,
-): boolean {
-  if (typeof filter === 'function') {
+function matchesKeyFilter(filter: KeyPressFilter, event: KeyboardEvent): boolean {
+  if (typeof filter === "function") {
     return filter(event);
   }
 
@@ -42,15 +33,12 @@ function matchesKeyFilter(
  * const isShiftPressed = useKeyPress('shift');
  * ```
  */
-export function useKeyPress(
-  keyFilter: KeyPressFilter,
-  options: UseKeyPressOptions = {},
-): boolean {
+export function useKeyPress(keyFilter: KeyPressFilter, options: UseKeyPressOptions = {}): boolean {
   const { target, preventDefault = false } = options;
   const { value: isPressed, setTrue, setFalse } = useBoolean(false);
 
   useEventListener(
-    'keydown',
+    "keydown",
     (event: Event) => {
       if (!(event instanceof KeyboardEvent)) {
         return;
@@ -67,7 +55,7 @@ export function useKeyPress(
   );
 
   useEventListener(
-    'keyup',
+    "keyup",
     (event: Event) => {
       if (!(event instanceof KeyboardEvent)) {
         return;
@@ -75,10 +63,10 @@ export function useKeyPress(
 
       if (
         matchesKeyFilter(keyFilter, event) ||
-        event.key === 'Meta' ||
-        event.key === 'Control' ||
-        event.key === 'Alt' ||
-        event.key === 'Shift'
+        event.key === "Meta" ||
+        event.key === "Control" ||
+        event.key === "Alt" ||
+        event.key === "Shift"
       ) {
         setFalse();
       }
@@ -86,7 +74,7 @@ export function useKeyPress(
     target,
   );
 
-  useEventListener('blur', () => {
+  useEventListener("blur", () => {
     if (isPressed) {
       setFalse();
     }

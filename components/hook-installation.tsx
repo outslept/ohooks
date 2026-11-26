@@ -1,13 +1,13 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Steps, Step, StepSource } from '@/components/ui/steps';
+import fs from "node:fs/promises";
+import path from "node:path";
+import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Steps, Step, StepSource } from "@/components/ui/steps";
 import {
   HookInstallationCli,
   type PackageManagerCommand,
-} from '@/components/hook-installation-cli';
-import { registryBaseUrl as defaultRegistryBaseUrl } from '@/lib/shared';
+} from "@/components/hook-installation-cli";
+import { registryBaseUrl as defaultRegistryBaseUrl } from "@/lib/shared";
 
 export interface HookInstallationProps {
   name: string;
@@ -29,7 +29,7 @@ function usesDomTargetUtils(content: string): boolean {
     /import\s+(?:type\s+)?\{([^}]*)\}\s+from\s+['"](?:@\/lib\/utils|\.\.\/lib\/utils)['"]/g;
 
   for (const match of content.matchAll(utilsImportRegex)) {
-    const importedMembers = match[1] ?? '';
+    const importedMembers = match[1] ?? "";
     if (
       /\bresolveTargetElement\b/.test(importedMembers) ||
       /\bisRefObject\b/.test(importedMembers)
@@ -43,8 +43,7 @@ function usesDomTargetUtils(content: string): boolean {
 
 function extractInternalHookDeps(content: string, selfName: string): string[] {
   const deps = new Set<string>();
-  const hookImportRegex =
-    /from\s+['"](?:@\/hooks\/|\.\.?\/)(use[A-Za-z0-9]+)['"]/g;
+  const hookImportRegex = /from\s+['"](?:@\/hooks\/|\.\.?\/)(use[A-Za-z0-9]+)['"]/g;
 
   for (const match of content.matchAll(hookImportRegex)) {
     const dep = match[1];
@@ -56,19 +55,16 @@ function extractInternalHookDeps(content: string, selfName: string): string[] {
   return Array.from(deps);
 }
 
-async function readHookFile(
-  name: string
-): Promise<{ fileName: string; content: string } | null> {
+async function readHookFile(name: string): Promise<{ fileName: string; content: string } | null> {
   const camelName = kebabToCamel(name);
   const candidates = Array.from(new Set([camelName, name]));
 
   for (const candidate of candidates) {
     try {
-      const filePath = path.join(process.cwd(), 'hooks', `${candidate}.ts`);
-      const content = await fs.readFile(filePath, 'utf-8');
+      const filePath = path.join(process.cwd(), "hooks", `${candidate}.ts`);
+      const content = await fs.readFile(filePath, "utf-8");
       return { fileName: candidate, content };
-    } catch {
-    }
+    } catch {}
   }
 
   return null;
@@ -76,7 +72,7 @@ async function readHookFile(
 
 async function resolveManualFiles(
   name: string,
-  explicitCode?: string
+  explicitCode?: string,
 ): Promise<{
   mainFile: ResolvedManualFile;
   dependencyFiles: ResolvedManualFile[];
@@ -135,15 +131,14 @@ async function resolveManualFiles(
 
   if (needsDomUtils) {
     try {
-      const utilsPath = path.join(process.cwd(), 'lib', 'utils.ts');
-      const utilsContent = await fs.readFile(utilsPath, 'utf-8');
-      await collectDeps(utilsContent, 'utils');
+      const utilsPath = path.join(process.cwd(), "lib", "utils.ts");
+      const utilsContent = await fs.readFile(utilsPath, "utf-8");
+      await collectDeps(utilsContent, "utils");
       dependencyFiles.push({
-        title: 'lib/utils.ts',
+        title: "lib/utils.ts",
         code: utilsContent.trim(),
       });
-    } catch {
-    }
+    } catch {}
   }
 
   dependencyFiles.push(...orderedHookDeps);
@@ -164,87 +159,87 @@ export async function HookInstallation({
 }: HookInstallationProps) {
   const { mainFile, dependencyFiles } = await resolveManualFiles(name, code);
 
-  const cleanBaseUrl = registryBaseUrl.replace(/\/$/, '');
+  const cleanBaseUrl = registryBaseUrl.replace(/\/$/, "");
   const registryUrl = `${cleanBaseUrl}/${name}.json`;
 
   const commands: PackageManagerCommand[] = [
     {
-      id: 'pnpm',
-      label: 'pnpm',
-      group: 'standard',
-      prefix: 'pnpm dlx shadcn@latest add',
+      id: "pnpm",
+      label: "pnpm",
+      group: "standard",
+      prefix: "pnpm dlx shadcn@latest add",
       target: registryUrl,
       command: `pnpm dlx shadcn@latest add ${registryUrl}`,
     },
     {
-      id: 'npm',
-      label: 'npm',
-      group: 'standard',
-      prefix: 'npx shadcn@latest add',
+      id: "npm",
+      label: "npm",
+      group: "standard",
+      prefix: "npx shadcn@latest add",
       target: registryUrl,
       command: `npx shadcn@latest add ${registryUrl}`,
     },
     {
-      id: 'yarn',
-      label: 'yarn',
-      group: 'standard',
-      prefix: 'yarn dlx shadcn@latest add',
+      id: "yarn",
+      label: "yarn",
+      group: "standard",
+      prefix: "yarn dlx shadcn@latest add",
       target: registryUrl,
       command: `yarn dlx shadcn@latest add ${registryUrl}`,
     },
     {
-      id: 'bun',
-      label: 'bun',
-      group: 'standard',
-      prefix: 'bunx --bun shadcn@latest add',
+      id: "bun",
+      label: "bun",
+      group: "standard",
+      prefix: "bunx --bun shadcn@latest add",
       target: registryUrl,
       command: `bunx --bun shadcn@latest add ${registryUrl}`,
     },
     {
-      id: 'deno',
-      label: 'deno',
-      group: 'modern',
-      prefix: 'deno run -A npm:shadcn@latest add',
+      id: "deno",
+      label: "deno",
+      group: "modern",
+      prefix: "deno run -A npm:shadcn@latest add",
       target: registryUrl,
       command: `deno run -A npm:shadcn@latest add ${registryUrl}`,
     },
     {
-      id: 'ni',
-      label: 'ni',
-      group: 'modern',
-      prefix: 'nlx shadcn@latest add',
+      id: "ni",
+      label: "ni",
+      group: "modern",
+      prefix: "nlx shadcn@latest add",
       target: registryUrl,
       command: `nlx shadcn@latest add ${registryUrl}`,
     },
     {
-      id: 'vlt',
-      label: 'vlt',
-      group: 'modern',
-      prefix: 'vlx shadcn@latest add',
+      id: "vlt",
+      label: "vlt",
+      group: "modern",
+      prefix: "vlx shadcn@latest add",
       target: registryUrl,
       command: `vlx shadcn@latest add ${registryUrl}`,
     },
     {
-      id: 'vp',
-      label: 'vp',
-      group: 'modern',
-      prefix: 'vp dlx shadcn@latest add',
+      id: "vp",
+      label: "vp",
+      group: "modern",
+      prefix: "vp dlx shadcn@latest add",
       target: registryUrl,
       command: `vp dlx shadcn@latest add ${registryUrl}`,
     },
     {
-      id: 'nub',
-      label: 'nub',
-      group: 'modern',
-      prefix: 'nub shadcn@latest add',
+      id: "nub",
+      label: "nub",
+      group: "modern",
+      prefix: "nub shadcn@latest add",
       target: registryUrl,
       command: `nub shadcn@latest add ${registryUrl}`,
     },
     {
-      id: 'upm',
-      label: 'upm',
-      group: 'modern',
-      prefix: 'upm dlx shadcn@latest add',
+      id: "upm",
+      label: "upm",
+      group: "modern",
+      prefix: "upm dlx shadcn@latest add",
       target: registryUrl,
       command: `upm dlx shadcn@latest add ${registryUrl}`,
     },

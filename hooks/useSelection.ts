@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from 'react';
-import { useControllableState } from './useControllableState';
-import { useEventCallback } from './useEventCallback';
+import { useCallback, useMemo } from "react";
+import { useControllableState } from "./useControllableState";
+import { useEventCallback } from "./useEventCallback";
 
 /** Configuration options for `useSelection`. */
 export interface UseSelectionOptions<T, TKey = T> {
@@ -77,23 +77,15 @@ export function useSelection<T, TKey = T>(
     onChange,
   } = options;
 
-  const [selectedKeys = [], setSelectedKeysState] = useControllableState<
-    TKey[]
-  >({
+  const [selectedKeys = [], setSelectedKeysState] = useControllableState<TKey[]>({
     value: value ? [...value] : undefined,
     defaultValue: () => [...defaultValue],
     onChange,
   });
 
-  const itemKeys = useMemo(
-    () => items.map((item) => getKey(item)),
-    [items, getKey],
-  );
+  const itemKeys = useMemo(() => items.map((item) => getKey(item)), [items, getKey]);
 
-  const selectedSet = useMemo(
-    () => new Set<TKey>(selectedKeys),
-    [selectedKeys],
-  );
+  const selectedSet = useMemo(() => new Set<TKey>(selectedKeys), [selectedKeys]);
 
   const selectedItems = useMemo(
     () => items.filter((item) => selectedSet.has(getKey(item))),
@@ -105,8 +97,7 @@ export function useSelection<T, TKey = T>(
     [itemKeys, selectedSet],
   );
 
-  const isAllSelected =
-    itemKeys.length > 0 && selectedItemCount === itemKeys.length;
+  const isAllSelected = itemKeys.length > 0 && selectedItemCount === itemKeys.length;
   const isNoneSelected = selectedItemCount === 0;
   const isPartiallySelected = !isNoneSelected && !isAllSelected;
 

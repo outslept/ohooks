@@ -1,5 +1,5 @@
-import { type SetStateAction, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
+import { type SetStateAction, useState } from "react";
+import { useEventCallback } from "./useEventCallback";
 
 export interface UseCounterOptions {
   /** Minimum allowed counter value */
@@ -45,19 +45,14 @@ function clamp(value: number, min?: number, max?: number): number {
  * const { count, inc, dec, reset } = useCounter(0, { min: 0, max: 10 });
  * ```
  */
-export function useCounter(
-  initialValue = 0,
-  options: UseCounterOptions = {},
-): UseCounterReturn {
+export function useCounter(initialValue = 0, options: UseCounterOptions = {}): UseCounterReturn {
   const { min, max } = options;
 
-  const [count, setCount] = useState<number>(() =>
-    clamp(initialValue, min, max),
-  );
+  const [count, setCount] = useState<number>(() => clamp(initialValue, min, max));
 
   const set = useEventCallback((value: SetStateAction<number>) => {
     setCount((prev) => {
-      const nextValue = typeof value === 'function' ? value(prev) : value;
+      const nextValue = typeof value === "function" ? value(prev) : value;
       return clamp(nextValue, min, max);
     });
   });

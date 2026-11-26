@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useLatest } from './useLatest';
+import { useEffect, useState } from "react";
+import { useLatest } from "./useLatest";
 
 export type ExtendedPermissionName =
   | PermissionName
-  | 'camera'
-  | 'microphone'
-  | 'speaker-selection'
-  | 'clipboard-read'
-  | 'clipboard-write'
-  | 'local-fonts'
-  | 'window-management';
+  | "camera"
+  | "microphone"
+  | "speaker-selection"
+  | "clipboard-read"
+  | "clipboard-write"
+  | "local-fonts"
+  | "window-management";
 
 export interface ExtendedPermissionDescriptor {
   /** Name of the browser permission to query */
@@ -18,13 +18,13 @@ export interface ExtendedPermissionDescriptor {
   [key: string]: unknown;
 }
 
-export type UsePermissionState = PermissionState | 'loading' | 'unsupported';
+export type UsePermissionState = PermissionState | "loading" | "unsupported";
 
 function isPermissionsSupported(): boolean {
   return (
-    typeof navigator !== 'undefined' &&
+    typeof navigator !== "undefined" &&
     Boolean(navigator.permissions) &&
-    typeof navigator.permissions.query === 'function'
+    typeof navigator.permissions.query === "function"
   );
 }
 
@@ -46,27 +46,24 @@ export function usePermission(
   const isSupported = isPermissionsSupported();
 
   const [state, setState] = useState<UsePermissionState>(() =>
-    isSupported ? 'loading' : 'unsupported',
+    isSupported ? "loading" : "unsupported",
   );
 
   const permissionRef = useLatest(permission);
 
-  const descriptorKey =
-    typeof permission === 'string'
-      ? permission
-      : JSON.stringify(permission);
+  const descriptorKey = typeof permission === "string" ? permission : JSON.stringify(permission);
 
   const [prevDescriptorKey, setPrevDescriptorKey] = useState(descriptorKey);
   if (prevDescriptorKey !== descriptorKey) {
     setPrevDescriptorKey(descriptorKey);
-    setState(isSupported ? 'loading' : 'unsupported');
+    setState(isSupported ? "loading" : "unsupported");
   }
 
   useEffect(() => {
     if (
-      typeof navigator === 'undefined' ||
+      typeof navigator === "undefined" ||
       !navigator.permissions ||
-      typeof navigator.permissions.query !== 'function'
+      typeof navigator.permissions.query !== "function"
     ) {
       return;
     }
@@ -82,7 +79,7 @@ export function usePermission(
 
     const currentPermission = permissionRef.current;
     const descriptor: PermissionDescriptor =
-      typeof currentPermission === 'string'
+      typeof currentPermission === "string"
         ? ({ name: currentPermission } as PermissionDescriptor)
         : (currentPermission as unknown as PermissionDescriptor);
 
@@ -94,18 +91,18 @@ export function usePermission(
         }
         permissionStatus = status;
         setState(status.state);
-        status.addEventListener('change', handleChange);
+        status.addEventListener("change", handleChange);
       })
       .catch(() => {
         if (!isCancelled) {
-          setState('unsupported');
+          setState("unsupported");
         }
       });
 
     return () => {
       isCancelled = true;
       if (permissionStatus) {
-        permissionStatus.removeEventListener('change', handleChange);
+        permissionStatus.removeEventListener("change", handleChange);
       }
     };
   }, [descriptorKey, permissionRef]);

@@ -8,11 +8,7 @@ import {
   type Generator,
   type RawTag,
 } from "fumadocs-typescript";
-import {
-  TypeTable,
-  type ParameterNode,
-  type TypeNode,
-} from "@/components/ui/type-table";
+import { TypeTable, type ParameterNode, type TypeNode } from "@/components/ui/type-table";
 import "server-only";
 
 let generatorInstance: Generator | undefined;
@@ -77,9 +73,7 @@ interface ParsedTags {
   params: ParameterNode[];
 }
 
-function parseTags(
-  tags?: RawTag[] | Record<string, string>
-): ParsedTags {
+function parseTags(tags?: RawTag[] | Record<string, string>): ParsedTags {
   const map: Record<string, string> = {};
   const params: ParameterNode[] = [];
 
@@ -91,9 +85,7 @@ function parseTags(
       const text = (tag.text ?? "").trim();
 
       if (tag.name === "param" || tag.name === "arg" || tag.name === "argument") {
-        const paramMatch = text.match(
-          /^(?:\{([^}]+)\}\s+)?(\[?[\w.$]+\]?)\s*(?:[-–—:]\s*(.*))?$/s
-        );
+        const paramMatch = text.match(/^(?:\{([^}]+)\}\s+)?(\[?[\w.$]+\]?)\s*(?:[-–—:]\s*(.*))?$/s);
         if (paramMatch) {
           const [, rawType, rawName, rawDesc] = paramMatch;
           params.push({
@@ -136,7 +128,7 @@ function splitTopLevelParams(paramList: string): string[] {
 
 function extractFunctionParameters(
   typeStr: string,
-  jsdocParams: ParameterNode[]
+  jsdocParams: ParameterNode[],
 ): ParameterNode[] | undefined {
   const fnMatch = typeStr.match(/^(?:<[^>]+>\s*)?\((.*)\)\s*=>\s*(.+)$/s);
   if (!fnMatch) {
@@ -189,8 +181,7 @@ function summarizeType(rawType: string): {
       .map((p) => p.split(":")[0]?.trim())
       .filter(Boolean)
       .join(", ");
-    const shortReturn =
-      returnType.length > 28 ? `${returnType.slice(0, 25)}...` : returnType;
+    const shortReturn = returnType.length > 28 ? `${returnType.slice(0, 25)}...` : returnType;
     const summary = `${generics}(${shortParams}) => ${shortReturn}`;
 
     if (summary.length < normalized.length) {
@@ -216,7 +207,7 @@ function summarizeType(rawType: string): {
 
 function extractDefaultAndCleanDescription(
   rawDescription?: string,
-  tagsMap: Record<string, string> = {}
+  tagsMap: Record<string, string> = {},
 ): { description?: string; defaultValue?: string } {
   const explicitTag = tagsMap.default ?? tagsMap.defaultValue;
   let description = rawDescription?.trim();
@@ -252,18 +243,12 @@ function isInputInterface(interfaceName?: string): boolean {
   return !OUTPUT_INTERFACE_PATTERN.test(interfaceName);
 }
 
-function mapDocEntryToTypeNode(
-  entry: DocEntry,
-  interfaceName?: string
-): TypeNode {
+function mapDocEntryToTypeNode(entry: DocEntry, interfaceName?: string): TypeNode {
   const { map: tags, params: jsdocParams } = parseTags(
-    entry.tags as RawTag[] | Record<string, string> | undefined
+    entry.tags as RawTag[] | Record<string, string> | undefined,
   );
 
-  const { description, defaultValue } = extractDefaultAndCleanDescription(
-    entry.description,
-    tags
-  );
+  const { description, defaultValue } = extractDefaultAndCleanDescription(entry.description, tags);
 
   const isInput = isInputInterface(interfaceName);
   const rawSimplified = (entry as { simplifiedType?: string }).simplifiedType;
@@ -271,16 +256,14 @@ function mapDocEntryToTypeNode(
   const { displayType, fullType } = rawSimplified
     ? {
         displayType: rawSimplified,
-        fullType:
-          entry.type && rawSimplified !== entry.type ? entry.type : undefined,
+        fullType: entry.type && rawSimplified !== entry.type ? entry.type : undefined,
       }
     : summarizeType(entry.type);
 
   const parameters = extractFunctionParameters(entry.type, jsdocParams);
 
   const isDeprecated = Boolean(
-    (entry as { deprecated?: boolean }).deprecated ||
-      tags.deprecated !== undefined
+    (entry as { deprecated?: boolean }).deprecated || tags.deprecated !== undefined,
   );
 
   return {
@@ -311,7 +294,7 @@ export async function AutoTypeTable({
       content: type,
     },
     name,
-    options
+    options,
   )) as GeneratedDoc[];
 
   const showInterfaceTitle = !name && output.length > 1;
@@ -323,10 +306,7 @@ export async function AutoTypeTable({
           key={doc.name}
           title={showInterfaceTitle ? doc.name : undefined}
           type={Object.fromEntries(
-            doc.entries.map((entry) => [
-              entry.name,
-              mapDocEntryToTypeNode(entry, doc.name),
-            ])
+            doc.entries.map((entry) => [entry.name, mapDocEntryToTypeNode(entry, doc.name)]),
           )}
         />
       ))}

@@ -1,24 +1,14 @@
-import { NextResponse } from 'next/server';
-import {
-  getAllRegistryItems,
-  getRegistryItemByName,
-  toKebabCase,
-} from '@/lib/registry';
+import { NextResponse } from "next/server";
+import { getAllRegistryItems, getRegistryItemByName, toKebabCase } from "@/lib/registry";
 
 export const revalidate = false;
 
-export async function GET(
-  _request: Request,
-  { params }: RouteContext<'/r/[name]'>
-) {
+export async function GET(_request: Request, { params }: RouteContext<"/r/[name]">) {
   const { name } = await params;
   const item = getRegistryItemByName(name);
 
   if (!item) {
-    return NextResponse.json(
-      { error: `Registry item "${name}" not found.` },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: `Registry item "${name}" not found.` }, { status: 404 });
   }
 
   return NextResponse.json(item);

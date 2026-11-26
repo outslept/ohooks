@@ -17,11 +17,10 @@ const TabsStyleContext = React.createContext<TabsStyleContextValue>({
   size: "default",
 });
 
-export interface TabsProps
-  extends Omit<
-    React.ComponentPropsWithoutRef<typeof BaseTabs.Root>,
-    "onValueChange"
-  > {
+export interface TabsProps extends Omit<
+  React.ComponentPropsWithoutRef<typeof BaseTabs.Root>,
+  "onValueChange"
+> {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -41,7 +40,7 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     const { size } = useSize(sizeProp);
 
@@ -66,12 +65,11 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
         </BaseTabs.Root>
       </TabsStyleContext.Provider>
     );
-  }
+  },
 );
 Tabs.displayName = "Tabs";
 
-export interface TabsListProps
-  extends React.ComponentPropsWithoutRef<typeof BaseTabs.List> {}
+export interface TabsListProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.List> {}
 
 const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
   ({ className, children, ...props }, ref) => {
@@ -94,7 +92,7 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             "w-full border-b border-border-subtle gap-5",
             isCompact ? "h-8" : "h-9",
           ],
-          className
+          className,
         )}
         {...props}
       >
@@ -106,17 +104,16 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             "translate-x-(--active-tab-left) w-(--active-tab-width)",
             variant === "pill" &&
               "top-0.5 bottom-0.5 z-0 rounded-[calc(var(--radius-lg)-2px)] bg-control shadow-2xs ring-1 ring-border-subtle/80",
-            variant === "underline" && "-bottom-px z-10 h-0.5 bg-foreground"
+            variant === "underline" && "-bottom-px z-10 h-0.5 bg-foreground",
           )}
         />
       </BaseTabs.List>
     );
-  }
+  },
 );
 TabsList.displayName = "TabsList";
 
-export interface TabsTriggerProps
-  extends React.ComponentPropsWithoutRef<typeof BaseTabs.Tab> {
+export interface TabsTriggerProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.Tab> {
   value: string;
 }
 
@@ -142,23 +139,19 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
             "h-full rounded-[calc(var(--radius-lg)-2px)]",
             isCompact ? "px-2.5 text-xs" : "px-3 text-compact",
           ],
-          variant === "underline" && [
-            "h-full px-0.5",
-            isCompact ? "text-xs" : "text-compact",
-          ],
-          className
+          variant === "underline" && ["h-full px-0.5", isCompact ? "text-xs" : "text-compact"],
+          className,
         )}
         {...props}
       >
         {children}
       </BaseTabs.Tab>
     );
-  }
+  },
 );
 TabsTrigger.displayName = "TabsTrigger";
 
-export interface TabsContentProps
-  extends React.ComponentPropsWithoutRef<typeof BaseTabs.Panel> {
+export interface TabsContentProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.Panel> {
   value: string;
 }
 
@@ -171,14 +164,14 @@ const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
         data-slot="tabs-content"
         className={cn(
           "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
-          className
+          className,
         )}
         {...props}
       >
         {children}
       </BaseTabs.Panel>
     );
-  }
+  },
 );
 TabsContent.displayName = "TabsContent";
 

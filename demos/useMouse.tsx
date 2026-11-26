@@ -1,31 +1,31 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { cn } from "cn"
-import { Crosshair } from "lucide-react"
-import { useMouse } from "@/hooks/useMouse"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useEffect, useRef, useState } from "react";
+import { cn } from "cn";
+import { Crosshair } from "lucide-react";
+import { useMouse } from "@/hooks/useMouse";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const SPACES = [
   { id: "element", label: "element" },
   { id: "client", label: "client" },
   { id: "page", label: "page" },
   { id: "screen", label: "screen" },
-] as const
+] as const;
 
-type SpaceId = (typeof SPACES)[number]["id"]
+type SpaceId = (typeof SPACES)[number]["id"];
 
 function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max)
+  return Math.min(Math.max(value, min), max);
 }
 
 export default function UseMouseDemo() {
-  const stageRef = useRef<HTMLDivElement>(null)
-  const [space, setSpace] = useState<SpaceId>("element")
-  const [isInside, setIsInside] = useState(false)
-  const [stageSize, setStageSize] = useState({ width: 0, height: 0 })
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [space, setSpace] = useState<SpaceId>("element");
+  const [isInside, setIsInside] = useState(false);
+  const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
 
   const {
     x,
@@ -38,34 +38,34 @@ export default function UseMouseDemo() {
     elementY,
     elementPositionX,
     elementPositionY,
-  } = useMouse(stageRef)
+  } = useMouse(stageRef);
 
   useEffect(() => {
-    const el = stageRef.current
-    if (!el) return
+    const el = stageRef.current;
+    if (!el) return;
 
     const updateSize = () => {
-      const rect = el.getBoundingClientRect()
-      setStageSize({ width: rect.width, height: rect.height })
-    }
+      const rect = el.getBoundingClientRect();
+      setStageSize({ width: rect.width, height: rect.height });
+    };
 
-    updateSize()
+    updateSize();
 
-    const observer = new ResizeObserver(updateSize)
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
-  const hasMoved = clientX !== 0 || clientY !== 0 || x !== 0 || y !== 0
+  const hasMoved = clientX !== 0 || clientY !== 0 || x !== 0 || y !== 0;
 
-  let offsetX = 0
-  let offsetY = 0
+  let offsetX = 0;
+  let offsetY = 0;
 
   if (hasMoved && stageSize.width > 0 && stageSize.height > 0) {
-    const rawDx = (elementX - stageSize.width / 2) * 0.18
-    const rawDy = (elementY - stageSize.height / 2) * 0.18
-    offsetX = clamp(rawDx, -28, 28)
-    offsetY = clamp(rawDy, -14, 14)
+    const rawDx = (elementX - stageSize.width / 2) * 0.18;
+    const rawDy = (elementY - stageSize.height / 2) * 0.18;
+    offsetX = clamp(rawDx, -28, 28);
+    offsetY = clamp(rawDy, -14, 14);
   }
 
   const coords =
@@ -75,17 +75,13 @@ export default function UseMouseDemo() {
         ? { x: Math.round(clientX), y: Math.round(clientY), prefix: "vp" }
         : space === "page"
           ? { x: Math.round(x), y: Math.round(y), prefix: "doc" }
-          : { x: Math.round(screenX), y: Math.round(screenY), prefix: "scr" }
+          : { x: Math.round(screenX), y: Math.round(screenY), prefix: "scr" };
 
   const triggerSamplePoint = () => {
-    if (typeof window === "undefined" || !stageRef.current) return
-    const rect = stageRef.current.getBoundingClientRect()
-    const randX = Math.round(
-      rect.left + rect.width * (0.2 + Math.random() * 0.6)
-    )
-    const randY = Math.round(
-      rect.top + rect.height * (0.2 + Math.random() * 0.6)
-    )
+    if (typeof window === "undefined" || !stageRef.current) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const randX = Math.round(rect.left + rect.width * (0.2 + Math.random() * 0.6));
+    const randY = Math.round(rect.top + rect.height * (0.2 + Math.random() * 0.6));
 
     const synthetic = new MouseEvent("mousemove", {
       bubbles: true,
@@ -93,9 +89,9 @@ export default function UseMouseDemo() {
       clientY: randY,
       screenX: randX,
       screenY: randY,
-    })
-    window.dispatchEvent(synthetic)
-  }
+    });
+    window.dispatchEvent(synthetic);
+  };
 
   return (
     <Card className="w-full max-w-80">
@@ -107,7 +103,7 @@ export default function UseMouseDemo() {
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {SPACES.map((item) => {
-              const isSelected = space === item.id
+              const isSelected = space === item.id;
               return (
                 <button
                   key={item.id}
@@ -117,12 +113,12 @@ export default function UseMouseDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs transition-all",
                     isSelected
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {item.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -196,5 +192,5 @@ export default function UseMouseDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

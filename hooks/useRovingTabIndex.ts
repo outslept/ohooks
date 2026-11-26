@@ -4,13 +4,13 @@ import {
   useCallback,
   useRef,
   useState,
-} from 'react';
-import { useControllableState } from './useControllableState';
-import { useEventCallback } from './useEventCallback';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+} from "react";
+import { useControllableState } from "./useControllableState";
+import { useEventCallback } from "./useEventCallback";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 /** Keyboard navigation orientation for roving tabindex groups. */
-export type RovingOrientation = 'horizontal' | 'vertical' | 'both';
+export type RovingOrientation = "horizontal" | "vertical" | "both";
 
 /** Configuration options for `useRovingTabIndex`. */
 export interface UseRovingTabIndexOptions {
@@ -91,14 +91,12 @@ interface RegisteredItem {
  * );
  * ```
  */
-export function useRovingTabIndex(
-  options: UseRovingTabIndexOptions = {},
-): UseRovingTabIndexReturn {
+export function useRovingTabIndex(options: UseRovingTabIndexOptions = {}): UseRovingTabIndexReturn {
   const {
     count,
     activeIndex: controlledIndex,
     defaultActiveIndex = 0,
-    orientation = 'horizontal',
+    orientation = "horizontal",
     loop = true,
     rtl = false,
     onActiveIndexChange,
@@ -135,8 +133,8 @@ export function useRovingTabIndex(
       return true;
     }
     return (
-      entry.element.hasAttribute('disabled') ||
-      entry.element.getAttribute('aria-disabled') === 'true'
+      entry.element.hasAttribute("disabled") ||
+      entry.element.getAttribute("aria-disabled") === "true"
     );
   };
 
@@ -163,10 +161,7 @@ export function useRovingTabIndex(
     return null;
   };
 
-  const findNextEnabledIndex = (
-    currentIndex: number,
-    step: 1 | -1,
-  ): number => {
+  const findNextEnabledIndex = (currentIndex: number, step: 1 | -1): number => {
     const total = getTotalCount();
     if (total <= 0) {
       return currentIndex;
@@ -199,9 +194,7 @@ export function useRovingTabIndex(
 
     if (isIndexDisabled(activeIndex)) {
       const firstEnabled = findBoundaryEnabledIndex(true);
-      setFallbackIndex((prev) =>
-        prev === firstEnabled ? prev : firstEnabled,
-      );
+      setFallbackIndex((prev) => (prev === firstEnabled ? prev : firstEnabled));
     } else if (fallbackIndex !== null) {
       setFallbackIndex(null);
     }
@@ -215,29 +208,24 @@ export function useRovingTabIndex(
 
   const handleKeyNavigation = useEventCallback(
     (index: number, event: ReactKeyboardEvent<HTMLElement>) => {
-      const isHorizontal =
-        orientation === 'horizontal' || orientation === 'both';
-      const isVertical =
-        orientation === 'vertical' || orientation === 'both';
+      const isHorizontal = orientation === "horizontal" || orientation === "both";
+      const isVertical = orientation === "vertical" || orientation === "both";
 
-      const nextKey = rtl ? 'ArrowLeft' : 'ArrowRight';
-      const prevKey = rtl ? 'ArrowRight' : 'ArrowLeft';
+      const nextKey = rtl ? "ArrowLeft" : "ArrowRight";
+      const prevKey = rtl ? "ArrowRight" : "ArrowLeft";
 
       let targetIndex: number | null = null;
 
-      if (
-        (isHorizontal && event.key === nextKey) ||
-        (isVertical && event.key === 'ArrowDown')
-      ) {
+      if ((isHorizontal && event.key === nextKey) || (isVertical && event.key === "ArrowDown")) {
         targetIndex = findNextEnabledIndex(index, 1);
       } else if (
         (isHorizontal && event.key === prevKey) ||
-        (isVertical && event.key === 'ArrowUp')
+        (isVertical && event.key === "ArrowUp")
       ) {
         targetIndex = findNextEnabledIndex(index, -1);
-      } else if (event.key === 'Home') {
+      } else if (event.key === "Home") {
         targetIndex = findBoundaryEnabledIndex(true);
-      } else if (event.key === 'End') {
+      } else if (event.key === "End") {
         targetIndex = findBoundaryEnabledIndex(false);
       }
 

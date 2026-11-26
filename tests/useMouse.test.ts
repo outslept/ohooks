@@ -1,25 +1,25 @@
-import { useMouse } from '@/hooks/useMouse';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useMouse } from "@/hooks/useMouse";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useMouse', () => {
+describe("useMouse", () => {
   afterEach(() => {
-    document.body.innerHTML = '';
+    document.body.innerHTML = "";
     vi.restoreAllMocks();
   });
 
-  it('tracks viewport, page, screen, and target-relative coordinates via real rAF and cancels superseded frames', async () => {
-    const cancelSpy = vi.spyOn(window, 'cancelAnimationFrame');
+  it("tracks viewport, page, screen, and target-relative coordinates via real rAF and cancels superseded frames", async () => {
+    const cancelSpy = vi.spyOn(window, "cancelAnimationFrame");
 
-    const box = document.createElement('div');
+    const box = document.createElement("div");
     Object.assign(box.style, {
-      position: 'fixed',
-      left: '50px',
-      top: '60px',
-      width: '200px',
-      height: '120px',
+      position: "fixed",
+      left: "50px",
+      top: "60px",
+      width: "200px",
+      height: "120px",
     });
     document.body.appendChild(box);
 
@@ -29,12 +29,9 @@ describe('useMouse', () => {
     expect(result.current.elementX).toBe(0);
 
     await act(async () => {
-
+      window.dispatchEvent(new MouseEvent("mousemove", { clientX: 10, clientY: 20 }));
       window.dispatchEvent(
-        new MouseEvent('mousemove', { clientX: 10, clientY: 20 }),
-      );
-      window.dispatchEvent(
-        new MouseEvent('mousemove', {
+        new MouseEvent("mousemove", {
           clientX: 150,
           clientY: 260,
           screenX: 300,
@@ -54,10 +51,7 @@ describe('useMouse', () => {
     expect(result.current.elementX).toBe(100);
     expect(result.current.elementY).toBe(200);
 
-
-    window.dispatchEvent(
-      new MouseEvent('mousemove', { clientX: 80, clientY: 90 }),
-    );
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 80, clientY: 90 }));
     await unmount();
 
     expect(cancelSpy).toHaveBeenCalledTimes(2);

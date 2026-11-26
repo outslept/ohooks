@@ -1,73 +1,69 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react"
-import { cn } from "cn"
-import { RotateCcw } from "lucide-react"
-import { usePointerDrag, type PointerDragAxis } from "@/hooks/usePointerDrag"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useRef, useState } from "react";
+import { cn } from "cn";
+import { RotateCcw } from "lucide-react";
+import { usePointerDrag, type PointerDragAxis } from "@/hooks/usePointerDrag";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
-const AXES: readonly PointerDragAxis[] = ["both", "x", "y"]
+const AXES: readonly PointerDragAxis[] = ["both", "x", "y"];
 
 function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max)
+  return Math.min(Math.max(value, min), max);
 }
 
 export default function UsePointerDragDemo() {
-  const boxRef = useRef<HTMLDivElement>(null)
-  const [axis, setAxis] = useState<PointerDragAxis>("both")
-  const [isCleared, setIsCleared] = useState(false)
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [axis, setAxis] = useState<PointerDragAxis>("both");
+  const [isCleared, setIsCleared] = useState(false);
 
-  const { isDragging, deltaX, deltaY, movementX, movementY } = usePointerDrag(
-    boxRef,
-    {
-      axis,
-      preventDefault: true,
-      onDragStart: () => {
-        setIsCleared(false)
-      },
-    }
-  )
+  const { isDragging, deltaX, deltaY, movementX, movementY } = usePointerDrag(boxRef, {
+    axis,
+    preventDefault: true,
+    onDragStart: () => {
+      setIsCleared(false);
+    },
+  });
 
-  const displayDeltaX = isCleared && !isDragging ? 0 : Math.round(deltaX)
-  const displayDeltaY = isCleared && !isDragging ? 0 : Math.round(deltaY)
-  const displayMoveX = isDragging ? Math.round(movementX) : 0
-  const displayMoveY = isDragging ? Math.round(movementY) : 0
+  const displayDeltaX = isCleared && !isDragging ? 0 : Math.round(deltaX);
+  const displayDeltaY = isCleared && !isDragging ? 0 : Math.round(deltaY);
+  const displayMoveX = isDragging ? Math.round(movementX) : 0;
+  const displayMoveY = isDragging ? Math.round(movementY) : 0;
 
-  const visualX = isDragging ? clamp(deltaX, -48, 48) : 0
-  const visualY = isDragging ? clamp(deltaY, -20, 20) : 0
+  const visualX = isDragging ? clamp(deltaX, -48, 48) : 0;
+  const visualY = isDragging ? clamp(deltaY, -20, 20) : 0;
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="Drag axis"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {AXES.map((item) => {
-              const isSelected = axis === item
+              const isSelected = axis === item;
               return (
                 <button
                   key={item}
                   type="button"
                   onClick={() => {
-                    setAxis(item)
-                    setIsCleared(true)
+                    setAxis(item);
+                    setIsCleared(true);
                   }}
                   className={cn(
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs transition-all",
                     isSelected
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {item}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -83,29 +79,22 @@ export default function UsePointerDragDemo() {
               "flex w-48 flex-col items-center justify-center gap-1 rounded-md border bg-card px-3 py-2.5 shadow-control select-none",
               isDragging
                 ? "cursor-grabbing border-primary/50 transition-none"
-                : "cursor-grab border-border-subtle transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
+                : "cursor-grab border-border-subtle transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
             )}
           >
             <div className="flex items-baseline gap-2.5 font-mono text-sm font-semibold tracking-tight text-foreground tabular-nums">
               <span>
-                <span className="mr-1 text-2xs font-normal text-muted-foreground">
-                  Δx
-                </span>
+                <span className="mr-1 text-2xs font-normal text-muted-foreground">Δx</span>
                 {displayDeltaX}px
               </span>
               <span className="text-border">/</span>
               <span>
-                <span className="mr-1 text-2xs font-normal text-muted-foreground">
-                  Δy
-                </span>
+                <span className="mr-1 text-2xs font-normal text-muted-foreground">Δy</span>
                 {displayDeltaY}px
               </span>
             </div>
 
-            <Badge
-              variant={isDragging ? "accent" : "secondary"}
-              size="compact"
-            >
+            <Badge variant={isDragging ? "accent" : "secondary"} size="compact">
               {isDragging ? "active drag" : "grab & drag"}
             </Badge>
           </div>
@@ -144,5 +133,5 @@ export default function UsePointerDragDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

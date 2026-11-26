@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from "react";
 
 export interface UseMediaQueryOptions {
   /** Fallback match state used during SSR and when `matchMedia` is unavailable (default: `false`) */
@@ -18,27 +18,21 @@ export interface UseMediaQueryOptions {
  * const isDesktop = useMediaQuery('(min-width: 1024px)');
  * ```
  */
-export function useMediaQuery(
-  query: string,
-  options: UseMediaQueryOptions = {},
-): boolean {
+export function useMediaQuery(query: string, options: UseMediaQueryOptions = {}): boolean {
   const { defaultValue = false } = options;
 
   const subscribe = useCallback(
     (onStoreChange: () => void) => {
-      if (
-        typeof window === 'undefined' ||
-        typeof window.matchMedia !== 'function'
-      ) {
+      if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
         return () => {};
       }
 
       const matchMediaList = window.matchMedia(query);
 
-      if (typeof matchMediaList.addEventListener === 'function') {
-        matchMediaList.addEventListener('change', onStoreChange);
+      if (typeof matchMediaList.addEventListener === "function") {
+        matchMediaList.addEventListener("change", onStoreChange);
         return () => {
-          matchMediaList.removeEventListener('change', onStoreChange);
+          matchMediaList.removeEventListener("change", onStoreChange);
         };
       }
 
@@ -51,10 +45,7 @@ export function useMediaQuery(
   );
 
   const getSnapshot = useCallback((): boolean => {
-    if (
-      typeof window === 'undefined' ||
-      typeof window.matchMedia !== 'function'
-    ) {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
       return defaultValue;
     }
 

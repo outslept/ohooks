@@ -14,16 +14,14 @@ The `useAsyncTask` hook runs an asynchronous task on demand, tracks its pending 
 ## Usage
 
 ```tsx
-import { useAsyncTask } from "@/hooks/useAsyncTask"
+import { useAsyncTask } from "@/hooks/useAsyncTask";
 ```
 
 ```tsx
-const { run, abort, isPending, data } = useAsyncTask(
-  async ({ signal }, id: string) => {
-    const res = await fetch(`/api/users/${id}`, { signal })
-    return res.json()
-  }
-)
+const { run, abort, isPending, data } = useAsyncTask(async ({ signal }, id: string) => {
+  const res = await fetch(`/api/users/${id}`, { signal });
+  return res.json();
+});
 ```
 
 ## Examples
@@ -51,15 +49,15 @@ Call `abort` to cancel the in-flight task. The `signal` passed to the task is ab
 
 ```tsx
 const { run, abort, isPending } = useAsyncTask(async ({ signal }) => {
-  const res = await fetch("/api/report", { signal })
-  return res.blob()
-})
+  const res = await fetch("/api/report", { signal });
+  return res.blob();
+});
 
 return isPending ? (
   <button onClick={abort}>Cancel</button>
 ) : (
   <button onClick={() => run()}>Generate report</button>
-)
+);
 ```
 
 ## API Reference

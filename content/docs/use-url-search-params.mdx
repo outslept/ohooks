@@ -14,12 +14,12 @@ The `useUrlSearchParams` hook reads `window.location.search` via `useSyncExterna
 ## Usage
 
 ```tsx
-import { useUrlSearchParams } from "@/hooks/useUrlSearchParams"
+import { useUrlSearchParams } from "@/hooks/useUrlSearchParams";
 ```
 
 ```tsx
-const [searchParams, setSearchParams] = useUrlSearchParams()
-const query = searchParams.get("q") ?? ""
+const [searchParams, setSearchParams] = useUrlSearchParams();
+const query = searchParams.get("q") ?? "";
 ```
 
 ## Examples
@@ -29,8 +29,8 @@ const query = searchParams.get("q") ?? ""
 Pass a plain object (where `null` or `undefined` removes a parameter) or an updater function that mutates a cloned `URLSearchParams` instance.
 
 ```tsx
-const [searchParams, setSearchParams] = useUrlSearchParams()
-const sort = searchParams.get("sort") ?? "newest"
+const [searchParams, setSearchParams] = useUrlSearchParams();
+const sort = searchParams.get("sort") ?? "newest";
 
 return (
   <div>
@@ -38,18 +38,16 @@ return (
     <button
       onClick={() =>
         setSearchParams((prev) => {
-          prev.set("sort", "popular")
-          return prev
+          prev.set("sort", "popular");
+          return prev;
         })
       }
     >
       Sort by popular
     </button>
-    <button onClick={() => setSearchParams({ sort: null })}>
-      Clear sort
-    </button>
+    <button onClick={() => setSearchParams({ sort: null })}>Clear sort</button>
   </div>
-)
+);
 ```
 
 ### Pushing vs. Replacing History Entries
@@ -59,17 +57,13 @@ By default, updates use `replaceState` so rapid filter changes do not clutter br
 ```tsx
 const [searchParams, setSearchParams] = useUrlSearchParams({
   history: "replace",
-})
+});
 
 return (
-  <button
-    onClick={() =>
-      setSearchParams({ tab: "billing" }, { history: "push" })
-    }
-  >
+  <button onClick={() => setSearchParams({ tab: "billing" }, { history: "push" })}>
     Open Billing tab
   </button>
-)
+);
 ```
 
 ## API Reference
@@ -78,7 +72,4 @@ return (
 
 Configuration options for browser history mode and initial SSR search params.
 
-<AutoTypeTable
-  path="./hooks/useUrlSearchParams.ts"
-  name="UseUrlSearchParamsOptions"
-/>
+<AutoTypeTable path="./hooks/useUrlSearchParams.ts" name="UseUrlSearchParamsOptions" />

@@ -14,11 +14,11 @@ The `useSessionStorage` hook synchronizes React state with `window.sessionStorag
 ## Usage
 
 ```tsx
-import { useSessionStorage } from "@/hooks/useSessionStorage"
+import { useSessionStorage } from "@/hooks/useSessionStorage";
 ```
 
 ```tsx
-const [draft, setDraft, clearDraft] = useSessionStorage("form-draft", "")
+const [draft, setDraft, clearDraft] = useSessionStorage("form-draft", "");
 ```
 
 ## Examples
@@ -28,24 +28,20 @@ const [draft, setDraft, clearDraft] = useSessionStorage("form-draft", "")
 Store wizard form data in `sessionStorage` so page refreshes preserve progress without leaking state to other browser tabs.
 
 ```tsx
-const [stepData, setStepData, clearStepData] = useSessionStorage(
-  "checkout-wizard",
-  { step: 1, coupon: "" }
-)
+const [stepData, setStepData, clearStepData] = useSessionStorage("checkout-wizard", {
+  step: 1,
+  coupon: "",
+});
 
 return (
   <div>
     <p>Current step: {stepData.step}</p>
-    <button
-      onClick={() =>
-        setStepData((prev) => ({ ...prev, step: prev.step + 1 }))
-      }
-    >
+    <button onClick={() => setStepData((prev) => ({ ...prev, step: prev.step + 1 }))}>
       Next step
     </button>
     <button onClick={clearStepData}>Reset wizard</button>
   </div>
-)
+);
 ```
 
 ### Custom Serialization Options
@@ -53,13 +49,9 @@ return (
 Pass `serializer` and `deserializer` functions when storing custom data structures in `sessionStorage`.
 
 ```tsx
-const [visitedIds, setVisitedIds] = useSessionStorage<number[]>(
-  "visited-ids",
-  [],
-  {
-    onError: (error) => console.warn("SessionStorage error:", error),
-  }
-)
+const [visitedIds, setVisitedIds] = useSessionStorage<number[]>("visited-ids", [], {
+  onError: (error) => console.warn("SessionStorage error:", error),
+});
 ```
 
 ## API Reference

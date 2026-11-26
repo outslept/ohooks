@@ -14,15 +14,15 @@ The `useSwipe` hook detects directional swipe gestures (`'left'`, `'right'`, `'u
 ## Usage
 
 ```tsx
-import { useSwipe } from "@/hooks/useSwipe"
+import { useSwipe } from "@/hooks/useSwipe";
 ```
 
 ```tsx
-const cardRef = useRef<HTMLDivElement>(null)
+const cardRef = useRef<HTMLDivElement>(null);
 const { direction } = useSwipe(cardRef, {
   onSwipeLeft: () => nextSlide(),
   onSwipeRight: () => prevSlide(),
-})
+});
 ```
 
 ## Examples
@@ -32,21 +32,21 @@ const { direction } = useSwipe(cardRef, {
 Use `onSwipeLeft` and `onSwipeRight` to advance or rewind slides on touch and pointer devices.
 
 ```tsx
-const carouselRef = useRef<HTMLDivElement>(null)
-const [slide, setSlide] = useState(0)
+const carouselRef = useRef<HTMLDivElement>(null);
+const [slide, setSlide] = useState(0);
 
 const { isSwiping, deltaX } = useSwipe(carouselRef, {
   threshold: 40,
   onSwipeLeft: () => setSlide((s) => Math.min(s + 1, 3)),
   onSwipeRight: () => setSlide((s) => Math.max(s - 1, 0)),
-})
+});
 
 return (
   <div ref={carouselRef} style={{ touchAction: "pan-y", padding: 32 }}>
     <p>Slide {slide + 1} of 4</p>
     {isSwiping && <p>Offset: {Math.round(deltaX)}px</p>}
   </div>
-)
+);
 ```
 
 ### Vertical Swipe to Dismiss
@@ -54,15 +54,15 @@ return (
 Listen to `onSwipeDown` to dismiss a bottom sheet or notification card when the user swipes downward.
 
 ```tsx
-const sheetRef = useRef<HTMLDivElement>(null)
+const sheetRef = useRef<HTMLDivElement>(null);
 
 useSwipe(sheetRef, {
   threshold: 60,
   timeout: 400,
   onSwipeDown: () => closeSheet(),
-})
+});
 
-return <div ref={sheetRef}>Swipe down to close</div>
+return <div ref={sheetRef}>Swipe down to close</div>;
 ```
 
 ## API Reference

@@ -1,63 +1,60 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react"
-import { cn } from "cn"
-import { Plus, RotateCcw } from "lucide-react"
+import { useRef, useState } from "react";
+import { cn } from "cn";
+import { Plus, RotateCcw } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useTextareaAutosize } from "@/hooks/useTextareaAutosize"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useTextareaAutosize } from "@/hooks/useTextareaAutosize";
 
-const MAX_HEIGHT_OPTIONS = [72, 96, 120] as const
-const MIN_HEIGHT = 38
+const MAX_HEIGHT_OPTIONS = [72, 96, 120] as const;
+const MIN_HEIGHT = 38;
 
 const EXTRA_LINES = [
   "Measures scrollHeight in layout effect",
   "Clamps smoothly at maxHeight bound",
   "Enables overflow-y scroll when full",
   "Recalculates on window resize events",
-]
+];
 
 export default function UseTextareaAutosizeDemo() {
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const [value, setValue] = useState("Auto-growing textarea primitive")
-  const [maxHeight, setMaxHeight] = useState<number>(96)
-  const [currentHeight, setCurrentHeight] = useState<number>(MIN_HEIGHT)
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [value, setValue] = useState("Auto-growing textarea primitive");
+  const [maxHeight, setMaxHeight] = useState<number>(96);
+  const [currentHeight, setCurrentHeight] = useState<number>(MIN_HEIGHT);
 
   const { resize } = useTextareaAutosize(textareaRef, value, {
     minHeight: MIN_HEIGHT,
     maxHeight,
     onResize: (height) => setCurrentHeight(Math.round(height)),
-  })
+  });
 
-  const lineCount = value ? value.split("\n").length : 1
+  const lineCount = value ? value.split("\n").length : 1;
 
   const handleAppendLine = () => {
-    const nextLine = EXTRA_LINES[(lineCount - 1) % EXTRA_LINES.length]
+    const nextLine = EXTRA_LINES[(lineCount - 1) % EXTRA_LINES.length];
     setValue((prev) =>
-      prev.length > 0
-        ? `${prev}\nLine ${lineCount + 1}: ${nextLine}`
-        : `Line 1: ${nextLine}`
-    )
-  }
+      prev.length > 0 ? `${prev}\nLine ${lineCount + 1}: ${nextLine}` : `Line 1: ${nextLine}`,
+    );
+  };
 
   const handleReset = () => {
-    setValue("")
-    resize()
-  }
+    setValue("");
+    resize();
+  };
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Maximum textarea height"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {MAX_HEIGHT_OPTIONS.map((px) => {
-              const active = maxHeight === px
+              const active = maxHeight === px;
               return (
                 <button
                   key={px}
@@ -67,12 +64,12 @@ export default function UseTextareaAutosizeDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs font-medium tabular-nums transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {px}px
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -129,5 +126,5 @@ export default function UseTextareaAutosizeDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

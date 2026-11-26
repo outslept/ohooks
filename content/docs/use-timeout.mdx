@@ -14,13 +14,13 @@ The `useTimeout` hook schedules a callback to run after `delay` milliseconds (pa
 ## Usage
 
 ```tsx
-import { useTimeout } from "@/hooks/useTimeout"
+import { useTimeout } from "@/hooks/useTimeout";
 ```
 
 ```tsx
 useTimeout(() => {
-  setVisible(false)
-}, 3000)
+  setVisible(false);
+}, 3000);
 ```
 
 ## Examples
@@ -30,14 +30,14 @@ useTimeout(() => {
 Hide a notification banner automatically after 4 seconds, or let the user cancel or restart the timer manually.
 
 ```tsx
-const [visible, setVisible] = useState(true)
+const [visible, setVisible] = useState(true);
 
 const { isPending, clear, reset } = useTimeout(
   () => {
-    setVisible(false)
+    setVisible(false);
   },
-  visible ? 4000 : null
-)
+  visible ? 4000 : null,
+);
 
 return (
   <div>
@@ -49,14 +49,14 @@ return (
     )}
     <button
       onClick={() => {
-        setVisible(true)
-        reset()
+        setVisible(true);
+        reset();
       }}
     >
       Show toast again
     </button>
   </div>
-)
+);
 ```
 
 ### Conditional Delayed Execution
@@ -64,12 +64,12 @@ return (
 Pass `null` as the `delay` until a condition is met to defer scheduling the timeout.
 
 ```tsx
-const [shouldRedirect, setShouldRedirect] = useState(false)
+const [shouldRedirect, setShouldRedirect] = useState(false);
 
 useTimeout(
   () => {
-    window.location.href = "/dashboard"
+    window.location.href = "/dashboard";
   },
-  shouldRedirect ? 2000 : null
-)
+  shouldRedirect ? 2000 : null,
+);
 ```

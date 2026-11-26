@@ -14,15 +14,15 @@ The `useVirtualList` hook virtualizes large lists of fixed or variable-height it
 ## Usage
 
 ```tsx
-import { useVirtualList } from "@/hooks/useVirtualList"
+import { useVirtualList } from "@/hooks/useVirtualList";
 ```
 
 ```tsx
-const containerRef = useRef<HTMLDivElement>(null)
+const containerRef = useRef<HTMLDivElement>(null);
 const { virtualItems, wrapperProps } = useVirtualList(rows, {
   containerTarget: containerRef,
   itemHeight: 40,
-})
+});
 ```
 
 ## Examples
@@ -32,27 +32,19 @@ const { virtualItems, wrapperProps } = useVirtualList(rows, {
 Spread `wrapperProps` onto an inner wrapper element and position each virtual item at `offsetTop`.
 
 ```tsx
-const containerRef = useRef<HTMLDivElement>(null)
-const items = useMemo(
-  () => Array.from({ length: 10_000 }, (_, i) => `Row #${i + 1}`),
-  []
-)
+const containerRef = useRef<HTMLDivElement>(null);
+const items = useMemo(() => Array.from({ length: 10_000 }, (_, i) => `Row #${i + 1}`), []);
 
 const { virtualItems, wrapperProps, scrollToIndex } = useVirtualList(items, {
   containerTarget: containerRef,
   itemHeight: 36,
   overscan: 5,
-})
+});
 
 return (
   <div>
-    <button onClick={() => scrollToIndex(5000, "center")}>
-      Jump to Row #5001
-    </button>
-    <div
-      ref={containerRef}
-      style={{ height: 320, overflowY: "auto", border: "1px solid #ccc" }}
-    >
+    <button onClick={() => scrollToIndex(5000, "center")}>Jump to Row #5001</button>
+    <div ref={containerRef} style={{ height: 320, overflowY: "auto", border: "1px solid #ccc" }}>
       <div {...wrapperProps}>
         {virtualItems.map(({ index, data, offsetTop, height }) => (
           <div
@@ -71,7 +63,7 @@ return (
       </div>
     </div>
   </div>
-)
+);
 ```
 
 ### Variable-Height Rows
@@ -83,7 +75,7 @@ const { virtualItems, wrapperProps } = useVirtualList(messages, {
   containerTarget: containerRef,
   itemHeight: (index, msg) => (msg.isExpanded ? 120 : 48),
   overscan: 3,
-})
+});
 ```
 
 ## API Reference
@@ -92,10 +84,7 @@ const { virtualItems, wrapperProps } = useVirtualList(messages, {
 
 Configuration options for scroll container target, row height calculation, and overscan count.
 
-<AutoTypeTable
-  path="./hooks/useVirtualList.ts"
-  name="UseVirtualListOptions"
-/>
+<AutoTypeTable path="./hooks/useVirtualList.ts" name="UseVirtualListOptions" />
 
 ### `VirtualItem`
 
@@ -107,7 +96,4 @@ Metadata and positioning descriptor for each visible virtualized row.
 
 Visible virtual items, total `height`, wrapper `props`, and `scrollToIndex` helper returned by the hook.
 
-<AutoTypeTable
-  path="./hooks/useVirtualList.ts"
-  name="UseVirtualListReturn"
-/>
+<AutoTypeTable path="./hooks/useVirtualList.ts" name="UseVirtualListReturn" />

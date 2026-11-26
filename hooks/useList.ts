@@ -1,5 +1,5 @@
-import { type Dispatch, type SetStateAction, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
+import { type Dispatch, type SetStateAction, useState } from "react";
+import { useEventCallback } from "./useEventCallback";
 
 export interface UseListActions<T> {
   /** Standard React state setter for replacing or updating the array */
@@ -13,9 +13,7 @@ export interface UseListActions<T> {
   /** Removes the item at `index` (supports negative indices) */
   removeAt: (index: number) => void;
   /** Keeps only items that satisfy the predicate function */
-  filter: (
-    predicate: (value: T, index: number, array: T[]) => boolean,
-  ) => void;
+  filter: (predicate: (value: T, index: number, array: T[]) => boolean) => void;
   /** Sorts the list in place (immutably) using an optional comparator */
   sort: (compareFn?: (a: T, b: T) => number) => void;
   /** Empties the list */
@@ -36,13 +34,9 @@ export interface UseListActions<T> {
  * const [items, { push, removeAt, clear }] = useList<string>(['a', 'b']);
  * ```
  */
-export function useList<T>(
-  initialValue: T[] | (() => T[]) = [],
-): [T[], UseListActions<T>] {
+export function useList<T>(initialValue: T[] | (() => T[]) = []): [T[], UseListActions<T>] {
   const resolveInitial = (): T[] =>
-    typeof initialValue === 'function'
-      ? (initialValue as () => T[])()
-      : initialValue;
+    typeof initialValue === "function" ? (initialValue as () => T[])() : initialValue;
 
   const [list, setList] = useState<T[]>(() => [...resolveInitial()]);
 
@@ -74,11 +68,7 @@ export function useList<T>(
         0,
         Math.min(prev.length, index < 0 ? prev.length + index : index),
       );
-      return [
-        ...prev.slice(0, clampedIndex),
-        item,
-        ...prev.slice(clampedIndex),
-      ];
+      return [...prev.slice(0, clampedIndex), item, ...prev.slice(clampedIndex)];
     });
   });
 
@@ -88,18 +78,13 @@ export function useList<T>(
       if (targetIndex < 0 || targetIndex >= prev.length) {
         return prev;
       }
-      return [
-        ...prev.slice(0, targetIndex),
-        ...prev.slice(targetIndex + 1),
-      ];
+      return [...prev.slice(0, targetIndex), ...prev.slice(targetIndex + 1)];
     });
   });
 
-  const filter = useEventCallback(
-    (predicate: (value: T, index: number, array: T[]) => boolean) => {
-      setList((prev) => prev.filter(predicate));
-    },
-  );
+  const filter = useEventCallback((predicate: (value: T, index: number, array: T[]) => boolean) => {
+    setList((prev) => prev.filter(predicate));
+  });
 
   const sort = useEventCallback((compareFn?: (a: T, b: T) => number) => {
     setList((prev) => [...prev].sort(compareFn));

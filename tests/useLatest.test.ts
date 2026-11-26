@@ -1,14 +1,14 @@
-import { useLatest } from '@/hooks/useLatest';
-import { describe, expect, it } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useLatest } from "@/hooks/useLatest";
+import { describe, expect, it } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useLatest', () => {
-  it('preserves ref object identity while updating .current on rerender', async () => {
+describe("useLatest", () => {
+  it("preserves ref object identity while updating .current on rerender", async () => {
     const { result, rerender } = await renderHook(
       (props?: { val: number }) => useLatest(props?.val ?? 1),
-      { initialProps: { val: 1 } }
+      { initialProps: { val: 1 } },
     );
 
     const initialRef = result.current;

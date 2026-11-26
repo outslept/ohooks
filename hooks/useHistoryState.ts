@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from "react";
 
 export interface UseHistoryStateReturn<T> {
   /** Current present state value */
@@ -44,15 +44,13 @@ interface HistorySnapshot<T> {
  */
 export function useHistoryState<T>(
   initialPresent: T | (() => T),
-  capacity: number = 100
+  capacity: number = 100,
 ): UseHistoryStateReturn<T> {
   const safeCapacity = Math.max(1, capacity);
 
   const [history, setHistory] = useState<HistorySnapshot<T>>(() => {
     const resolved =
-      typeof initialPresent === 'function'
-        ? (initialPresent as () => T)()
-        : initialPresent;
+      typeof initialPresent === "function" ? (initialPresent as () => T)() : initialPresent;
     return {
       past: [],
       present: resolved,
@@ -66,7 +64,7 @@ export function useHistoryState<T>(
     (nextState: T | ((prevPresent: T) => T)) => {
       setHistory((curr) => {
         const resolvedNext =
-          typeof nextState === 'function'
+          typeof nextState === "function"
             ? (nextState as (prevPresent: T) => T)(curr.present)
             : nextState;
 
@@ -82,7 +80,7 @@ export function useHistoryState<T>(
         };
       });
     },
-    [safeCapacity]
+    [safeCapacity],
   );
 
   const undo = useCallback(() => {
@@ -125,8 +123,7 @@ export function useHistoryState<T>(
   }, []);
 
   const reset = useCallback((...args: [newInitialValue?: T]) => {
-    const resolvedResetValue =
-      args.length > 0 ? (args[0] as T) : initialValueRef.current;
+    const resolvedResetValue = args.length > 0 ? (args[0] as T) : initialValueRef.current;
     initialValueRef.current = resolvedResetValue;
     setHistory({
       past: [],

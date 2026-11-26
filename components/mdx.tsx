@@ -2,10 +2,7 @@ import * as React from "react";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 
-import {
-  AutoTypeTable,
-  type AutoTypeTableProps,
-} from "@/components/ui/auto-type-table";
+import { AutoTypeTable, type AutoTypeTableProps } from "@/components/ui/auto-type-table";
 import { HookInstallation } from "@/components/hook-installation";
 import { HookPreview } from "@/components/hook-preview";
 import { Badge } from "@/components/ui/badge";
@@ -27,12 +24,7 @@ import {
   StepsHeader,
   StepSource,
 } from "@/components/ui/steps";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TypeTable } from "@/components/ui/type-table";
 
 export function getMDXComponents(components?: MDXComponents) {

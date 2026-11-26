@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
-import { useLatest } from './useLatest';
+import { useCallback } from "react";
+import { useLatest } from "./useLatest";
 
 /**
  * Returns a referentially stable callback that always invokes the latest version of `fn`.
@@ -15,13 +15,8 @@ import { useLatest } from './useLatest';
  * });
  * ```
  */
-export function useEventCallback<T extends (...args: never[]) => unknown>(
-  fn: T,
-): T {
+export function useEventCallback<T extends (...args: never[]) => unknown>(fn: T): T {
   const fnRef = useLatest(fn);
 
-  return useCallback(
-    (...args: Parameters<T>) => fnRef.current(...args),
-    [fnRef],
-  ) as T;
+  return useCallback((...args: Parameters<T>) => fnRef.current(...args), [fnRef]) as T;
 }

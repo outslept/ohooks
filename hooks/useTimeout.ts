@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useLatest } from './useLatest';
+import { useEffect } from "react";
+import { useLatest } from "./useLatest";
 
 /**
  * Declarative `setTimeout` hook that invokes a callback after `delay` milliseconds.
@@ -15,10 +15,7 @@ import { useLatest } from './useLatest';
  * }, 3000);
  * ```
  */
-export function useTimeout(
-  callback: () => void,
-  delay: number | null,
-): void {
+export function useTimeout(callback: () => void, delay: number | null): void {
   const savedCallback = useLatest(callback);
 
   useEffect(() => {

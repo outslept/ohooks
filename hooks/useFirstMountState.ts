@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { useRef } from "react";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 /**
  * Returns `true` during the initial render of a component and `false` on all subsequent renders.

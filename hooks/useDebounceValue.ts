@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   type DebouncedFunction,
   type DebounceOptions,
   useDebounceCallback,
-} from './useDebounceCallback';
-import { useUpdateEffect } from './useUpdateEffect';
+} from "./useDebounceCallback";
+import { useUpdateEffect } from "./useUpdateEffect";
 
 /**
  * Debounces a reactive value and provides a debounced setter with `.cancel()`, `.flush()`, and `.isPending()` controls.
@@ -27,11 +27,7 @@ export function useDebounceValue<T>(
 ): [T, DebouncedFunction<(value: T) => void>] {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-  const updateDebouncedValue = useDebounceCallback(
-    setDebouncedValue,
-    delay,
-    options,
-  );
+  const updateDebouncedValue = useDebounceCallback(setDebouncedValue, delay, options);
 
   useUpdateEffect(() => {
     updateDebouncedValue(value);

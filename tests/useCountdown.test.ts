@@ -1,10 +1,10 @@
-import { useCountdown } from '@/hooks/useCountdown';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useCountdown } from "@/hooks/useCountdown";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useCountdown', () => {
+describe("useCountdown", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -13,7 +13,7 @@ describe('useCountdown', () => {
     vi.useRealTimers();
   });
 
-  it('counts down to default countStop (0), invokes onTick/onComplete, pauses, and resets', async () => {
+  it("counts down to default countStop (0), invokes onTick/onComplete, pauses, and resets", async () => {
     const onTick = vi.fn();
     const onComplete = vi.fn();
     const { result, act } = await renderHook(() =>
@@ -40,7 +40,6 @@ describe('useCountdown', () => {
     expect(result.current.count).toBe(1);
     expect(onTick).toHaveBeenLastCalledWith(1);
 
-
     await act(async () => {
       result.current.pause();
     });
@@ -52,7 +51,6 @@ describe('useCountdown', () => {
     expect(result.current.count).toBe(1);
     expect(onComplete).not.toHaveBeenCalled();
 
-
     await act(async () => {
       result.current.start();
     });
@@ -62,7 +60,6 @@ describe('useCountdown', () => {
     expect(result.current.count).toBe(0);
     expect(result.current.isRunning).toBe(false);
     expect(onComplete).toHaveBeenCalledTimes(1);
-
 
     await act(async () => {
       result.current.start();
@@ -76,7 +73,7 @@ describe('useCountdown', () => {
     expect(result.current.isRunning).toBe(false);
   });
 
-  it('supports count-up mode (isIncrement: true) and autoStart: true', async () => {
+  it("supports count-up mode (isIncrement: true) and autoStart: true", async () => {
     const onComplete = vi.fn();
     const { result, act } = await renderHook(() =>
       useCountdown({

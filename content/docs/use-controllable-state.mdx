@@ -14,7 +14,7 @@ The `useControllableState` hook powers components that support both controlled (
 ## Usage
 
 ```tsx
-import { useControllableState } from "@/hooks/useControllableState"
+import { useControllableState } from "@/hooks/useControllableState";
 ```
 
 ```tsx
@@ -22,7 +22,7 @@ const [open, setOpen, isControlled] = useControllableState({
   value: props.open,
   defaultValue: false,
   onChange: props.onOpenChange,
-})
+});
 ```
 
 ## Examples
@@ -33,31 +33,23 @@ Accept optional `checked`, `defaultChecked`, and `onCheckedChange` props and del
 
 ```tsx
 interface SwitchProps {
-  checked?: boolean
-  defaultChecked?: boolean
-  onCheckedChange?: (checked: boolean) => void
+  checked?: boolean;
+  defaultChecked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
 }
 
-export function Switch({
-  checked,
-  defaultChecked = false,
-  onCheckedChange,
-}: SwitchProps) {
+export function Switch({ checked, defaultChecked = false, onCheckedChange }: SwitchProps) {
   const [isChecked, setIsChecked] = useControllableState({
     value: checked,
     defaultValue: defaultChecked,
     onChange: onCheckedChange,
-  })
+  });
 
   return (
-    <button
-      role="switch"
-      aria-checked={isChecked}
-      onClick={() => setIsChecked((prev) => !prev)}
-    >
+    <button role="switch" aria-checked={isChecked} onClick={() => setIsChecked((prev) => !prev)}>
       {isChecked ? "On" : "Off"}
     </button>
-  )
+  );
 }
 ```
 
@@ -70,13 +62,9 @@ const [count, setCount] = useControllableState({
   value: props.count,
   defaultValue: 0,
   onChange: props.onCountChange,
-})
+});
 
-return (
-  <button onClick={() => setCount((prev) => prev + 1)}>
-    Count: {count}
-  </button>
-)
+return <button onClick={() => setCount((prev) => prev + 1)}>Count: {count}</button>;
 ```
 
 ## API Reference
@@ -85,7 +73,4 @@ return (
 
 Configuration options for resolving controlled and uncontrolled state.
 
-<AutoTypeTable
-  path="./hooks/useControllableState.ts"
-  name="UseControllableStateOptions"
-/>
+<AutoTypeTable path="./hooks/useControllableState.ts" name="UseControllableStateOptions" />

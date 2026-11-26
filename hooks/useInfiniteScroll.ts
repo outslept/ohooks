@@ -1,9 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 export interface UseInfiniteScrollOptions {
   /** Scrollable root container element or ref (default: browser viewport) */
@@ -44,11 +42,11 @@ export interface UseInfiniteScrollReturn {
 export function useInfiniteScroll(
   sentinelTarget: EventListenerTarget<HTMLElement>,
   onLoadMore: () => void | Promise<void>,
-  options: UseInfiniteScrollOptions = {}
+  options: UseInfiniteScrollOptions = {},
 ): UseInfiniteScrollReturn {
   const {
     root,
-    rootMargin = '0px 0px 200px 0px',
+    rootMargin = "0px 0px 200px 0px",
     threshold = 0,
     hasMore = true,
     enabled = true,
@@ -85,16 +83,14 @@ export function useInfiniteScroll(
     }
   }, [hasMore, enabled, onLoadMoreRef]);
 
-  const thresholdKey = Array.isArray(threshold)
-    ? threshold.join(',')
-    : String(threshold);
+  const thresholdKey = Array.isArray(threshold) ? threshold.join(",") : String(threshold);
 
   useEffect(() => {
     if (
       !enabled ||
       !hasMore ||
-      typeof window === 'undefined' ||
-      typeof IntersectionObserver === 'undefined'
+      typeof window === "undefined" ||
+      typeof IntersectionObserver === "undefined"
     ) {
       return;
     }
@@ -117,7 +113,7 @@ export function useInfiniteScroll(
         root: rootElement,
         rootMargin,
         threshold: thresholdRef.current,
-      }
+      },
     );
 
     observer.observe(sentinel);
@@ -125,16 +121,7 @@ export function useInfiniteScroll(
     return () => {
       observer.disconnect();
     };
-  }, [
-    sentinelTarget,
-    root,
-    rootMargin,
-    thresholdKey,
-    thresholdRef,
-    hasMore,
-    enabled,
-    loadMore,
-  ]);
+  }, [sentinelTarget, root, rootMargin, thresholdKey, thresholdRef, hasMore, enabled, loadMore]);
 
   return {
     isLoading,

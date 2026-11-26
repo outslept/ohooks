@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
-import { useBoolean } from './useBoolean';
-import { useEventCallback } from './useEventCallback';
-import { useLatest } from './useLatest';
-import { useThrottleCallback } from './useThrottleCallback';
+import { useEffect, useRef } from "react";
+import { useBoolean } from "./useBoolean";
+import { useEventCallback } from "./useEventCallback";
+import { useLatest } from "./useLatest";
+import { useThrottleCallback } from "./useThrottleCallback";
 
 export interface UseIdleOptions {
   /** Initial idle state before the first timeout elapses (default: `false`) */
@@ -14,12 +14,12 @@ export interface UseIdleOptions {
 }
 
 const DEFAULT_EVENTS: ReadonlyArray<keyof WindowEventMap> = [
-  'mousemove',
-  'mousedown',
-  'resize',
-  'keydown',
-  'touchstart',
-  'wheel',
+  "mousemove",
+  "mousedown",
+  "resize",
+  "keydown",
+  "touchstart",
+  "wheel",
 ];
 
 /**
@@ -35,15 +35,8 @@ const DEFAULT_EVENTS: ReadonlyArray<keyof WindowEventMap> = [
  * const isIdle = useIdle(30_000);
  * ```
  */
-export function useIdle(
-  timeout = 60_000,
-  options: UseIdleOptions = {},
-): boolean {
-  const {
-    initialState = false,
-    events = DEFAULT_EVENTS,
-    throttleMs = 200,
-  } = options;
+export function useIdle(timeout = 60_000, options: UseIdleOptions = {}): boolean {
+  const { initialState = false, events = DEFAULT_EVENTS, throttleMs = 200 } = options;
 
   const { value: isIdle, setTrue, setFalse } = useBoolean(initialState);
   const timerIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,25 +51,31 @@ export function useIdle(
       clearTimeout(timerIdRef.current);
     }
 
-    timerIdRef.current = setTimeout(() => {
-      setTrue();
-    }, Math.max(0, timeout));
+    timerIdRef.current = setTimeout(
+      () => {
+        setTrue();
+      },
+      Math.max(0, timeout),
+    );
   });
 
   const handleActivity = useThrottleCallback(resetTimer, throttleMs);
 
-  const eventsKey = events.join(',');
+  const eventsKey = events.join(",");
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
+    if (typeof window === "undefined" || typeof document === "undefined") {
       return;
     }
 
     const currentEvents = eventsRef.current;
 
-    timerIdRef.current = setTimeout(() => {
-      setTrue();
-    }, Math.max(0, timeout));
+    timerIdRef.current = setTimeout(
+      () => {
+        setTrue();
+      },
+      Math.max(0, timeout),
+    );
 
     const listener = (): void => {
       if (throttleMs > 0) {
@@ -95,7 +94,7 @@ export function useIdle(
     for (const eventName of currentEvents) {
       window.addEventListener(eventName, listener, { passive: true });
     }
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       if (timerIdRef.current !== null) {
@@ -106,17 +105,9 @@ export function useIdle(
       for (const eventName of currentEvents) {
         window.removeEventListener(eventName, listener);
       }
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [
-    timeout,
-    throttleMs,
-    eventsKey,
-    eventsRef,
-    handleActivity,
-    resetTimer,
-    setTrue,
-  ]);
+  }, [timeout, throttleMs, eventsKey, eventsRef, handleActivity, resetTimer, setTrue]);
 
   return isIdle;
 }

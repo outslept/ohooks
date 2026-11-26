@@ -1,47 +1,39 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "cn"
-import { Check, Minus, Plus, RotateCcw, Trash2 } from "lucide-react"
+import { useState } from "react";
+import { cn } from "cn";
+import { Check, Minus, Plus, RotateCcw, Trash2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useSet } from "@/hooks/useSet"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useSet } from "@/hooks/useSet";
 
-const TOPICS = [
-  "TypeScript",
-  "React 19",
-  "SSR",
-  "Tailwind",
-  "Signals",
-  "WASM",
-] as const
+const TOPICS = ["TypeScript", "React 19", "SSR", "Tailwind", "Signals", "WASM"] as const;
 
-const PROBE_KEYS = ["TypeScript", "SSR", "WASM"] as const
+const PROBE_KEYS = ["TypeScript", "SSR", "WASM"] as const;
 
 export default function UseSetDemo() {
   const [set, { add, remove, toggle, clear, reset, has }] = useSet<string>([
     "TypeScript",
     "React 19",
-  ])
-  const [probe, setProbe] = useState<(typeof PROBE_KEYS)[number]>("TypeScript")
+  ]);
+  const [probe, setProbe] = useState<(typeof PROBE_KEYS)[number]>("TypeScript");
 
-  const items = Array.from(set)
-  const nextToAdd = TOPICS.find((t) => !has(t))
-  const lastAdded = items[items.length - 1]
+  const items = Array.from(set);
+  const nextToAdd = TOPICS.find((t) => !has(t));
+  const lastAdded = items[items.length - 1];
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Inspect set key with has()"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {PROBE_KEYS.map((key) => {
-              const active = probe === key
+              const active = probe === key;
               return (
                 <button
                   key={key}
@@ -51,12 +43,12 @@ export default function UseSetDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs font-medium transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {key === "TypeScript" ? "TS" : key}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -64,7 +56,7 @@ export default function UseSetDemo() {
         <div className="flex flex-col gap-2 rounded-md border border-border-subtle bg-subtle/35 p-2.5">
           <div className="grid grid-cols-3 gap-1.5">
             {TOPICS.map((topic) => {
-              const active = has(topic)
+              const active = has(topic);
               return (
                 <button
                   key={topic}
@@ -74,7 +66,7 @@ export default function UseSetDemo() {
                     "inline-flex items-center justify-center gap-1 rounded-sm border px-2 py-1 font-mono text-2xs font-medium transition-all active:scale-[0.98]",
                     active
                       ? "border-primary/40 bg-primary/10 text-primary shadow-control"
-                      : "border-border-subtle bg-card/80 text-muted-foreground hover:bg-control hover:text-foreground"
+                      : "border-border-subtle bg-card/80 text-muted-foreground hover:bg-control hover:text-foreground",
                   )}
                 >
                   {active ? (
@@ -84,7 +76,7 @@ export default function UseSetDemo() {
                   )}
                   <span className="truncate">{topic}</span>
                 </button>
-              )
+              );
             })}
           </div>
 
@@ -95,8 +87,7 @@ export default function UseSetDemo() {
                 : "Set(0) {}"}
             </span>
             <span className="shrink-0 pl-2">
-              <strong className="text-foreground">{set.size}</strong>/
-              {TOPICS.length}
+              <strong className="text-foreground">{set.size}</strong>/{TOPICS.length}
             </span>
           </div>
         </div>
@@ -108,7 +99,7 @@ export default function UseSetDemo() {
           size="compact"
           leadingIcon={<Plus />}
           onClick={() => {
-            if (nextToAdd) add(nextToAdd)
+            if (nextToAdd) add(nextToAdd);
           }}
           disabled={!nextToAdd}
           className="flex-1"
@@ -120,7 +111,7 @@ export default function UseSetDemo() {
           size="compact"
           leadingIcon={<Minus />}
           onClick={() => {
-            if (lastAdded) remove(lastAdded)
+            if (lastAdded) remove(lastAdded);
           }}
           disabled={!lastAdded}
         >
@@ -145,5 +136,5 @@ export default function UseSetDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

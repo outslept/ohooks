@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { isRefObject, resolveTargetElement } from '@/lib/utils';
+import { useEffect, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { isRefObject, resolveTargetElement } from "@/lib/utils";
 
 /** Section target accepted by `useScrollSpy` (element ID, CSS selector, ref, or DOM element). */
 export type ScrollSpyTarget = string | EventListenerTarget<HTMLElement>;
@@ -21,17 +19,14 @@ export interface UseScrollSpyOptions {
 }
 
 function resolveSectionElement(target: ScrollSpyTarget): HTMLElement | null {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return null;
   }
-  if (typeof target === 'string') {
+  if (typeof target === "string") {
     const trimmed = target.trim();
     if (!trimmed) return null;
-    const id = trimmed.startsWith('#') ? trimmed.slice(1) : trimmed;
-    return (
-      document.getElementById(id) ??
-      document.querySelector<HTMLElement>(trimmed)
-    );
+    const id = trimmed.startsWith("#") ? trimmed.slice(1) : trimmed;
+    return document.getElementById(id) ?? document.querySelector<HTMLElement>(trimmed);
   }
   return resolveTargetElement(target);
 }
@@ -51,14 +46,9 @@ function resolveSectionElement(target: ScrollSpyTarget): HTMLElement | null {
  */
 export function useScrollSpy(
   targets: readonly ScrollSpyTarget[],
-  options: UseScrollSpyOptions = {}
+  options: UseScrollSpyOptions = {},
 ): string | null {
-  const {
-    root,
-    rootMargin = '0px 0px -80% 0px',
-    threshold = 0,
-    offset = 0,
-  } = options;
+  const { root, rootMargin = "0px 0px -80% 0px", threshold = 0, offset = 0 } = options;
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const targetsRef = useLatest(targets);
@@ -66,21 +56,16 @@ export function useScrollSpy(
 
   const targetsKey = targets
     .map((t, index) => {
-      if (typeof t === 'string') return `s:${t}`;
-      if (isRefObject(t)) return `r:${index}:${t.current?.id ?? ''}`;
+      if (typeof t === "string") return `s:${t}`;
+      if (isRefObject(t)) return `r:${index}:${t.current?.id ?? ""}`;
       return `e:${t?.id ?? index}`;
     })
-    .join('|');
+    .join("|");
 
-  const thresholdKey = Array.isArray(threshold)
-    ? threshold.join(',')
-    : String(threshold);
+  const thresholdKey = Array.isArray(threshold) ? threshold.join(",") : String(threshold);
 
   useEffect(() => {
-    if (
-      typeof window === 'undefined' ||
-      typeof IntersectionObserver === 'undefined'
-    ) {
+    if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
       return;
     }
 
@@ -112,9 +97,7 @@ export function useScrollSpy(
           return;
         }
 
-        const rootTop = rootElement
-          ? rootElement.getBoundingClientRect().top
-          : 0;
+        const rootTop = rootElement ? rootElement.getBoundingClientRect().top : 0;
 
         let bestId: string | null = null;
         let bestTop = Number.POSITIVE_INFINITY;
@@ -136,7 +119,7 @@ export function useScrollSpy(
         root: rootElement,
         rootMargin,
         threshold: thresholdRef.current,
-      }
+      },
     );
 
     for (const element of elements) {
@@ -146,15 +129,7 @@ export function useScrollSpy(
     return () => {
       observer.disconnect();
     };
-  }, [
-    targetsKey,
-    targetsRef,
-    root,
-    rootMargin,
-    thresholdKey,
-    thresholdRef,
-    offset,
-  ]);
+  }, [targetsKey, targetsRef, root, rootMargin, thresholdKey, thresholdRef, offset]);
 
   return activeId;
 }

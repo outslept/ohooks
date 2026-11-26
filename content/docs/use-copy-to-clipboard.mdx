@@ -14,11 +14,11 @@ The `useCopyToClipboard` hook writes text to the system clipboard via the Clipbo
 ## Usage
 
 ```tsx
-import { useCopyToClipboard } from "@/hooks/useCopyToClipboard"
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 ```
 
 ```tsx
-const { isCopied, copy } = useCopyToClipboard({ resetInterval: 2000 })
+const { isCopied, copy } = useCopyToClipboard({ resetInterval: 2000 });
 ```
 
 ## Examples
@@ -28,13 +28,11 @@ const { isCopied, copy } = useCopyToClipboard({ resetInterval: 2000 })
 Set `resetInterval` so `isCopied` automatically reverts to `false` after a few seconds.
 
 ```tsx
-const { isCopied, copy } = useCopyToClipboard({ resetInterval: 2000 })
+const { isCopied, copy } = useCopyToClipboard({ resetInterval: 2000 });
 
 return (
-  <button onClick={() => copy("npm install react")}>
-    {isCopied ? "Copied!" : "Copy command"}
-  </button>
-)
+  <button onClick={() => copy("npm install react")}>{isCopied ? "Copied!" : "Copy command"}</button>
+);
 ```
 
 ### Handling Errors and Inspecting the Copied Value
@@ -42,22 +40,19 @@ return (
 Read `error` and `copiedText` or await the boolean promise returned by `copy` to trigger custom notifications.
 
 ```tsx
-const { copiedText, error, copy, reset } = useCopyToClipboard()
+const { copiedText, error, copy, reset } = useCopyToClipboard();
 
 return (
   <div>
-    <button onClick={() => copy("https://example.com/invite")}>
-      Copy invite link
-    </button>
+    <button onClick={() => copy("https://example.com/invite")}>Copy invite link</button>
     {copiedText && (
       <p>
-        Copied: <code>{copiedText}</code>{" "}
-        <button onClick={reset}>Clear</button>
+        Copied: <code>{copiedText}</code> <button onClick={reset}>Clear</button>
       </p>
     )}
     {error && <p role="alert">Failed to copy: {error.message}</p>}
   </div>
-)
+);
 ```
 
 ## API Reference
@@ -66,16 +61,10 @@ return (
 
 Configuration options for the clipboard hook.
 
-<AutoTypeTable
-  path="./hooks/useCopyToClipboard.ts"
-  name="UseCopyToClipboardOptions"
-/>
+<AutoTypeTable path="./hooks/useCopyToClipboard.ts" name="UseCopyToClipboardOptions" />
 
 ### `UseCopyToClipboardReturn`
 
 Clipboard state and helper methods returned by the hook.
 
-<AutoTypeTable
-  path="./hooks/useCopyToClipboard.ts"
-  name="UseCopyToClipboardReturn"
-/>
+<AutoTypeTable path="./hooks/useCopyToClipboard.ts" name="UseCopyToClipboardReturn" />

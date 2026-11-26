@@ -1,124 +1,118 @@
-"use client"
+"use client";
 
-import { useCallback, useEffect, useState } from "react"
-import { cn } from "cn"
-import { Play, RotateCcw } from "lucide-react"
+import { useCallback, useEffect, useState } from "react";
+import { cn } from "cn";
+import { Play, RotateCcw } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useUnmountedRef } from "@/hooks/useUnmountedRef"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useUnmountedRef } from "@/hooks/useUnmountedRef";
 
-type TaskPhase = "idle" | "pending" | "committed" | "guarded"
+type TaskPhase = "idle" | "pending" | "committed" | "guarded";
 
 const MOUNT_OPTIONS = [
   { label: "true", value: true },
   { label: "false", value: false },
-] as const
+] as const;
 
 function WorkerProbe({
   runId,
   onPhaseChange,
 }: {
-  runId: number
-  onPhaseChange: (phase: TaskPhase, unmounted: boolean) => void
+  runId: number;
+  onPhaseChange: (phase: TaskPhase, unmounted: boolean) => void;
 }) {
-  const isUnmountedRef = useUnmountedRef()
-  const [, setSafeUpdates] = useState(0)
+  const isUnmountedRef = useUnmountedRef();
+  const [, setSafeUpdates] = useState(0);
 
   useEffect(() => {
-    const checkUnmounted = () => isUnmountedRef.current
-    onPhaseChange("idle", checkUnmounted())
+    const checkUnmounted = () => isUnmountedRef.current;
+    onPhaseChange("idle", checkUnmounted());
     return () => {
-      onPhaseChange("idle", checkUnmounted())
-    }
-  }, [isUnmountedRef, onPhaseChange])
+      onPhaseChange("idle", checkUnmounted());
+    };
+  }, [isUnmountedRef, onPhaseChange]);
 
   useEffect(() => {
-    if (runId === 0) return
+    if (runId === 0) return;
 
-    onPhaseChange("pending", isUnmountedRef.current)
+    onPhaseChange("pending", isUnmountedRef.current);
 
     const timer = window.setTimeout(() => {
       if (isUnmountedRef.current) {
-        onPhaseChange("guarded", true)
-        return
+        onPhaseChange("guarded", true);
+        return;
       }
-      setSafeUpdates((c) => c + 1)
-      onPhaseChange("committed", false)
-    }, 1500)
+      setSafeUpdates((c) => c + 1);
+      onPhaseChange("committed", false);
+    }, 1500);
 
     return () => {
-      void timer
-    }
-  }, [runId, isUnmountedRef, onPhaseChange])
+      void timer;
+    };
+  }, [runId, isUnmountedRef, onPhaseChange]);
 
-  return null
+  return null;
 }
 
 export default function UseUnmountedRefDemo() {
-  const [mountIdx, setMountIdx] = useState(0)
-  const isMounted = MOUNT_OPTIONS[mountIdx].value
+  const [mountIdx, setMountIdx] = useState(0);
+  const isMounted = MOUNT_OPTIONS[mountIdx].value;
 
-  const [runId, setRunId] = useState(0)
-  const [phase, setPhase] = useState<TaskPhase>("idle")
-  const [refValue, setRefValue] = useState(false)
-  const [activeRunId, setActiveRunId] = useState<number | null>(null)
+  const [runId, setRunId] = useState(0);
+  const [phase, setPhase] = useState<TaskPhase>("idle");
+  const [refValue, setRefValue] = useState(false);
+  const [activeRunId, setActiveRunId] = useState<number | null>(null);
 
-  const isPending = phase === "pending"
-  const fillBar = isPending && activeRunId === runId
+  const isPending = phase === "pending";
+  const fillBar = isPending && activeRunId === runId;
 
   useEffect(() => {
-    if (!isPending) return
+    if (!isPending) return;
     const frame = requestAnimationFrame(() => {
-      setActiveRunId(runId)
-    })
-    return () => cancelAnimationFrame(frame)
-  }, [isPending, runId])
+      setActiveRunId(runId);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isPending, runId]);
 
-  const handlePhaseChange = useCallback(
-    (nextPhase: TaskPhase, unmounted: boolean) => {
-      setRefValue(unmounted)
-      setPhase((prev) => {
-        if (prev === "pending" && nextPhase === "idle") {
-          return "pending"
-        }
-        return nextPhase
-      })
-    },
-    []
-  )
+  const handlePhaseChange = useCallback((nextPhase: TaskPhase, unmounted: boolean) => {
+    setRefValue(unmounted);
+    setPhase((prev) => {
+      if (prev === "pending" && nextPhase === "idle") {
+        return "pending";
+      }
+      return nextPhase;
+    });
+  }, []);
 
   const handleRun = () => {
     if (!isMounted) {
-      setMountIdx(0)
+      setMountIdx(0);
     }
-    setRunId((id) => id + 1)
-  }
+    setRunId((id) => id + 1);
+  };
 
   const handleReset = () => {
-    setMountIdx(0)
-    setRunId(0)
-    setPhase("idle")
-    setRefValue(false)
-  }
+    setMountIdx(0);
+    setRunId(0);
+    setPhase("idle");
+    setRefValue(false);
+  };
 
   return (
     <Card className="w-full max-w-80">
-      {isMounted && (
-        <WorkerProbe runId={runId} onPhaseChange={handlePhaseChange} />
-      )}
+      {isMounted && <WorkerProbe runId={runId} onPhaseChange={handlePhaseChange} />}
 
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Component mount state"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {MOUNT_OPTIONS.map((opt, idx) => {
-              const active = idx === mountIdx
+              const active = idx === mountIdx;
               return (
                 <button
                   key={opt.label}
@@ -128,12 +122,12 @@ export default function UseUnmountedRefDemo() {
                     "rounded-[3px] px-2 py-0.5 font-mono text-2xs font-medium transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {opt.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -149,11 +143,7 @@ export default function UseUnmountedRefDemo() {
               </span>
               <Badge
                 variant={
-                  phase === "guarded"
-                    ? "warning"
-                    : phase === "committed"
-                      ? "accent"
-                      : "code"
+                  phase === "guarded" ? "warning" : phase === "committed" ? "accent" : "code"
                 }
                 size="compact"
               >
@@ -161,12 +151,9 @@ export default function UseUnmountedRefDemo() {
               </Badge>
             </div>
             <span className="text-2xs text-muted-foreground">
-              {phase === "idle" &&
-                (isMounted ? "mounted · standby" : "unmounted · standby")}
+              {phase === "idle" && (isMounted ? "mounted · standby" : "unmounted · standby")}
               {phase === "pending" &&
-                (isMounted
-                  ? "1500ms · toggle mounted → false"
-                  : "1500ms · unmounted in-flight")}
+                (isMounted ? "1500ms · toggle mounted → false" : "1500ms · unmounted in-flight")}
               {phase === "committed" && "resolved · setState executed safely"}
               {phase === "guarded" && "resolved · setState skipped (guarded)"}
             </span>
@@ -207,5 +194,5 @@ export default function UseUnmountedRefDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

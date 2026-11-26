@@ -1,60 +1,57 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { PowerIcon, PowerOffIcon } from "lucide-react"
-import { cn } from "cn"
+import { useState } from "react";
+import { PowerIcon, PowerOffIcon } from "lucide-react";
+import { cn } from "cn";
 
-import { useElementRef } from "@/hooks/useElementRef"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useElementRef } from "@/hooks/useElementRef";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
-type TagOption = "div" | "section" | "article"
+type TagOption = "div" | "section" | "article";
 
-const TAGS: TagOption[] = ["div", "section", "article"]
+const TAGS: TagOption[] = ["div", "section", "article"];
 
 export default function UseElementRefDemo() {
-  const [mounted, setMounted] = useState(true)
-  const [tag, setTag] = useState<TagOption>("div")
-  const [ref, element] = useElementRef<HTMLElement>()
+  const [mounted, setMounted] = useState(true);
+  const [tag, setTag] = useState<TagOption>("div");
+  const [ref, element] = useElementRef<HTMLElement>();
 
-  const Tag = tag
+  const Tag = tag;
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
-
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="HTML tag"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {TAGS.map((option) => {
-              const active = tag === option
+              const active = tag === option;
               return (
                 <button
                   key={option}
                   type="button"
                   onClick={() => {
-                    setTag(option)
-                    if (!mounted) setMounted(true)
+                    setTag(option);
+                    if (!mounted) setMounted(true);
                   }}
                   className={cn(
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-3xs font-medium transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {`<${option}>`}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
-
 
         {mounted ? (
           <Tag
@@ -91,16 +88,13 @@ export default function UseElementRefDemo() {
         )}
       </CardContent>
 
-
       <div className="grid grid-cols-2 divide-x divide-border-subtle border-t border-border-subtle bg-subtle/20">
         <div className="flex flex-col gap-0.5 px-3 py-2">
           <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
             Dimensions
           </span>
           <span className="font-mono text-xs font-medium text-foreground tabular-nums">
-            {element
-              ? `${element.clientWidth}×${element.clientHeight}px`
-              : "0×0px"}
+            {element ? `${element.clientWidth}×${element.clientHeight}px` : "0×0px"}
           </span>
         </div>
         <div className="flex flex-col gap-0.5 px-3 py-2">
@@ -134,5 +128,5 @@ export default function UseElementRefDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

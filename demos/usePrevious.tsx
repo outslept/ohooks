@@ -1,60 +1,56 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react"
-import { cn } from "cn"
-import { ArrowRight, Minus, Plus, RotateCcw } from "lucide-react"
-import { usePrevious } from "@/hooks/usePrevious"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useRef, useState } from "react";
+import { cn } from "cn";
+import { ArrowRight, Minus, Plus, RotateCcw } from "lucide-react";
+import { usePrevious } from "@/hooks/usePrevious";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
-const STEP_OPTIONS = [1, 5, 10] as const
+const STEP_OPTIONS = [1, 5, 10] as const;
 
 export default function UsePreviousDemo() {
-  const [count, setCount] = useState(0)
-  const [step, setStep] = useState<(typeof STEP_OPTIONS)[number]>(1)
-  const frameRef = useRef<HTMLDivElement>(null)
+  const [count, setCount] = useState(0);
+  const [step, setStep] = useState<(typeof STEP_OPTIONS)[number]>(1);
+  const frameRef = useRef<HTMLDivElement>(null);
 
-  const prevCount = usePrevious(count)
+  const prevCount = usePrevious(count);
 
   const pulseFrame = () => {
-    const el = frameRef.current
-    if (!el) return
+    const el = frameRef.current;
+    if (!el) return;
     if (
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      return
+      return;
     }
-    el.animate(
-      [
-        { transform: "scale3d(1.02, 1.02, 1)" },
-        { transform: "scale3d(1, 1, 1)" },
-      ],
-      { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" }
-    )
-  }
+    el.animate([{ transform: "scale3d(1.02, 1.02, 1)" }, { transform: "scale3d(1, 1, 1)" }], {
+      duration: 200,
+      easing: "cubic-bezier(0.23, 1, 0.32, 1)",
+    });
+  };
 
   const updateCount = (next: number) => {
-    if (next === count) return
-    setCount(next)
-    pulseFrame()
-  }
+    if (next === count) return;
+    setCount(next);
+    pulseFrame();
+  };
 
-  const delta = prevCount !== undefined ? count - prevCount : null
+  const delta = prevCount !== undefined ? count - prevCount : null;
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="Step increment size"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {STEP_OPTIONS.map((s) => {
-              const active = step === s
+              const active = step === s;
               return (
                 <button
                   key={s}
@@ -64,12 +60,12 @@ export default function UsePreviousDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs tabular-nums transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   ±{s}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -145,5 +141,5 @@ export default function UsePreviousDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

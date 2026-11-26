@@ -14,11 +14,11 @@ The `useDebounceValue` hook delays updates to a reactive value until `delay` mil
 ## Usage
 
 ```tsx
-import { useDebounceValue } from "@/hooks/useDebounceValue"
+import { useDebounceValue } from "@/hooks/useDebounceValue";
 ```
 
 ```tsx
-const [debouncedQuery, setDebouncedQuery] = useDebounceValue(searchQuery, 300)
+const [debouncedQuery, setDebouncedQuery] = useDebounceValue(searchQuery, 300);
 ```
 
 ## Examples
@@ -28,22 +28,16 @@ const [debouncedQuery, setDebouncedQuery] = useDebounceValue(searchQuery, 300)
 Pass a rapidly changing input state to `useDebounceValue` so expensive filtering or network requests only run after the user pauses typing.
 
 ```tsx
-const [query, setQuery] = useState("")
-const [debouncedQuery] = useDebounceValue(query, 300)
+const [query, setQuery] = useState("");
+const [debouncedQuery] = useDebounceValue(query, 300);
 
 useEffect(() => {
   if (debouncedQuery) {
-    fetchSearchResults(debouncedQuery)
+    fetchSearchResults(debouncedQuery);
   }
-}, [debouncedQuery])
+}, [debouncedQuery]);
 
-return (
-  <input
-    value={query}
-    onChange={(e) => setQuery(e.target.value)}
-    placeholder="Search..."
-  />
-)
+return <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search..." />;
 ```
 
 ### Flushing or Cancelling via the Setter
@@ -51,10 +45,10 @@ return (
 Use the second tuple item to manually update, flush, or cancel pending value transitions.
 
 ```tsx
-const [text, setText] = useState("")
+const [text, setText] = useState("");
 const [debouncedText, updateDebouncedText] = useDebounceValue(text, 500, {
   maxWait: 2000,
-})
+});
 
 return (
   <div>
@@ -63,7 +57,7 @@ return (
     <button onClick={() => updateDebouncedText.cancel()}>Cancel</button>
     <p>Debounced value: {debouncedText}</p>
   </div>
-)
+);
 ```
 
 ## API Reference

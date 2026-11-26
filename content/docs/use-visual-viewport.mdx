@@ -14,11 +14,11 @@ The `useVisualViewport` hook subscribes to `window.visualViewport` resize and sc
 ## Usage
 
 ```tsx
-import { useVisualViewport } from "@/hooks/useVisualViewport"
+import { useVisualViewport } from "@/hooks/useVisualViewport";
 ```
 
 ```tsx
-const { width, height, scale } = useVisualViewport()
+const { width, height, scale } = useVisualViewport();
 ```
 
 ## Examples
@@ -28,7 +28,7 @@ const { width, height, scale } = useVisualViewport()
 Compare `window.innerHeight` with `visualViewport.height` to detect when a mobile virtual keyboard shrinks the visible area.
 
 ```tsx
-const { height, offsetTop } = useVisualViewport()
+const { height, offsetTop } = useVisualViewport();
 
 return (
   <div
@@ -42,7 +42,7 @@ return (
   >
     Sticky toolbar above virtual keyboard
   </div>
-)
+);
 ```
 
 ### Monitoring Pinch-Zoom Scale
@@ -50,14 +50,13 @@ return (
 Read `scale` to hide or adjust fixed overlays when the user pinch-zooms the page.
 
 ```tsx
-const { width, height, scale } = useVisualViewport()
+const { width, height, scale } = useVisualViewport();
 
 return (
   <p>
-    Visual viewport: {Math.round(width)}×{Math.round(height)}px (Zoom:{" "}
-    {scale.toFixed(2)}x)
+    Visual viewport: {Math.round(width)}×{Math.round(height)}px (Zoom: {scale.toFixed(2)}x)
   </p>
-)
+);
 ```
 
 ## API Reference
@@ -66,7 +65,4 @@ return (
 
 Visual viewport dimensions, offsets, and zoom scale returned by the hook.
 
-<AutoTypeTable
-  path="./hooks/useVisualViewport.ts"
-  name="VisualViewportState"
-/>
+<AutoTypeTable path="./hooks/useVisualViewport.ts" name="VisualViewportState" />

@@ -36,28 +36,28 @@ function ControllableCounter({
         aria-hidden="true"
         className={cn(
           "absolute top-1.5 left-1.5 size-2 border-t-[1.5px] border-l-[1.5px] border-foreground transition-opacity duration-200",
-          isControlled ? "opacity-85" : "opacity-30"
+          isControlled ? "opacity-85" : "opacity-30",
         )}
       />
       <span
         aria-hidden="true"
         className={cn(
           "absolute top-1.5 right-1.5 size-2 border-t-[1.5px] border-r-[1.5px] border-foreground transition-opacity duration-200",
-          isControlled ? "opacity-85" : "opacity-30"
+          isControlled ? "opacity-85" : "opacity-30",
         )}
       />
       <span
         aria-hidden="true"
         className={cn(
           "absolute bottom-1.5 left-1.5 size-2 border-b-[1.5px] border-l-[1.5px] border-foreground transition-opacity duration-200",
-          isControlled ? "opacity-85" : "opacity-30"
+          isControlled ? "opacity-85" : "opacity-30",
         )}
       />
       <span
         aria-hidden="true"
         className={cn(
           "absolute right-1.5 bottom-1.5 size-2 border-r-[1.5px] border-b-[1.5px] border-foreground transition-opacity duration-200",
-          isControlled ? "opacity-85" : "opacity-30"
+          isControlled ? "opacity-85" : "opacity-30",
         )}
       />
 
@@ -85,11 +85,7 @@ function ControllableCounter({
         </Button>
       </div>
 
-      <Badge
-        size="compact"
-        variant={isControlled ? "code" : "secondary"}
-        className="font-mono"
-      >
+      <Badge size="compact" variant={isControlled ? "code" : "secondary"} className="font-mono">
         isControlled: {String(isControlled)}
       </Badge>
     </div>
@@ -106,7 +102,6 @@ export function UseControllableStateDemo() {
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Control mode"
@@ -125,7 +120,7 @@ export function UseControllableStateDemo() {
                     selected
                       ? "bg-control text-foreground shadow-control"
                       : "text-muted-foreground pointer-hover:hover:text-foreground",
-                    "focus-visible:ring-1 focus-visible:ring-ring"
+                    "focus-visible:ring-1 focus-visible:ring-ring",
                   )}
                 >
                   {option.label}

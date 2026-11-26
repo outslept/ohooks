@@ -1,34 +1,28 @@
-import {
-  useGeolocation,
-  type UseGeolocationOptions,
-} from '@/hooks/useGeolocation';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useGeolocation, type UseGeolocationOptions } from "@/hooks/useGeolocation";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useGeolocation', () => {
-  const originalGeo = Object.getOwnPropertyDescriptor(navigator, 'geolocation');
+describe("useGeolocation", () => {
+  const originalGeo = Object.getOwnPropertyDescriptor(navigator, "geolocation");
 
   afterEach(() => {
     if (originalGeo) {
-      Object.defineProperty(navigator, 'geolocation', originalGeo);
+      Object.defineProperty(navigator, "geolocation", originalGeo);
     }
     vi.restoreAllMocks();
   });
 
-  it('watches position updates, handles and recovers from errors, and clears watch on disable or unmount', async () => {
+  it("watches position updates, handles and recovers from errors, and clears watch on disable or unmount", async () => {
     let successCb: PositionCallback | null = null;
     let errorCb: PositionErrorCallback | null = null;
     let watchCalls = 0;
     const clearedIds: number[] = [];
 
-    Object.defineProperty(navigator, 'geolocation', {
+    Object.defineProperty(navigator, "geolocation", {
       value: {
-        watchPosition: (
-          onSuccess: PositionCallback,
-          onError?: PositionErrorCallback | null,
-        ) => {
+        watchPosition: (onSuccess: PositionCallback, onError?: PositionErrorCallback | null) => {
           watchCalls += 1;
           successCb = onSuccess;
           errorCb = onError ?? null;
@@ -41,9 +35,8 @@ describe('useGeolocation', () => {
       configurable: true,
     });
 
-    const { result, rerender, unmount, act } = await renderHook(
-      (props?: UseGeolocationOptions) =>
-        useGeolocation(props ?? { enableHighAccuracy: true }),
+    const { result, rerender, unmount, act } = await renderHook((props?: UseGeolocationOptions) =>
+      useGeolocation(props ?? { enableHighAccuracy: true }),
     );
 
     expect(result.current.isSupported).toBe(true);
@@ -52,7 +45,7 @@ describe('useGeolocation', () => {
 
     const mockErr = {
       code: 1,
-      message: 'User denied Geolocation',
+      message: "User denied Geolocation",
       PERMISSION_DENIED: 1,
       POSITION_UNAVAILABLE: 2,
       TIMEOUT: 3,

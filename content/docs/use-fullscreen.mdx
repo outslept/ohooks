@@ -14,11 +14,11 @@ The `useFullscreen` hook enters, exits, and toggles fullscreen mode for a target
 ## Usage
 
 ```tsx
-import { useFullscreen } from "@/hooks/useFullscreen"
+import { useFullscreen } from "@/hooks/useFullscreen";
 ```
 
 ```tsx
-const { isFullscreen, toggle } = useFullscreen(videoContainerRef)
+const { isFullscreen, toggle } = useFullscreen(videoContainerRef);
 ```
 
 ## Examples
@@ -28,22 +28,20 @@ const { isFullscreen, toggle } = useFullscreen(videoContainerRef)
 Pass a container `RefObject` to toggle fullscreen on a specific element rather than the entire page.
 
 ```tsx
-const playerRef = useRef<HTMLDivElement>(null)
+const playerRef = useRef<HTMLDivElement>(null);
 const { isFullscreen, isSupported, toggle } = useFullscreen(playerRef, {
   onEnter: () => console.log("Entered fullscreen"),
   onExit: () => console.log("Exited fullscreen"),
-})
+});
 
 return (
   <div ref={playerRef}>
     <video src="/clip.mp4" controls />
     {isSupported && (
-      <button onClick={toggle}>
-        {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-      </button>
+      <button onClick={toggle}>{isFullscreen ? "Exit fullscreen" : "Fullscreen"}</button>
     )}
   </div>
-)
+);
 ```
 
 ### Fullscreen Document Mode
@@ -51,13 +49,13 @@ return (
 Omit the target argument (or pass `undefined`) to enter and exit fullscreen on `document.documentElement`.
 
 ```tsx
-const { isFullscreen, enter, exit } = useFullscreen()
+const { isFullscreen, enter, exit } = useFullscreen();
 
 return (
   <button onClick={isFullscreen ? exit : enter}>
     {isFullscreen ? "Exit page fullscreen" : "Enter page fullscreen"}
   </button>
-)
+);
 ```
 
 ## API Reference

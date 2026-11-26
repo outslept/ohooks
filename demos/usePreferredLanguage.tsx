@@ -1,58 +1,58 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo, useRef, useState } from "react"
-import { cn } from "cn"
-import { Languages } from "lucide-react"
-import { usePreferredLanguage } from "@/hooks/usePreferredLanguage"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "cn";
+import { Languages } from "lucide-react";
+import { usePreferredLanguage } from "@/hooks/usePreferredLanguage";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const MODES = [
   { id: "system", label: "System" },
   { id: "en-US", label: "en-US" },
   { id: "de-DE", label: "de-DE" },
   { id: "ja-JP", label: "ja-JP" },
-] as const
+] as const;
 
-type ModeId = (typeof MODES)[number]["id"]
+type ModeId = (typeof MODES)[number]["id"];
 
-const REFERENCE_DATE = new Date(Date.UTC(2025, 3, 15, 12, 0, 0))
+const REFERENCE_DATE = new Date(Date.UTC(2025, 3, 15, 12, 0, 0));
 
 function applyBrowserLanguage(locale: ModeId) {
-  if (typeof window === "undefined") return
+  if (typeof window === "undefined") return;
 
   if (locale === "system") {
-    delete (window.navigator as { language?: string }).language
+    delete (window.navigator as { language?: string }).language;
   } else {
     Object.defineProperty(window.navigator, "language", {
       value: locale,
       configurable: true,
-    })
+    });
   }
 
-  window.dispatchEvent(new Event("languagechange"))
+  window.dispatchEvent(new Event("languagechange"));
 }
 
 export default function UsePreferredLanguageDemo() {
-  const language = usePreferredLanguage("en-US")
-  const [mode, setMode] = useState<ModeId>("system")
-  const frameRef = useRef<HTMLDivElement>(null)
-  const isFirstRender = useRef(true)
+  const language = usePreferredLanguage("en-US");
+  const [mode, setMode] = useState<ModeId>("system");
+  const frameRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     return () => {
       if (typeof window !== "undefined") {
-        delete (window.navigator as { language?: string }).language
-        window.dispatchEvent(new Event("languagechange"))
+        delete (window.navigator as { language?: string }).language;
+        window.dispatchEvent(new Event("languagechange"));
       }
-    }
-  }, [])
+    };
+  }, []);
 
   useEffect(() => {
     if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
+      isFirstRender.current = false;
+      return;
     }
 
     if (
@@ -64,63 +64,62 @@ export default function UsePreferredLanguageDemo() {
           { transform: "scale3d(0.97, 0.97, 1)", opacity: 0.75 },
           { transform: "scale3d(1, 1, 1)", opacity: 1 },
         ],
-        { duration: 220, easing: "cubic-bezier(0.23, 1, 0.32, 1)" }
-      )
+        { duration: 220, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+      );
     }
-  }, [language])
+  }, [language]);
 
   const selectMode = (nextMode: ModeId) => {
-    setMode(nextMode)
-    applyBrowserLanguage(nextMode)
-  }
+    setMode(nextMode);
+    applyBrowserLanguage(nextMode);
+  };
 
   const cycleMode = () => {
-    const currentIndex = MODES.findIndex((item) => item.id === mode)
-    const nextItem = MODES[(currentIndex + 1) % MODES.length]
-    selectMode(nextItem.id)
-  }
+    const currentIndex = MODES.findIndex((item) => item.id === mode);
+    const nextItem = MODES[(currentIndex + 1) % MODES.length];
+    selectMode(nextItem.id);
+  };
 
   const formatted = useMemo(() => {
     try {
       const displayNames = new Intl.DisplayNames([language], {
         type: "language",
-      })
+      });
       const date = new Intl.DateTimeFormat(language, {
         month: "short",
         day: "numeric",
         year: "numeric",
         timeZone: "UTC",
-      }).format(REFERENCE_DATE)
+      }).format(REFERENCE_DATE);
       const number = new Intl.NumberFormat(language, {
         maximumFractionDigits: 2,
-      }).format(12840.5)
+      }).format(12840.5);
 
       return {
         name: displayNames.of(language) ?? language,
         date,
         number,
-      }
+      };
     } catch {
       return {
         name: language,
         date: "2025-04-15",
         number: "12,840.5",
-      }
+      };
     }
-  }, [language])
+  }, [language]);
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between gap-2">
-
           <div
             role="group"
             aria-label="Preferred language"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {MODES.map((item) => {
-              const isSelected = mode === item.id
+              const isSelected = mode === item.id;
               return (
                 <button
                   key={item.id}
@@ -130,12 +129,12 @@ export default function UsePreferredLanguageDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs transition-all",
                     isSelected
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {item.label}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -184,5 +183,5 @@ export default function UsePreferredLanguageDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

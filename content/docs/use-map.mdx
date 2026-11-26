@@ -14,11 +14,11 @@ The `useMap` hook manages a JavaScript `Map` in React state and provides memoize
 ## Usage
 
 ```tsx
-import { useMap } from "@/hooks/useMap"
+import { useMap } from "@/hooks/useMap";
 ```
 
 ```tsx
-const [map, { set, remove, clear }] = useMap<string, number>([["a", 1]])
+const [map, { set, remove, clear }] = useMap<string, number>([["a", 1]]);
 ```
 
 ## Examples
@@ -31,7 +31,7 @@ Use `set`, `remove`, and `clear` to update entries reactively without mutating t
 const [scores, { set, remove, clear }] = useMap<string, number>([
   ["Alice", 10],
   ["Bob", 15],
-])
+]);
 
 return (
   <div>
@@ -47,7 +47,7 @@ return (
     <button onClick={() => set("Charlie", 0)}>Add Charlie</button>
     <button onClick={clear}>Clear all</button>
   </div>
-)
+);
 ```
 
 ## API Reference

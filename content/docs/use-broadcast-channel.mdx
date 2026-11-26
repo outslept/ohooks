@@ -14,11 +14,11 @@ The `useBroadcastChannel` hook connects to a named `BroadcastChannel` so tabs, w
 ## Usage
 
 ```tsx
-import { useBroadcastChannel } from "@/hooks/useBroadcastChannel"
+import { useBroadcastChannel } from "@/hooks/useBroadcastChannel";
 ```
 
 ```tsx
-const { lastMessage, postMessage } = useBroadcastChannel<string>("auth-channel")
+const { lastMessage, postMessage } = useBroadcastChannel<string>("auth-channel");
 ```
 
 ## Examples
@@ -28,21 +28,17 @@ const { lastMessage, postMessage } = useBroadcastChannel<string>("auth-channel")
 Use the `onMessage` callback to react immediately when another tab broadcasts an event such as signing out.
 
 ```tsx
-type AuthMessage = { type: "LOGOUT" } | { type: "LOGIN"; userId: string }
+type AuthMessage = { type: "LOGOUT" } | { type: "LOGIN"; userId: string };
 
 const { postMessage } = useBroadcastChannel<AuthMessage>("auth-channel", {
   onMessage: (event) => {
     if (event.data.type === "LOGOUT") {
-      window.location.href = "/login"
+      window.location.href = "/login";
     }
   },
-})
+});
 
-return (
-  <button onClick={() => postMessage({ type: "LOGOUT" })}>
-    Sign out everywhere
-  </button>
-)
+return <button onClick={() => postMessage({ type: "LOGOUT" })}>Sign out everywhere</button>;
 ```
 
 ### Closing the Channel
@@ -50,8 +46,7 @@ return (
 Call `close` to disconnect the tab from the channel when it no longer needs to receive updates.
 
 ```tsx
-const { lastMessage, postMessage, close, isClosed } =
-  useBroadcastChannel<string>("notifications")
+const { lastMessage, postMessage, close, isClosed } = useBroadcastChannel<string>("notifications");
 
 return (
   <div>
@@ -63,7 +58,7 @@ return (
       Disconnect
     </button>
   </div>
-)
+);
 ```
 
 ## API Reference
@@ -72,16 +67,10 @@ return (
 
 Callback options for handling incoming messages and deserialization errors.
 
-<AutoTypeTable
-  path="./hooks/useBroadcastChannel.ts"
-  name="UseBroadcastChannelOptions"
-/>
+<AutoTypeTable path="./hooks/useBroadcastChannel.ts" name="UseBroadcastChannelOptions" />
 
 ### `UseBroadcastChannelReturn`
 
 State and methods returned by the hook.
 
-<AutoTypeTable
-  path="./hooks/useBroadcastChannel.ts"
-  name="UseBroadcastChannelReturn"
-/>
+<AutoTypeTable path="./hooks/useBroadcastChannel.ts" name="UseBroadcastChannelReturn" />

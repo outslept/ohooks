@@ -1,8 +1,6 @@
-import { resolveTargetElement } from '@/lib/utils';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { resolveTargetElement } from "@/lib/utils";
+import { EventListenerTarget } from "./useEventListener";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 export interface UseLockBodyScrollOptions {
   /** Compensate for the hidden scrollbar width by adding `padding-right` to prevent layout shift (default: `true`) */
@@ -33,12 +31,12 @@ const lockRegistry = new WeakMap<HTMLElement, LockState>();
  */
 export function useLockBodyScroll(
   locked: boolean = true,
-  options: UseLockBodyScrollOptions = {}
+  options: UseLockBodyScrollOptions = {},
 ): void {
   const { reserveScrollBarGap = true, target } = options;
 
   useIsomorphicLayoutEffect(() => {
-    if (!locked || typeof document === 'undefined') {
+    if (!locked || typeof document === "undefined") {
       return;
     }
 
@@ -61,9 +59,8 @@ export function useLockBodyScroll(
         originalPaddingRight,
       });
 
-      if (reserveScrollBarGap && typeof window !== 'undefined') {
-        const isBody =
-          element === document.body || element === document.documentElement;
+      if (reserveScrollBarGap && typeof window !== "undefined") {
+        const isBody = element === document.body || element === document.documentElement;
         const scrollBarWidth = isBody
           ? window.innerWidth - document.documentElement.clientWidth
           : element.offsetWidth - element.clientWidth;
@@ -75,7 +72,7 @@ export function useLockBodyScroll(
         }
       }
 
-      element.style.overflow = 'hidden';
+      element.style.overflow = "hidden";
     }
 
     return () => {

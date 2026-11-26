@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { useEventCallback } from './useEventCallback';
+import { useCallback, useState } from "react";
+import { useEventCallback } from "./useEventCallback";
 
 export interface UseMapActions<K, V> {
   /** Sets or updates the value for `key` */

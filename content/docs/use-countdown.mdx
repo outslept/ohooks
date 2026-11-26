@@ -14,7 +14,7 @@ The `useCountdown` hook steps a numeric counter toward a target value on a fixed
 ## Usage
 
 ```tsx
-import { useCountdown } from "@/hooks/useCountdown"
+import { useCountdown } from "@/hooks/useCountdown";
 ```
 
 ```tsx
@@ -22,7 +22,7 @@ const { count, isRunning, start, pause, reset } = useCountdown({
   countStart: 60,
   countStop: 0,
   intervalMs: 1000,
-})
+});
 ```
 
 ## Examples
@@ -32,26 +32,26 @@ const { count, isRunning, start, pause, reset } = useCountdown({
 Use `onComplete` to unlock an action when the countdown reaches `countStop`, and call `reset` followed by `start` to restart the timer.
 
 ```tsx
-const [canResend, setCanResend] = useState(false)
+const [canResend, setCanResend] = useState(false);
 
 const { count, start, reset } = useCountdown({
   countStart: 30,
   countStop: 0,
   intervalMs: 1000,
   onComplete: () => setCanResend(true),
-})
+});
 
 const handleResend = () => {
-  setCanResend(false)
-  reset()
-  start()
-}
+  setCanResend(false);
+  reset();
+  start();
+};
 
 return (
   <button onClick={handleResend} disabled={!canResend}>
     {canResend ? "Resend code" : `Resend in ${count}s`}
   </button>
-)
+);
 ```
 
 ### Count-Up Timer
@@ -64,17 +64,15 @@ const { count, isRunning, start, pause, reset } = useCountdown({
   countStop: 100,
   intervalMs: 100,
   isIncrement: true,
-})
+});
 
 return (
   <div>
     <p>Progress: {count}%</p>
-    <button onClick={isRunning ? pause : start}>
-      {isRunning ? "Pause" : "Start"}
-    </button>
+    <button onClick={isRunning ? pause : start}>{isRunning ? "Pause" : "Start"}</button>
     <button onClick={reset}>Reset</button>
   </div>
-)
+);
 ```
 
 ## API Reference

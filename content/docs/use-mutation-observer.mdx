@@ -14,17 +14,17 @@ The `useMutationObserver` hook attaches a `MutationObserver` to a target DOM nod
 ## Usage
 
 ```tsx
-import { useMutationObserver } from "@/hooks/useMutationObserver"
+import { useMutationObserver } from "@/hooks/useMutationObserver";
 ```
 
 ```tsx
 useMutationObserver(
   containerRef,
   (mutations) => {
-    console.log("DOM mutated:", mutations)
+    console.log("DOM mutated:", mutations);
   },
-  { childList: true, subtree: true }
-)
+  { childList: true, subtree: true },
+);
 ```
 
 ## Examples
@@ -34,25 +34,25 @@ useMutationObserver(
 Configure `attributes: true` and `attributeFilter` to react only when specific attributes change on a target element.
 
 ```tsx
-const panelRef = useRef<HTMLDivElement>(null)
-const [stateAttr, setStateAttr] = useState("closed")
+const panelRef = useRef<HTMLDivElement>(null);
+const [stateAttr, setStateAttr] = useState("closed");
 
 useMutationObserver(
   panelRef,
   () => {
-    setStateAttr(panelRef.current?.getAttribute("data-state") ?? "closed")
+    setStateAttr(panelRef.current?.getAttribute("data-state") ?? "closed");
   },
   {
     attributes: true,
     attributeFilter: ["data-state"],
-  }
-)
+  },
+);
 
 return (
   <div ref={panelRef} data-state="open">
     Observed state: {stateAttr}
   </div>
-)
+);
 ```
 
 ### Pausing Observation with `enabled`
@@ -60,16 +60,16 @@ return (
 Set `enabled: false` in the options object to temporarily disconnect the `MutationObserver`.
 
 ```tsx
-const listRef = useRef<HTMLUListElement>(null)
-const [isObserving, setIsObserving] = useState(true)
+const listRef = useRef<HTMLUListElement>(null);
+const [isObserving, setIsObserving] = useState(true);
 
 useMutationObserver(
   listRef,
   (records) => {
-    console.logAddedNodes(records.length)
+    console.logAddedNodes(records.length);
   },
-  { childList: true, enabled: isObserving }
-)
+  { childList: true, enabled: isObserving },
+);
 ```
 
 ## API Reference
@@ -78,7 +78,4 @@ useMutationObserver(
 
 Configuration options extending standard `MutationObserverInit` with an `enabled` flag.
 
-<AutoTypeTable
-  path="./hooks/useMutationObserver.ts"
-  name="UseMutationObserverOptions"
-/>
+<AutoTypeTable path="./hooks/useMutationObserver.ts" name="UseMutationObserverOptions" />

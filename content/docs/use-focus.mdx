@@ -14,11 +14,11 @@ The `useFocus` hook monitors `focus` and `blur` events on a target DOM element, 
 ## Usage
 
 ```tsx
-import { useFocus } from "@/hooks/useFocus"
+import { useFocus } from "@/hooks/useFocus";
 ```
 
 ```tsx
-const { isFocused, focus, blur } = useFocus(inputRef, { focusVisible: true })
+const { isFocused, focus, blur } = useFocus(inputRef, { focusVisible: true });
 ```
 
 ## Examples
@@ -28,19 +28,16 @@ const { isFocused, focus, blur } = useFocus(inputRef, { focusVisible: true })
 Use `focus()` and `blur()` to move focus to an input from external buttons or shortcuts.
 
 ```tsx
-const inputRef = useRef<HTMLInputElement>(null)
-const { isFocused, focus, blur } = useFocus(inputRef)
+const inputRef = useRef<HTMLInputElement>(null);
+const { isFocused, focus, blur } = useFocus(inputRef);
 
 return (
   <div>
-    <input
-      ref={inputRef}
-      placeholder={isFocused ? "Focused" : "Click button to focus"}
-    />
+    <input ref={inputRef} placeholder={isFocused ? "Focused" : "Click button to focus"} />
     <button onClick={focus}>Focus input</button>
     <button onClick={blur}>Blur input</button>
   </div>
-)
+);
 ```
 
 ### Keyboard-Only Focus Ring (`focusVisible`)
@@ -48,17 +45,14 @@ return (
 Enable `focusVisible: true` so `isFocused` only turns `true` when the element matches `:focus-visible` (such as via `Tab` navigation).
 
 ```tsx
-const buttonRef = useRef<HTMLButtonElement>(null)
-const { isFocused } = useFocus(buttonRef, { focusVisible: true })
+const buttonRef = useRef<HTMLButtonElement>(null);
+const { isFocused } = useFocus(buttonRef, { focusVisible: true });
 
 return (
-  <button
-    ref={buttonRef}
-    style={{ outline: isFocused ? "2px solid royalblue" : "none" }}
-  >
+  <button ref={buttonRef} style={{ outline: isFocused ? "2px solid royalblue" : "none" }}>
     Keyboard focusable
   </button>
-)
+);
 ```
 
 ## API Reference

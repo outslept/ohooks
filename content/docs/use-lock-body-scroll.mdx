@@ -14,11 +14,11 @@ The `useLockBodyScroll` hook prevents background scrolling by setting `overflow:
 ## Usage
 
 ```tsx
-import { useLockBodyScroll } from "@/hooks/useLockBodyScroll"
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 ```
 
 ```tsx
-useLockBodyScroll(isModalOpen)
+useLockBodyScroll(isModalOpen);
 ```
 
 ## Examples
@@ -28,8 +28,8 @@ useLockBodyScroll(isModalOpen)
 Pass a boolean `locked` flag so body scrolling is disabled only while the overlay is open.
 
 ```tsx
-const [isOpen, setIsOpen] = useState(false)
-useLockBodyScroll(isOpen)
+const [isOpen, setIsOpen] = useState(false);
+useLockBodyScroll(isOpen);
 
 return (
   <>
@@ -41,7 +41,7 @@ return (
       </div>
     )}
   </>
-)
+);
 ```
 
 ### Locking a Custom Scrollable Container
@@ -49,23 +49,22 @@ return (
 Pass a `target` element ref and optionally disable `reserveScrollBarGap` to lock a specific container element instead of `document.body`.
 
 ```tsx
-const panelRef = useRef<HTMLDivElement>(null)
-const [locked, setLocked] = useState(false)
+const panelRef = useRef<HTMLDivElement>(null);
+const [locked, setLocked] = useState(false);
 
 useLockBodyScroll(locked, {
   target: panelRef,
   reserveScrollBarGap: false,
-})
+});
 
 return (
   <div>
     <button onClick={() => setLocked((prev) => !prev)}>
       {locked ? "Unlock panel" : "Lock panel"}
     </button>
-    <div ref={panelRef} style={{ height: 200, overflowY: "auto" }}>
-    </div>
+    <div ref={panelRef} style={{ height: 200, overflowY: "auto" }}></div>
   </div>
-)
+);
 ```
 
 ## API Reference
@@ -74,7 +73,4 @@ return (
 
 Configuration options for target element and scrollbar gap reservation.
 
-<AutoTypeTable
-  path="./hooks/useLockBodyScroll.ts"
-  name="UseLockBodyScrollOptions"
-/>
+<AutoTypeTable path="./hooks/useLockBodyScroll.ts" name="UseLockBodyScrollOptions" />

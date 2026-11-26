@@ -1,33 +1,33 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { Plus, RefreshCw, RotateCcw } from "lucide-react"
+import { useEffect, useRef, useState } from "react";
+import { Plus, RefreshCw, RotateCcw } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useUpdateEffect } from "@/hooks/useUpdateEffect"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 
 function UpdateEffectStage({ onRemount }: { onRemount: () => void }) {
-  const [state, setState] = useState({ dep: 0, renders: 1 })
-  const runsRef = useRef(0)
-  const runsNodeRef = useRef<HTMLSpanElement>(null)
-  const statusNodeRef = useRef<HTMLSpanElement>(null)
+  const [state, setState] = useState({ dep: 0, renders: 1 });
+  const runsRef = useRef(0);
+  const runsNodeRef = useRef<HTMLSpanElement>(null);
+  const statusNodeRef = useRef<HTMLSpanElement>(null);
 
   useUpdateEffect(() => {
-    runsRef.current += 1
+    runsRef.current += 1;
 
     if (runsNodeRef.current) {
-      runsNodeRef.current.textContent = String(runsRef.current)
+      runsNodeRef.current.textContent = String(runsRef.current);
     }
     if (statusNodeRef.current) {
       statusNodeRef.current.textContent =
-        runsRef.current === 1 ? "run · effect fired" : "runs · effect fired"
+        runsRef.current === 1 ? "run · effect fired" : "runs · effect fired";
     }
-  }, [state.dep])
+  }, [state.dep]);
 
   useEffect(() => {
     if (runsNodeRef.current) {
-      runsNodeRef.current.textContent = String(runsRef.current)
+      runsNodeRef.current.textContent = String(runsRef.current);
     }
     if (statusNodeRef.current) {
       statusNodeRef.current.textContent =
@@ -35,25 +35,19 @@ function UpdateEffectStage({ onRemount }: { onRemount: () => void }) {
           ? "runs · mount skipped"
           : runsRef.current === 1
             ? "run · effect fired"
-            : "runs · effect fired"
+            : "runs · effect fired";
     }
-  })
+  });
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex flex-col items-center justify-center gap-1 rounded-md border border-border-subtle bg-subtle/35 py-5 font-mono tabular-nums">
           <div className="flex items-baseline gap-1.5">
-            <span
-              ref={runsNodeRef}
-              className="text-2xl font-bold tracking-tight text-primary"
-            >
+            <span ref={runsNodeRef} className="text-2xl font-bold tracking-tight text-primary">
               0
             </span>
-            <span
-              ref={statusNodeRef}
-              className="text-xs text-muted-foreground"
-            >
+            <span ref={statusNodeRef} className="text-xs text-muted-foreground">
               runs · mount skipped
             </span>
           </div>
@@ -84,9 +78,7 @@ function UpdateEffectStage({ onRemount }: { onRemount: () => void }) {
           variant="primary"
           size="compact"
           leadingIcon={<Plus />}
-          onClick={() =>
-            setState((s) => ({ dep: s.dep + 1, renders: s.renders + 1 }))
-          }
+          onClick={() => setState((s) => ({ dep: s.dep + 1, renders: s.renders + 1 }))}
           className="flex-1"
         >
           Update dep
@@ -109,16 +101,11 @@ function UpdateEffectStage({ onRemount }: { onRemount: () => void }) {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
 
 export default function UseUpdateEffectDemo() {
-  const [mountKey, setMountKey] = useState(0)
+  const [mountKey, setMountKey] = useState(0);
 
-  return (
-    <UpdateEffectStage
-      key={mountKey}
-      onRemount={() => setMountKey((k) => k + 1)}
-    />
-  )
+  return <UpdateEffectStage key={mountKey} onRemount={() => setMountKey((k) => k + 1)} />;
 }

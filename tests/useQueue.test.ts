@@ -1,11 +1,11 @@
-import { useQueue } from '@/hooks/useQueue';
-import { describe, expect, it } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useQueue } from "@/hooks/useQueue";
+import { describe, expect, it } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useQueue', () => {
-  it('defaults to an empty queue and handles synchronous FIFO operations within the same tick', async () => {
+describe("useQueue", () => {
+  it("defaults to an empty queue and handles synchronous FIFO operations within the same tick", async () => {
     const { result: emptyResult } = await renderHook(() => useQueue<number>());
     expect(emptyResult.current.isEmpty).toBe(true);
     expect(emptyResult.current.first).toBeUndefined();

@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect, useRef, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { resolveTargetElement } from "@/lib/utils";
 
 export interface MousePositionState {
   /** Horizontal coordinate relative to the whole document (`pageX`) */
@@ -52,14 +50,12 @@ const INITIAL_STATE: MousePositionState = {
  * const { x, y, elementX, elementY } = useMouse(boxRef);
  * ```
  */
-export function useMouse(
-  target?: EventListenerTarget<HTMLElement>
-): MousePositionState {
+export function useMouse(target?: EventListenerTarget<HTMLElement>): MousePositionState {
   const [state, setState] = useState<MousePositionState>(INITIAL_STATE);
   const rafIdRef: { current: number | null } = useRef(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
 
@@ -100,10 +96,10 @@ export function useMouse(
       });
     };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener("mousemove", handleMouseMove);
       if (rafIdRef.current !== null) {
         window.cancelAnimationFrame(rafIdRef.current);
         rafIdRef.current = null;

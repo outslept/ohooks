@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 /** Comparator function used to determine if two values are equal. */
 export type EqualityComparator<T> = (prev: T, next: T) => boolean;

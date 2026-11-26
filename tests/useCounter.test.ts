@@ -1,9 +1,9 @@
-import { useCounter, type UseCounterOptions } from '@/hooks/useCounter';
-import { describe, expect, it } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useCounter, type UseCounterOptions } from "@/hooks/useCounter";
+import { describe, expect, it } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
-describe('useCounter', () => {
-  it('increments, decrements, sets, and resets without bounds', async () => {
+describe("useCounter", () => {
+  it("increments, decrements, sets, and resets without bounds", async () => {
     const { result, act } = await renderHook(() => useCounter());
 
     expect(result.current.count).toBe(0);
@@ -31,13 +31,12 @@ describe('useCounter', () => {
     expect(result.current.count).toBe(0);
   });
 
-  it('clamps initialValue, inc, dec, functional set, and reset within min and max bounds', async () => {
+  it("clamps initialValue, inc, dec, functional set, and reset within min and max bounds", async () => {
     const { result, rerender, act } = await renderHook(
       (props?: { initialValue: number; options: UseCounterOptions }) =>
         useCounter(props?.initialValue ?? -10, props?.options ?? { min: 0, max: 10 }),
       { initialProps: { initialValue: -10, options: { min: 0, max: 10 } } },
     );
-
 
     expect(result.current.count).toBe(0);
 
@@ -51,7 +50,6 @@ describe('useCounter', () => {
     });
     expect(result.current.count).toBe(10);
 
-
     await act(async () => {
       result.current.set((prev) => prev - 50);
     });
@@ -61,7 +59,6 @@ describe('useCounter', () => {
       result.current.set(6);
     });
     expect(result.current.count).toBe(6);
-
 
     await rerender({ initialValue: 50, options: { min: 0, max: 20 } });
 

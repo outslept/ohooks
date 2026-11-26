@@ -1,55 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "cn"
-import {
-  AlignCenter,
-  AlignJustify,
-  AlignLeft,
-  AlignRight,
-  Ban,
-  Crosshair,
-} from "lucide-react"
+import { useState } from "react";
+import { cn } from "cn";
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Ban, Crosshair } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useRovingTabIndex } from "@/hooks/useRovingTabIndex"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useRovingTabIndex } from "@/hooks/useRovingTabIndex";
 
 const TOOLS = [
   { id: "left", label: "Left", icon: AlignLeft },
   { id: "center", label: "Center", icon: AlignCenter },
   { id: "right", label: "Right", icon: AlignRight },
   { id: "justify", label: "Justify", icon: AlignJustify },
-] as const
+] as const;
 
-const LOOP_MODES = ["loop", "clamp"] as const
-type LoopMode = (typeof LOOP_MODES)[number]
+const LOOP_MODES = ["loop", "clamp"] as const;
+type LoopMode = (typeof LOOP_MODES)[number];
 
 export default function UseRovingTabIndexDemo() {
-  const [loopMode, setLoopMode] = useState<LoopMode>("loop")
-  const [disableThird, setDisableThird] = useState(false)
-  const [_hasFocusWithin, setHasFocusWithin] = useState(false)
-  const [lastKey, setLastKey] = useState<string>("none")
+  const [loopMode, setLoopMode] = useState<LoopMode>("loop");
+  const [disableThird, setDisableThird] = useState(false);
+  const [_hasFocusWithin, setHasFocusWithin] = useState(false);
+  const [lastKey, setLastKey] = useState<string>("none");
 
-  const loop = loopMode === "loop"
+  const loop = loopMode === "loop";
 
   const { activeIndex, focusItem, getItemProps } = useRovingTabIndex({
     orientation: "horizontal",
     loop,
-  })
+  });
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Roving boundary behavior"
             className="inline-flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {LOOP_MODES.map((m) => {
-              const active = loopMode === m
+              const active = loopMode === m;
               return (
                 <button
                   key={m}
@@ -59,12 +51,12 @@ export default function UseRovingTabIndexDemo() {
                     "rounded-[3px] px-2 py-0.5 font-mono text-2xs font-medium capitalize transition-all",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {m}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -73,20 +65,16 @@ export default function UseRovingTabIndexDemo() {
           onFocusCapture={() => setHasFocusWithin(true)}
           onBlurCapture={(e) => {
             if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
-              setHasFocusWithin(false)
+              setHasFocusWithin(false);
             }
           }}
           className="flex flex-col gap-2 rounded-md border border-border-subtle bg-subtle/35 p-2.5"
         >
-          <div
-            role="toolbar"
-            aria-label="Text alignment"
-            className="grid grid-cols-4 gap-1.5"
-          >
+          <div role="toolbar" aria-label="Text alignment" className="grid grid-cols-4 gap-1.5">
             {TOOLS.map((tool, index) => {
-              const Icon = tool.icon
-              const isItemDisabled = index === 2 && disableThird
-              const isActive = activeIndex === index && !isItemDisabled
+              const Icon = tool.icon;
+              const isItemDisabled = index === 2 && disableThird;
+              const isActive = activeIndex === index && !isItemDisabled;
               const itemProps = getItemProps<HTMLButtonElement>(index, {
                 disabled: isItemDisabled,
                 onKeyDown: (e) => {
@@ -96,10 +84,10 @@ export default function UseRovingTabIndexDemo() {
                     e.key === "Home" ||
                     e.key === "End"
                   ) {
-                    setLastKey(e.key)
+                    setLastKey(e.key);
                   }
                 },
-              })
+              });
 
               return (
                 <button
@@ -112,16 +100,14 @@ export default function UseRovingTabIndexDemo() {
                     "flex flex-col items-center justify-center gap-1 rounded-sm border py-2 font-mono transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.98] disabled:pointer-events-none disabled:opacity-35",
                     isActive
                       ? "border-primary/40 bg-primary/10 text-primary shadow-control"
-                      : "border-border-subtle bg-card/80 text-muted-foreground hover:bg-control hover:text-foreground"
+                      : "border-border-subtle bg-card/80 text-muted-foreground hover:bg-control hover:text-foreground",
                   )}
                 >
                   <Icon className="size-3.5" />
                   <span className="text-2xs font-medium">{tool.label}</span>
-                  <span className="text-3xs tabular-nums opacity-75">
-                    tab={itemProps.tabIndex}
-                  </span>
+                  <span className="text-3xs tabular-nums opacity-75">tab={itemProps.tabIndex}</span>
                 </button>
-              )
+              );
             })}
           </div>
 
@@ -145,9 +131,7 @@ export default function UseRovingTabIndexDemo() {
           <span className="font-mono text-3xs tracking-wider text-muted-foreground uppercase">
             Last Key
           </span>
-          <span className="font-mono text-xs font-semibold text-foreground">
-            {lastKey}
-          </span>
+          <span className="font-mono text-xs font-semibold text-foreground">{lastKey}</span>
         </div>
       </div>
 
@@ -172,5 +156,5 @@ export default function UseRovingTabIndexDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

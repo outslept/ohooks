@@ -1,12 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect, useRef, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 /** Detected cardinal direction of a swipe gesture. */
-export type SwipeDirection = 'up' | 'down' | 'left' | 'right' | 'none';
+export type SwipeDirection = "up" | "down" | "left" | "right" | "none";
 
 /** Reactive state representing the current or most recent swipe gesture. */
 export interface SwipeState {
@@ -46,27 +44,23 @@ export interface UseSwipeOptions {
 
 const INITIAL_SWIPE_STATE: SwipeState = {
   isSwiping: false,
-  direction: 'none',
+  direction: "none",
   lengthX: 0,
   lengthY: 0,
 };
 
-function computeDirection(
-  lengthX: number,
-  lengthY: number,
-  threshold: number
-): SwipeDirection {
+function computeDirection(lengthX: number, lengthY: number, threshold: number): SwipeDirection {
   const absX = Math.abs(lengthX);
   const absY = Math.abs(lengthY);
 
   if (Math.max(absX, absY) < threshold) {
-    return 'none';
+    return "none";
   }
 
   if (absX >= absY) {
-    return lengthX > 0 ? 'left' : 'right';
+    return lengthX > 0 ? "left" : "right";
   }
-  return lengthY > 0 ? 'up' : 'down';
+  return lengthY > 0 ? "up" : "down";
 }
 
 /**
@@ -88,13 +82,9 @@ function computeDirection(
  */
 export function useSwipe(
   target: EventListenerTarget<HTMLElement | Document | Window>,
-  options: UseSwipeOptions = {}
+  options: UseSwipeOptions = {},
 ): SwipeState {
-  const {
-    threshold = 50,
-    enabled = true,
-    preventDefault = false,
-  } = options;
+  const { threshold = 50, enabled = true, preventDefault = false } = options;
 
   const optionsRef = useLatest(options);
   const [state, setState] = useState<SwipeState>(INITIAL_SWIPE_STATE);
@@ -107,7 +97,7 @@ export function useSwipe(
   const latestStateRef: { current: SwipeState } = useRef(INITIAL_SWIPE_STATE);
 
   useEffect(() => {
-    if (!enabled || typeof window === 'undefined') {
+    if (!enabled || typeof window === "undefined") {
       return;
     }
 
@@ -127,7 +117,7 @@ export function useSwipe(
 
       const nextState: SwipeState = {
         isSwiping: true,
-        direction: 'none',
+        direction: "none",
         lengthX: 0,
         lengthY: 0,
       };
@@ -159,7 +149,7 @@ export function useSwipe(
       latestStateRef.current = nextState;
       setState(nextState);
 
-      if (direction !== 'none') {
+      if (direction !== "none") {
         optionsRef.current.onSwipe?.(nextState, event);
       }
     };
@@ -181,29 +171,29 @@ export function useSwipe(
 
       optionsRef.current.onSwipeEnd?.(endState, event);
 
-      if (finalDirection === 'left') {
+      if (finalDirection === "left") {
         optionsRef.current.onSwipeLeft?.(event);
-      } else if (finalDirection === 'right') {
+      } else if (finalDirection === "right") {
         optionsRef.current.onSwipeRight?.(event);
-      } else if (finalDirection === 'up') {
+      } else if (finalDirection === "up") {
         optionsRef.current.onSwipeUp?.(event);
-      } else if (finalDirection === 'down') {
+      } else if (finalDirection === "down") {
         optionsRef.current.onSwipeDown?.(event);
       }
     };
 
-    targetElement.addEventListener('pointerdown', handlePointerDown);
-    window.addEventListener('pointermove', handlePointerMove, {
+    targetElement.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("pointermove", handlePointerMove, {
       passive: !preventDefault,
     });
-    window.addEventListener('pointerup', handlePointerUpOrCancel);
-    window.addEventListener('pointercancel', handlePointerUpOrCancel);
+    window.addEventListener("pointerup", handlePointerUpOrCancel);
+    window.addEventListener("pointercancel", handlePointerUpOrCancel);
 
     return () => {
-      targetElement.removeEventListener('pointerdown', handlePointerDown);
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUpOrCancel);
-      window.removeEventListener('pointercancel', handlePointerUpOrCancel);
+      targetElement.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUpOrCancel);
+      window.removeEventListener("pointercancel", handlePointerUpOrCancel);
       activePointerIdRef.current = null;
     };
   }, [target, enabled, threshold, preventDefault, optionsRef]);

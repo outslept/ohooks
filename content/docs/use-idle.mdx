@@ -14,11 +14,11 @@ The `useIdle` hook monitors user activity across mouse, pointer, touch, keyboard
 ## Usage
 
 ```tsx
-import { useIdle } from "@/hooks/useIdle"
+import { useIdle } from "@/hooks/useIdle";
 ```
 
 ```tsx
-const isIdle = useIdle(30_000)
+const isIdle = useIdle(30_000);
 ```
 
 ## Examples
@@ -28,14 +28,14 @@ const isIdle = useIdle(30_000)
 Detect when the user has been inactive for 60 seconds and show a lock screen or warning banner.
 
 ```tsx
-const isIdle = useIdle(60_000)
+const isIdle = useIdle(60_000);
 
 return (
   <div>
     <p>Status: {isIdle ? "Away" : "Active"}</p>
     {isIdle && <div role="alert">Session paused due to inactivity.</div>}
   </div>
-)
+);
 ```
 
 ### Custom Activity Events and Initial State
@@ -46,7 +46,7 @@ Customize the list of DOM events that reset the timer or start in the idle state
 const isIdle = useIdle(10_000, {
   initialState: false,
   events: ["keydown", "pointerdown"],
-})
+});
 ```
 
 ## API Reference

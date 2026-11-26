@@ -3,9 +3,9 @@ import {
   type PointerEvent as ReactPointerEvent,
   useMemo,
   useRef,
-} from 'react';
-import { useEventCallback } from './useEventCallback';
-import { useUnmount } from './useUnmount';
+} from "react";
+import { useEventCallback } from "./useEventCallback";
+import { useUnmount } from "./useUnmount";
 
 export interface UseLongPressOptions<T extends Element = Element> {
   /** Hold duration in milliseconds required to trigger the long press callback (default: `400`) */
@@ -86,7 +86,7 @@ export function useLongPress<T extends Element = Element>(
   };
 
   const handlePointerDown = useEventCallback((event: ReactPointerEvent<T>) => {
-    if (event.pointerType === 'mouse' && event.button !== 0) {
+    if (event.pointerType === "mouse" && event.button !== 0) {
       return;
     }
     if (filterEvents && !filterEvents(event)) {
@@ -101,22 +101,21 @@ export function useLongPress<T extends Element = Element>(
 
     onStart?.(event);
 
-    timerIdRef.current = setTimeout(() => {
-      timerIdRef.current = null;
-      isLongPressTriggeredRef.current = true;
-      if (preventClick) {
-        suppressNextClickRef.current = true;
-      }
-      callback(event);
-    }, Math.max(0, threshold));
+    timerIdRef.current = setTimeout(
+      () => {
+        timerIdRef.current = null;
+        isLongPressTriggeredRef.current = true;
+        if (preventClick) {
+          suppressNextClickRef.current = true;
+        }
+        callback(event);
+      },
+      Math.max(0, threshold),
+    );
   });
 
   const handlePointerMove = useEventCallback((event: ReactPointerEvent<T>) => {
-    if (
-      !isPressedRef.current ||
-      timerIdRef.current === null ||
-      startCoordRef.current === null
-    ) {
+    if (!isPressedRef.current || timerIdRef.current === null || startCoordRef.current === null) {
       return;
     }
 
@@ -167,11 +166,9 @@ export function useLongPress<T extends Element = Element>(
     }
   });
 
-  const handlePointerCancel = useEventCallback(
-    (event: ReactPointerEvent<T>) => {
-      finishInteraction(event, true);
-    },
-  );
+  const handlePointerCancel = useEventCallback((event: ReactPointerEvent<T>) => {
+    finishInteraction(event, true);
+  });
 
   const handleClickCapture = useEventCallback((event: ReactMouseEvent<T>) => {
     if (suppressNextClickRef.current) {

@@ -1,13 +1,6 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { useLatest } from './useLatest';
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
+import { useLatest } from "./useLatest";
 
 export interface UseControllableStateOptions<T> {
   /** Controlled state value; when `undefined`, the hook manages state internally */
@@ -37,34 +30,22 @@ export interface UseControllableStateOptions<T> {
  * ```
  */
 export function useControllableState<T>(
-  options: UseControllableStateOptions<T>
-): [
-  value: T,
-  setValue: Dispatch<SetStateAction<T>>,
-  isControlled: boolean,
-] {
-  const {
-    value: controlledValue,
-    defaultValue,
-    onChange,
-    shouldUpdate = Object.is,
-  } = options;
+  options: UseControllableStateOptions<T>,
+): [value: T, setValue: Dispatch<SetStateAction<T>>, isControlled: boolean] {
+  const { value: controlledValue, defaultValue, onChange, shouldUpdate = Object.is } = options;
 
   const isControlled = controlledValue !== undefined;
   const wasControlledRef: { current: boolean } = useRef(isControlled);
 
   useEffect(() => {
-    if (
-      typeof process !== 'undefined' &&
-      process.env?.NODE_ENV !== 'production'
-    ) {
+    if (typeof process !== "undefined" && process.env?.NODE_ENV !== "production") {
       if (wasControlledRef.current !== isControlled) {
         console.warn(
           `Warning: useControllableState switched from ${
-            wasControlledRef.current ? 'controlled' : 'uncontrolled'
+            wasControlledRef.current ? "controlled" : "uncontrolled"
           } to ${
-            isControlled ? 'controlled' : 'uncontrolled'
-          } mode. Components should not switch between controlled and uncontrolled during their lifetime.`
+            isControlled ? "controlled" : "uncontrolled"
+          } mode. Components should not switch between controlled and uncontrolled during their lifetime.`,
         );
       }
     }
@@ -72,9 +53,7 @@ export function useControllableState<T>(
   }, [isControlled]);
 
   const [uncontrolledValue, setUncontrolledValue] = useState<T>(defaultValue);
-  const currentValue = isControlled
-    ? (controlledValue as T)
-    : uncontrolledValue;
+  const currentValue = isControlled ? (controlledValue as T) : uncontrolledValue;
 
   const valueRef: { current: T } = useRef(currentValue);
   useIsomorphicLayoutEffect(() => {
@@ -89,9 +68,7 @@ export function useControllableState<T>(
     (nextAction: SetStateAction<T>) => {
       const prev = valueRef.current;
       const next =
-        typeof nextAction === 'function'
-          ? (nextAction as (prevState: T) => T)(prev)
-          : nextAction;
+        typeof nextAction === "function" ? (nextAction as (prevState: T) => T)(prev) : nextAction;
 
       if (shouldUpdateRef.current(prev, next)) {
         return;
@@ -104,7 +81,7 @@ export function useControllableState<T>(
 
       onChangeRef.current?.(next);
     },
-    [isControlledRef, onChangeRef, shouldUpdateRef]
+    [isControlledRef, onChangeRef, shouldUpdateRef],
   );
 
   return [currentValue, setValue, isControlled];

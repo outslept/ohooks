@@ -1,17 +1,17 @@
-import { useCallback, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useRef, useSyncExternalStore } from "react";
 
-export type EffectiveConnectionType = 'slow-2g' | '2g' | '3g' | '4g';
+export type EffectiveConnectionType = "slow-2g" | "2g" | "3g" | "4g";
 
 export type NetworkConnectionType =
-  | 'bluetooth'
-  | 'cellular'
-  | 'ethernet'
-  | 'mixed'
-  | 'none'
-  | 'other'
-  | 'unknown'
-  | 'wifi'
-  | 'wimax';
+  | "bluetooth"
+  | "cellular"
+  | "ethernet"
+  | "mixed"
+  | "none"
+  | "other"
+  | "unknown"
+  | "wifi"
+  | "wimax";
 
 interface NetworkInformationTarget extends EventTarget {
   readonly downlink?: number;
@@ -53,17 +53,14 @@ const SERVER_SNAPSHOT: NetworkInformationState = {
 };
 
 function getConnection(): NetworkInformationTarget | null {
-  if (typeof navigator === 'undefined') {
+  if (typeof navigator === "undefined") {
     return null;
   }
   const nav = navigator as VendorNavigator;
   return nav.connection ?? nav.mozConnection ?? nav.webkitConnection ?? null;
 }
 
-function isSameNetworkState(
-  a: NetworkInformationState,
-  b: NetworkInformationState,
-): boolean {
+function isSameNetworkState(a: NetworkInformationState, b: NetworkInformationState): boolean {
   return (
     a.isOnline === b.isOnline &&
     a.isSupported === b.isSupported &&
@@ -77,20 +74,20 @@ function isSameNetworkState(
 }
 
 function subscribe(onStoreChange: () => void): () => void {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return () => {};
   }
 
   const connection = getConnection();
 
-  window.addEventListener('online', onStoreChange);
-  window.addEventListener('offline', onStoreChange);
-  connection?.addEventListener('change', onStoreChange);
+  window.addEventListener("online", onStoreChange);
+  window.addEventListener("offline", onStoreChange);
+  connection?.addEventListener("change", onStoreChange);
 
   return () => {
-    window.removeEventListener('online', onStoreChange);
-    window.removeEventListener('offline', onStoreChange);
-    connection?.removeEventListener('change', onStoreChange);
+    window.removeEventListener("online", onStoreChange);
+    window.removeEventListener("offline", onStoreChange);
+    connection?.removeEventListener("change", onStoreChange);
   };
 }
 
@@ -113,12 +110,11 @@ export function useNetworkInformation(): NetworkInformationState {
   const cacheRef = useRef<NetworkInformationState>(SERVER_SNAPSHOT);
 
   const getSnapshot = useCallback((): NetworkInformationState => {
-    if (typeof navigator === 'undefined') {
+    if (typeof navigator === "undefined") {
       return SERVER_SNAPSHOT;
     }
 
-    const isOnline =
-      typeof navigator.onLine === 'boolean' ? navigator.onLine : true;
+    const isOnline = typeof navigator.onLine === "boolean" ? navigator.onLine : true;
     const connection = getConnection();
 
     const nextState: NetworkInformationState = connection

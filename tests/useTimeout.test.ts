@@ -1,10 +1,10 @@
-import { useTimeout } from '@/hooks/useTimeout';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useTimeout } from "@/hooks/useTimeout";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useTimeout', () => {
+describe("useTimeout", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -13,12 +13,11 @@ describe('useTimeout', () => {
     vi.useRealTimers();
   });
 
-  it('invokes latest callback after delay and cancels pending timer when delay becomes null', async () => {
+  it("invokes latest callback after delay and cancels pending timer when delay becomes null", async () => {
     const fn1 = vi.fn();
     const fn2 = vi.fn();
-    const { rerender } = await renderHook(
-      (props?: { cb: () => void; delay: number | null }) =>
-        useTimeout(props?.cb ?? fn1, props ? props.delay : 100),
+    const { rerender } = await renderHook((props?: { cb: () => void; delay: number | null }) =>
+      useTimeout(props?.cb ?? fn1, props ? props.delay : 100),
     );
 
     await rerender({ cb: fn2, delay: 100 });
@@ -29,7 +28,6 @@ describe('useTimeout', () => {
     expect(fn1).not.toHaveBeenCalled();
     expect(fn2).toHaveBeenCalledOnce();
 
-
     await rerender({ cb: fn2, delay: 200 });
     vi.advanceTimersByTime(100);
     await rerender({ cb: fn2, delay: null });
@@ -37,7 +35,7 @@ describe('useTimeout', () => {
     expect(fn2).toHaveBeenCalledOnce();
   });
 
-  it('clears pending timeout on unmount', async () => {
+  it("clears pending timeout on unmount", async () => {
     const fn = vi.fn();
     const { unmount } = await renderHook(() => useTimeout(fn, 100));
 

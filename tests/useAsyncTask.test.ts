@@ -1,9 +1,6 @@
-import {
-  useAsyncTask,
-  type AsyncTaskContext,
-} from '@/hooks/useAsyncTask';
-import { describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useAsyncTask, type AsyncTaskContext } from "@/hooks/useAsyncTask";
+import { describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 interface Deferred<T> {
   promise: Promise<T>;
@@ -21,14 +18,14 @@ function createDeferred<T>(): Deferred<T> {
   return { promise, resolve, reject };
 }
 
-describe('useAsyncTask', () => {
-  it('starts idle and transitions to success while preserving data across runs by default', async () => {
+describe("useAsyncTask", () => {
+  it("starts idle and transitions to success while preserving data across runs by default", async () => {
     const onSuccess = vi.fn();
     const { result, act } = await renderHook(() =>
       useAsyncTask(
         async (_ctx, value: number) => {
           if (value < 0) {
-            throw new Error('negative');
+            throw new Error("negative");
           }
           return value * 2;
         },
@@ -36,7 +33,7 @@ describe('useAsyncTask', () => {
       ),
     );
 
-    expect(result.current.status).toBe('idle');
+    expect(result.current.status).toBe("idle");
     expect(result.current.isIdle).toBe(true);
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeNull();
@@ -47,7 +44,7 @@ describe('useAsyncTask', () => {
     });
 
     expect(returnedValue).toBe(10);
-    expect(result.current.status).toBe('success');
+    expect(result.current.status).toBe("success");
     expect(result.current.isSuccess).toBe(true);
     expect(result.current.data).toBe(10);
     expect(onSuccess).toHaveBeenCalledExactlyOnceWith(10);
@@ -57,23 +54,23 @@ describe('useAsyncTask', () => {
     });
 
     expect(returnedValue).toBeUndefined();
-    expect(result.current.status).toBe('error');
+    expect(result.current.status).toBe("error");
     expect(result.current.isError).toBe(true);
     expect(result.current.data).toBe(10);
-    expect(result.current.error?.message).toBe('negative');
+    expect(result.current.error?.message).toBe("negative");
   });
 
-  it('resets data to initialData on new run when resetDataOnRun is true and normalizes non-Error throws', async () => {
+  it("resets data to initialData on new run when resetDataOnRun is true and normalizes non-Error throws", async () => {
     const onError = vi.fn();
-    const explicitError = new TypeError('invalid type');
+    const explicitError = new TypeError("invalid type");
 
     const { result, act } = await renderHook(() =>
       useAsyncTask(
-        async (_ctx, mode: 'ok' | 'string-err' | 'error-instance') => {
-          if (mode === 'string-err') {
-            throw 'raw-string-error';
+        async (_ctx, mode: "ok" | "string-err" | "error-instance") => {
+          if (mode === "string-err") {
+            throw "raw-string-error";
           }
-          if (mode === 'error-instance') {
+          if (mode === "error-instance") {
             throw explicitError;
           }
           return 42;
@@ -85,27 +82,27 @@ describe('useAsyncTask', () => {
     expect(result.current.data).toBe(0);
 
     await act(async () => {
-      await result.current.run('ok');
+      await result.current.run("ok");
     });
     expect(result.current.data).toBe(42);
 
     await act(async () => {
-      await result.current.run('string-err');
+      await result.current.run("string-err");
     });
     expect(result.current.isError).toBe(true);
     expect(result.current.data).toBe(0);
     expect(result.current.error).toBeInstanceOf(Error);
-    expect(result.current.error?.message).toBe('raw-string-error');
+    expect(result.current.error?.message).toBe("raw-string-error");
     expect(onError).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      await result.current.run('error-instance');
+      await result.current.run("error-instance");
     });
     expect(result.current.error).toBe(explicitError);
     expect(onError).toHaveBeenLastCalledWith(explicitError);
   });
 
-  it('aborts an in-flight task with reason and ignores abort calls when no task is running', async () => {
+  it("aborts an in-flight task with reason and ignores abort calls when no task is running", async () => {
     const onAbort = vi.fn();
     const onSuccess = vi.fn();
     let capturedSignal: AbortSignal | undefined;
@@ -135,27 +132,27 @@ describe('useAsyncTask', () => {
     expect(result.current.isPending).toBe(true);
 
     await act(async () => {
-      result.current.abort('user-cancelled');
-      deferred.resolve('late-result');
+      result.current.abort("user-cancelled");
+      deferred.resolve("late-result");
       await runPromise;
     });
 
     expect(capturedSignal?.aborted).toBe(true);
-    expect(capturedSignal?.reason).toBe('user-cancelled');
-    expect(result.current.status).toBe('aborted');
+    expect(capturedSignal?.reason).toBe("user-cancelled");
+    expect(result.current.status).toBe("aborted");
     expect(result.current.isAborted).toBe(true);
     expect(onAbort).toHaveBeenCalledOnce();
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
-  it('treats an AbortError thrown by the task itself as an aborted state rather than an error', async () => {
+  it("treats an AbortError thrown by the task itself as an aborted state rather than an error", async () => {
     const onAbort = vi.fn();
     const onError = vi.fn();
 
     const { result, act } = await renderHook(() =>
       useAsyncTask(
         async () => {
-          throw new DOMException('The operation was aborted.', 'AbortError');
+          throw new DOMException("The operation was aborted.", "AbortError");
         },
         { onAbort, onError },
       ),
@@ -174,7 +171,7 @@ describe('useAsyncTask', () => {
     expect(onError).not.toHaveBeenCalled();
   });
 
-  it('aborts a pending run when superseded by a newer run and ignores the stale resolution', async () => {
+  it("aborts a pending run when superseded by a newer run and ignores the stale resolution", async () => {
     const firstDeferred = createDeferred<string>();
     const secondDeferred = createDeferred<string>();
     const signals: AbortSignal[] = [];
@@ -184,9 +181,7 @@ describe('useAsyncTask', () => {
       useAsyncTask(
         ({ signal }, callNumber: 1 | 2) => {
           signals.push(signal);
-          return callNumber === 1
-            ? firstDeferred.promise
-            : secondDeferred.promise;
+          return callNumber === 1 ? firstDeferred.promise : secondDeferred.promise;
         },
         { onSuccess },
       ),
@@ -205,19 +200,19 @@ describe('useAsyncTask', () => {
     expect(result.current.isPending).toBe(true);
 
     await act(async () => {
-      firstDeferred.resolve('stale');
-      secondDeferred.resolve('fresh');
+      firstDeferred.resolve("stale");
+      secondDeferred.resolve("fresh");
       const [r1, r2] = await Promise.all([p1, p2]);
       expect(r1).toBeUndefined();
-      expect(r2).toBe('fresh');
+      expect(r2).toBe("fresh");
     });
 
     expect(result.current.isSuccess).toBe(true);
-    expect(result.current.data).toBe('fresh');
-    expect(onSuccess).toHaveBeenCalledExactlyOnceWith('fresh');
+    expect(result.current.data).toBe("fresh");
+    expect(onSuccess).toHaveBeenCalledExactlyOnceWith("fresh");
   });
 
-  it('aborts in-flight work and restores initial state when reset is called', async () => {
+  it("aborts in-flight work and restores initial state when reset is called", async () => {
     const deferred = createDeferred<number>();
     let capturedSignal: AbortSignal | undefined;
     const onSuccess = vi.fn();
@@ -251,7 +246,7 @@ describe('useAsyncTask', () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
-  it('aborts in-flight task on unmount and suppresses post-unmount callbacks', async () => {
+  it("aborts in-flight task on unmount and suppresses post-unmount callbacks", async () => {
     const deferred = createDeferred<string>();
     let capturedSignal: AbortSignal | undefined;
     const onSuccess = vi.fn();
@@ -277,7 +272,7 @@ describe('useAsyncTask', () => {
     expect(capturedSignal?.aborted).toBe(true);
 
     await act(async () => {
-      deferred.resolve('after-unmount');
+      deferred.resolve("after-unmount");
       const resolved = await runPromise;
       expect(resolved).toBeUndefined();
     });

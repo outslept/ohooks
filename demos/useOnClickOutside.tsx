@@ -1,30 +1,25 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react"
-import { ShieldAlert } from "lucide-react"
-import { cn } from "cn"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useOnClickOutside } from "@/hooks/useOnClickOutside"
+import { useRef, useState } from "react";
+import { ShieldAlert } from "lucide-react";
+import { cn } from "cn";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useOnClickOutside } from "@/hooks/useOnClickOutside";
 
 export default function UseOnClickOutsideDemo() {
-  const boxRef = useRef<HTMLDivElement>(null)
-  const ignoreButtonRef = useRef<HTMLButtonElement>(null)
+  const boxRef = useRef<HTMLDivElement>(null);
+  const ignoreButtonRef = useRef<HTMLButtonElement>(null);
 
-  const [outsideCount, setOutsideCount] = useState(0)
-  const [insideCount, setInsideCount] = useState(0)
-  const [lastEvent, setLastEvent] = useState<"inside" | "outside" | "idle">(
-    "idle"
-  )
+  const [outsideCount, setOutsideCount] = useState(0);
+  const [insideCount, setInsideCount] = useState(0);
+  const [lastEvent, setLastEvent] = useState<"inside" | "outside" | "idle">("idle");
 
-  useOnClickOutside(
-    boxRef,
-    () => {
-      setOutsideCount((c) => c + 1)
-      setLastEvent("outside")
-    }
-  )
+  useOnClickOutside(boxRef, () => {
+    setOutsideCount((c) => c + 1);
+    setLastEvent("outside");
+  });
 
   return (
     <Card className="w-full max-w-80">
@@ -32,11 +27,7 @@ export default function UseOnClickOutsideDemo() {
         <div className="flex items-center justify-between">
           <Badge
             variant={
-              lastEvent === "outside"
-                ? "warning"
-                : lastEvent === "inside"
-                  ? "accent"
-                  : "secondary"
+              lastEvent === "outside" ? "warning" : lastEvent === "inside" ? "accent" : "secondary"
             }
             size="compact"
           >
@@ -47,14 +38,14 @@ export default function UseOnClickOutsideDemo() {
         <div
           ref={boxRef}
           onClick={() => {
-            setInsideCount((c) => c + 1)
-            setLastEvent("inside")
+            setInsideCount((c) => c + 1);
+            setLastEvent("inside");
           }}
           className={cn(
             "flex h-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed px-4 text-center transition-colors select-none",
             lastEvent === "inside"
               ? "border-primary/60 bg-primary/5"
-              : "border-border-subtle bg-subtle/35 hover:bg-subtle/60"
+              : "border-border-subtle bg-subtle/35 hover:bg-subtle/60",
           )}
         >
           <span className="font-mono text-xs font-medium text-foreground">
@@ -99,14 +90,14 @@ export default function UseOnClickOutsideDemo() {
           variant="ghost"
           size="compact"
           onClick={() => {
-            setInsideCount(0)
-            setOutsideCount(0)
-            setLastEvent("idle")
+            setInsideCount(0);
+            setOutsideCount(0);
+            setLastEvent("idle");
           }}
         >
           Reset
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

@@ -14,11 +14,11 @@ The `useToggle` hook manages a boolean state and returns a `[value, toggle, setV
 ## Usage
 
 ```tsx
-import { useToggle } from "@/hooks/useToggle"
+import { useToggle } from "@/hooks/useToggle";
 ```
 
 ```tsx
-const [isOpen, toggleOpen, setOpen] = useToggle(false)
+const [isOpen, toggleOpen, setOpen] = useToggle(false);
 ```
 
 ## Examples
@@ -28,16 +28,14 @@ const [isOpen, toggleOpen, setOpen] = useToggle(false)
 Because `toggle` ignores non-boolean arguments like `MouseEvent`, you can pass it directly to `onClick` handlers without wrapping it in an arrow function.
 
 ```tsx
-const [isExpanded, toggleExpanded] = useToggle(false)
+const [isExpanded, toggleExpanded] = useToggle(false);
 
 return (
   <div>
-    <button onClick={toggleExpanded}>
-      {isExpanded ? "Hide details" : "Show details"}
-    </button>
+    <button onClick={toggleExpanded}>{isExpanded ? "Hide details" : "Show details"}</button>
     {isExpanded && <p>Extra details content.</p>}
   </div>
-)
+);
 ```
 
 ### Forcing an Explicit Boolean Value
@@ -45,7 +43,7 @@ return (
 Pass `true` or `false` to `toggle(nextValue)` (or use `setValue`) when you need to force a specific state.
 
 ```tsx
-const [isEditing, toggleEditing] = useToggle(false)
+const [isEditing, toggleEditing] = useToggle(false);
 
 return (
   <div>
@@ -53,7 +51,7 @@ return (
     <button onClick={() => toggleEditing(false)}>Cancel</button>
     <button onClick={toggleEditing}>Toggle ({String(isEditing)})</button>
   </div>
-)
+);
 ```
 
 ## API Reference

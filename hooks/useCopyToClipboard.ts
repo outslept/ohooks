@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useBoolean } from './useBoolean';
-import { useEventCallback } from './useEventCallback';
-import { useTimeout } from './useTimeout';
+import { useState } from "react";
+import { useBoolean } from "./useBoolean";
+import { useEventCallback } from "./useEventCallback";
+import { useTimeout } from "./useTimeout";
 
 export interface UseCopyToClipboardOptions {
   /** Time in milliseconds before `isCopied` resets to `false`, or `null` to disable auto-reset (default: `2000`) */
@@ -46,9 +46,9 @@ export function useCopyToClipboard(
 
   const copy = useEventCallback(async (text: string): Promise<boolean> => {
     if (
-      typeof navigator === 'undefined' ||
+      typeof navigator === "undefined" ||
       !navigator.clipboard ||
-      typeof navigator.clipboard.writeText !== 'function'
+      typeof navigator.clipboard.writeText !== "function"
     ) {
       setFalse();
       setCopiedText(null);
@@ -71,9 +71,7 @@ export function useCopyToClipboard(
 
   useTimeout(
     setFalse,
-    isCopied && resetInterval !== null && resetInterval > 0
-      ? resetInterval
-      : null,
+    isCopied && resetInterval !== null && resetInterval > 0 ? resetInterval : null,
   );
 
   return { copiedText, isCopied, copy, reset };

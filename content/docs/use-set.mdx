@@ -14,11 +14,11 @@ The `useSet` hook manages a JavaScript `Set` in React state and provides memoize
 ## Usage
 
 ```tsx
-import { useSet } from "@/hooks/useSet"
+import { useSet } from "@/hooks/useSet";
 ```
 
 ```tsx
-const [tags, { add, remove, toggle, has }] = useSet(["react", "typescript"])
+const [tags, { add, remove, toggle, has }] = useSet(["react", "typescript"]);
 ```
 
 ## Examples
@@ -28,18 +28,14 @@ const [tags, { add, remove, toggle, has }] = useSet(["react", "typescript"])
 Use `toggle` and `has` to build a multi-select filter bar where clicking a tag adds or removes it from the active set.
 
 ```tsx
-const availableTags = ["react", "typescript", "tailwind", "nextjs"]
-const [selected, { toggle, has, clear, reset }] = useSet(["react"])
+const availableTags = ["react", "typescript", "tailwind", "nextjs"];
+const [selected, { toggle, has, clear, reset }] = useSet(["react"]);
 
 return (
   <div>
     <div>
       {availableTags.map((tag) => (
-        <button
-          key={tag}
-          aria-pressed={has(tag)}
-          onClick={() => toggle(tag)}
-        >
+        <button key={tag} aria-pressed={has(tag)} onClick={() => toggle(tag)}>
           {tag} {has(tag) ? "✓" : ""}
         </button>
       ))}
@@ -48,7 +44,7 @@ return (
     <button onClick={clear}>Clear</button>
     <button onClick={reset}>Reset</button>
   </div>
-)
+);
 ```
 
 ### Tracking Expanded Accordion Items
@@ -56,16 +52,14 @@ return (
 Store expanded item IDs in `useSet` to allow multiple accordion panels to stay open simultaneously.
 
 ```tsx
-const [openIds, { add, remove, has }] = useSet<string>()
+const [openIds, { add, remove, has }] = useSet<string>();
 
 return (
   <div>
-    <button onClick={() => (has("faq-1") ? remove("faq-1") : add("faq-1"))}>
-      Toggle FAQ 1
-    </button>
+    <button onClick={() => (has("faq-1") ? remove("faq-1") : add("faq-1"))}>Toggle FAQ 1</button>
     {has("faq-1") && <p>Answer to FAQ 1</p>}
   </div>
-)
+);
 ```
 
 ## API Reference

@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { useControllableState } from './useControllableState';
-import { useEventCallback } from './useEventCallback';
+import { useMemo } from "react";
+import { useControllableState } from "./useControllableState";
+import { useEventCallback } from "./useEventCallback";
 
-export type PaginationItem = number | 'ellipsis';
+export type PaginationItem = number | "ellipsis";
 
 export interface UsePaginationOptions {
   /** Total number of items across all pages (used with `pageSize` when `totalPages` is not set) */
@@ -73,9 +73,7 @@ function createRange(start: number, end: number): number[] {
  * });
  * ```
  */
-export function usePagination(
-  options: UsePaginationOptions = {},
-): UsePaginationReturn {
+export function usePagination(options: UsePaginationOptions = {}): UsePaginationReturn {
   const {
     totalItems,
     pageSize = 10,
@@ -105,43 +103,33 @@ export function usePagination(
   const page = Math.min(Math.max(1, Math.floor(rawPage)), totalPages);
 
   const items = useMemo<PaginationItem[]>(() => {
-    const totalPageNumbers =
-      safeBoundaryCount * 2 + safeSiblingCount * 2 + 3;
+    const totalPageNumbers = safeBoundaryCount * 2 + safeSiblingCount * 2 + 3;
 
     if (totalPageNumbers >= totalPages) {
       return createRange(1, totalPages);
     }
 
-    const startPages = createRange(
-      1,
-      Math.min(safeBoundaryCount, totalPages),
-    );
+    const startPages = createRange(1, Math.min(safeBoundaryCount, totalPages));
     const endPages = createRange(
       Math.max(totalPages - safeBoundaryCount + 1, safeBoundaryCount + 1),
       totalPages,
     );
 
     const siblingsStart = Math.max(
-      Math.min(
-        page - safeSiblingCount,
-        totalPages - safeBoundaryCount - safeSiblingCount * 2 - 1,
-      ),
+      Math.min(page - safeSiblingCount, totalPages - safeBoundaryCount - safeSiblingCount * 2 - 1),
       safeBoundaryCount + 2,
     );
 
     const firstEndPage = endPages[0];
     const siblingsEnd = Math.min(
-      Math.max(
-        page + safeSiblingCount,
-        safeBoundaryCount + safeSiblingCount * 2 + 2,
-      ),
+      Math.max(page + safeSiblingCount, safeBoundaryCount + safeSiblingCount * 2 + 2),
       firstEndPage !== undefined ? firstEndPage - 2 : totalPages - 1,
     );
 
     const result: PaginationItem[] = [...startPages];
 
     if (siblingsStart > safeBoundaryCount + 2) {
-      result.push('ellipsis');
+      result.push("ellipsis");
     } else if (safeBoundaryCount + 1 < totalPages - safeBoundaryCount) {
       result.push(safeBoundaryCount + 1);
     }
@@ -149,7 +137,7 @@ export function usePagination(
     result.push(...createRange(siblingsStart, siblingsEnd));
 
     if (siblingsEnd < totalPages - safeBoundaryCount - 1) {
-      result.push('ellipsis');
+      result.push("ellipsis");
     } else if (totalPages - safeBoundaryCount > safeBoundaryCount) {
       result.push(totalPages - safeBoundaryCount);
     }

@@ -1,8 +1,6 @@
-import { resolveTargetElement } from '@/lib/utils';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { resolveTargetElement } from "@/lib/utils";
+import { EventListenerTarget } from "./useEventListener";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 export interface UseInertOptions {
   /** Apply `inert` and `aria-hidden="true"` to all top-level sibling elements instead of the target itself (default: `false`) */
@@ -28,14 +26,14 @@ function applyInertToElement(element: HTMLElement): void {
   const elementWithInert = element as HTMLElement & { inert?: boolean };
   inertRegistry.set(element, {
     count: 1,
-    hadInertAttr: element.hasAttribute('inert'),
+    hadInertAttr: element.hasAttribute("inert"),
     originalInertProp: Boolean(elementWithInert.inert),
-    originalAriaHidden: element.getAttribute('aria-hidden'),
+    originalAriaHidden: element.getAttribute("aria-hidden"),
   });
 
   elementWithInert.inert = true;
-  element.setAttribute('inert', '');
-  element.setAttribute('aria-hidden', 'true');
+  element.setAttribute("inert", "");
+  element.setAttribute("aria-hidden", "true");
 }
 
 function releaseInertFromElement(element: HTMLElement): void {
@@ -53,15 +51,15 @@ function releaseInertFromElement(element: HTMLElement): void {
   elementWithInert.inert = state.originalInertProp;
 
   if (state.hadInertAttr) {
-    element.setAttribute('inert', '');
+    element.setAttribute("inert", "");
   } else {
-    element.removeAttribute('inert');
+    element.removeAttribute("inert");
   }
 
   if (state.originalAriaHidden !== null) {
-    element.setAttribute('aria-hidden', state.originalAriaHidden);
+    element.setAttribute("aria-hidden", state.originalAriaHidden);
   } else {
-    element.removeAttribute('aria-hidden');
+    element.removeAttribute("aria-hidden");
   }
 
   inertRegistry.delete(element);
@@ -83,12 +81,12 @@ function releaseInertFromElement(element: HTMLElement): void {
 export function useInert(
   target: EventListenerTarget<HTMLElement>,
   inert: boolean = true,
-  options: UseInertOptions = {}
+  options: UseInertOptions = {},
 ): void {
   const { trapSiblings = false } = options;
 
   useIsomorphicLayoutEffect(() => {
-    if (!inert || typeof document === 'undefined') {
+    if (!inert || typeof document === "undefined") {
       return;
     }
 
@@ -104,8 +102,8 @@ export function useInert(
       for (const child of bodyChildren) {
         if (
           child instanceof HTMLElement &&
-          child.tagName !== 'SCRIPT' &&
-          child.tagName !== 'STYLE' &&
+          child.tagName !== "SCRIPT" &&
+          child.tagName !== "STYLE" &&
           child !== targetElement &&
           !child.contains(targetElement)
         ) {

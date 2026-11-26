@@ -1,8 +1,4 @@
-import {
-  StorageOptions,
-  UseStorageReturn,
-  useWebStorage,
-} from './useLocalStorage';
+import { StorageOptions, UseStorageReturn, useWebStorage } from "./useLocalStorage";
 
 /** Configuration options for `useSessionStorage`. */
 export type UseSessionStorageOptions<T> = StorageOptions<T>;
@@ -24,9 +20,9 @@ export type UseSessionStorageOptions<T> = StorageOptions<T>;
 export function useSessionStorage<T>(
   key: string,
   initialValue: T | (() => T),
-  options: UseSessionStorageOptions<T> = {}
+  options: UseSessionStorageOptions<T> = {},
 ): UseStorageReturn<T> {
-  return useWebStorage('sessionStorage', key, initialValue, options);
+  return useWebStorage("sessionStorage", key, initialValue, options);
 }
 
 export default useSessionStorage;

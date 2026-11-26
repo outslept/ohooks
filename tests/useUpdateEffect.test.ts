@@ -1,11 +1,11 @@
-import { useUpdateEffect } from '@/hooks/useUpdateEffect';
-import { describe, expect, it, vi } from 'vitest';
-import { renderHook } from 'vitest-browser-react';
+import { useUpdateEffect } from "@/hooks/useUpdateEffect";
+import { describe, expect, it, vi } from "vitest";
+import { renderHook } from "vitest-browser-react";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useUpdateEffect', () => {
-  it('skips mount, runs on dep change, and cleans up before next run and unmount', async () => {
+describe("useUpdateEffect", () => {
+  it("skips mount, runs on dep change, and cleans up before next run and unmount", async () => {
     const cleanup = vi.fn();
     const effect = vi.fn(() => cleanup);
     const { rerender, unmount } = await renderHook((dep: number = 1) =>
@@ -28,7 +28,7 @@ describe('useUpdateEffect', () => {
     expect(cleanup).toHaveBeenCalledTimes(2);
   });
 
-  it('runs on every re-render after mount when deps are omitted', async () => {
+  it("runs on every re-render after mount when deps are omitted", async () => {
     const effect = vi.fn();
     const { rerender } = await renderHook(() => useUpdateEffect(effect));
 

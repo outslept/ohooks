@@ -14,11 +14,11 @@ The `useOnline` hook subscribes to window `online` and `offline` events via `use
 ## Usage
 
 ```tsx
-import { useOnline } from "@/hooks/useOnline"
+import { useOnline } from "@/hooks/useOnline";
 ```
 
 ```tsx
-const isOnline = useOnline()
+const isOnline = useOnline();
 ```
 
 ## Examples
@@ -28,17 +28,15 @@ const isOnline = useOnline()
 Display a status banner whenever the user loses network connectivity.
 
 ```tsx
-const isOnline = useOnline()
+const isOnline = useOnline();
 
 if (!isOnline) {
   return (
-    <div role="status">
-      You are offline. Changes will be saved locally until you reconnect.
-    </div>
-  )
+    <div role="status">You are offline. Changes will be saved locally until you reconnect.</div>
+  );
 }
 
-return null
+return null;
 ```
 
 ### Disabling Network Actions While Offline
@@ -46,11 +44,11 @@ return null
 Prevent form submission buttons from firing while the browser is disconnected.
 
 ```tsx
-const isOnline = useOnline()
+const isOnline = useOnline();
 
 return (
   <button type="submit" disabled={!isOnline}>
     {isOnline ? "Publish post" : "Waiting for connection..."}
   </button>
-)
+);
 ```

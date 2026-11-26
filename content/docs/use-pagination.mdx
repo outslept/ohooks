@@ -14,14 +14,14 @@ The `usePagination` hook calculates total pages, `[startIndex, endIndex)` array 
 ## Usage
 
 ```tsx
-import { usePagination } from "@/hooks/usePagination"
+import { usePagination } from "@/hooks/usePagination";
 ```
 
 ```tsx
 const { page, items, nextPage, prevPage, setPage } = usePagination({
   totalItems: 250,
   pageSize: 20,
-})
+});
 ```
 
 ## Examples
@@ -31,20 +31,12 @@ const { page, items, nextPage, prevPage, setPage } = usePagination({
 Map over `items` to render numbered page buttons alongside `'ellipsis'` separators.
 
 ```tsx
-const {
-  page,
-  items,
-   canPrevPage,
-  canNextPage,
-  prevPage,
-  nextPage,
-  setPage,
-} = usePagination({
+const { page, items, canPrevPage, canNextPage, prevPage, nextPage, setPage } = usePagination({
   totalItems: 200,
   pageSize: 10,
   siblingCount: 1,
   boundaryCount: 1,
-})
+});
 
 return (
   <nav aria-label="Pagination">
@@ -62,13 +54,13 @@ return (
         >
           {item}
         </button>
-      )
+      ),
     )}
     <button onClick={nextPage} disabled={!canNextPage}>
       Next
     </button>
   </nav>
-)
+);
 ```
 
 ### Slicing Client-Side Data
@@ -79,9 +71,9 @@ Use `startIndex` and `endIndex` directly with `Array.prototype.slice` to paginat
 const { startIndex, endIndex, nextPage, prevPage } = usePagination({
   totalItems: allUsers.length,
   pageSize: 5,
-})
+});
 
-const visibleUsers = allUsers.slice(startIndex, endIndex)
+const visibleUsers = allUsers.slice(startIndex, endIndex);
 ```
 
 ## API Reference

@@ -1,14 +1,14 @@
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from "react";
 
 function subscribe(onStoreChange: () => void): () => void {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return () => {};
   }
 
-  window.addEventListener('languagechange', onStoreChange);
+  window.addEventListener("languagechange", onStoreChange);
 
   return () => {
-    window.removeEventListener('languagechange', onStoreChange);
+    window.removeEventListener("languagechange", onStoreChange);
   };
 }
 
@@ -24,9 +24,9 @@ function subscribe(onStoreChange: () => void): () => void {
  * const language = usePreferredLanguage('en-US');
  * ```
  */
-export function usePreferredLanguage(defaultLanguage = 'en'): string {
+export function usePreferredLanguage(defaultLanguage = "en"): string {
   const getSnapshot = useCallback((): string => {
-    if (typeof navigator === 'undefined' || !navigator.language) {
+    if (typeof navigator === "undefined" || !navigator.language) {
       return defaultLanguage;
     }
     return navigator.language;

@@ -1,9 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  EventListenerTarget,
-} from './useEventListener';
-import { useLatest } from './useLatest';
-import { resolveTargetElement } from '@/lib/utils';
+import { useEffect, useRef, useState } from "react";
+import { EventListenerTarget } from "./useEventListener";
+import { useLatest } from "./useLatest";
+import { resolveTargetElement } from "@/lib/utils";
 
 export interface UseHoverOptions {
   /** Delay in milliseconds before `isHovered` becomes `true` after `mouseenter` (default: `0`) */
@@ -31,7 +29,7 @@ export interface UseHoverOptions {
  */
 export function useHover<T extends HTMLElement = HTMLElement>(
   target: EventListenerTarget<T>,
-  options: UseHoverOptions = {}
+  options: UseHoverOptions = {},
 ): boolean {
   const { enterDelay = 0, leaveDelay = 0, onEnter, onLeave } = options;
 
@@ -47,10 +45,8 @@ export function useHover<T extends HTMLElement = HTMLElement>(
     }
   }
 
-  const enterTimerRef: { current: ReturnType<typeof setTimeout> | null } =
-    useRef(null);
-  const leaveTimerRef: { current: ReturnType<typeof setTimeout> | null } =
-    useRef(null);
+  const enterTimerRef: { current: ReturnType<typeof setTimeout> | null } = useRef(null);
+  const leaveTimerRef: { current: ReturnType<typeof setTimeout> | null } = useRef(null);
 
   useEffect(() => {
     const element = resolveTargetElement(target);
@@ -95,13 +91,13 @@ export function useHover<T extends HTMLElement = HTMLElement>(
       }
     };
 
-    element.addEventListener('mouseenter', handleMouseEnter);
-    element.addEventListener('mouseleave', handleMouseLeave);
+    element.addEventListener("mouseenter", handleMouseEnter);
+    element.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
       clearTimers();
-      element.removeEventListener('mouseenter', handleMouseEnter);
-      element.removeEventListener('mouseleave', handleMouseLeave);
+      element.removeEventListener("mouseenter", handleMouseEnter);
+      element.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, [target, enterDelay, leaveDelay, onEnterRef, onLeaveRef]);
 

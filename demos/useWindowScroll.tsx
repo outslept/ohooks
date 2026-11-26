@@ -1,63 +1,61 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { ArrowDown, ArrowUp, ArrowUpToLine } from "lucide-react"
-import { cn } from "cn"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useWindowScroll } from "@/hooks/useWindowScroll"
+import { useEffect, useRef, useState } from "react";
+import { ArrowDown, ArrowUp, ArrowUpToLine } from "lucide-react";
+import { cn } from "cn";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useWindowScroll } from "@/hooks/useWindowScroll";
 
-const THROTTLE_OPTIONS = [0, 100, 300] as const
+const THROTTLE_OPTIONS = [0, 100, 300] as const;
 
 export default function UseWindowScrollDemo() {
-  const [throttleIdx, setThrottleIdx] = useState(0)
-  const throttleMs = THROTTLE_OPTIONS[throttleIdx]
+  const [throttleIdx, setThrottleIdx] = useState(0);
+  const throttleMs = THROTTLE_OPTIONS[throttleIdx];
 
-  const { x, y, scrollTo } = useWindowScroll({ throttleMs })
-  const [isScrolling, setIsScrolling] = useState(false)
-  const [maxScroll, setMaxScroll] = useState(1)
-  const isFirstRender = useRef(true)
+  const { x, y, scrollTo } = useWindowScroll({ throttleMs });
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [maxScroll, setMaxScroll] = useState(1);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     const updateMaxScroll = () => {
-      const scrollable =
-        document.documentElement.scrollHeight - window.innerHeight
-      setMaxScroll(Math.max(1, scrollable))
-    }
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      setMaxScroll(Math.max(1, scrollable));
+    };
 
-    updateMaxScroll()
-    window.addEventListener("resize", updateMaxScroll, { passive: true })
-    return () => window.removeEventListener("resize", updateMaxScroll)
-  }, [])
+    updateMaxScroll();
+    window.addEventListener("resize", updateMaxScroll, { passive: true });
+    return () => window.removeEventListener("resize", updateMaxScroll);
+  }, []);
 
   useEffect(() => {
     if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
+      isFirstRender.current = false;
+      return;
     }
-    setIsScrolling(true)
-    const id = window.setTimeout(() => setIsScrolling(false), 160)
-    return () => window.clearTimeout(id)
-  }, [x, y])
+    setIsScrolling(true);
+    const id = window.setTimeout(() => setIsScrolling(false), 160);
+    return () => window.clearTimeout(id);
+  }, [x, y]);
 
-  const progress = Math.min(1, Math.max(0, y / maxScroll))
-  const translateY = (progress - 0.5) * 32
-  const roundedX = Math.round(x)
-  const roundedY = Math.round(y)
-  const atTop = roundedY <= 0
+  const progress = Math.min(1, Math.max(0, y / maxScroll));
+  const translateY = (progress - 0.5) * 32;
+  const roundedX = Math.round(x);
+  const roundedY = Math.round(y);
+  const atTop = roundedY <= 0;
 
   return (
     <Card className="w-full max-w-80">
       <CardContent className="flex flex-col gap-3 pt-4 pb-4">
         <div className="flex items-center justify-between">
-
           <div
             role="group"
             aria-label="Throttle interval"
             className="flex items-center rounded-sm border border-border-subtle bg-subtle/60 p-0.5"
           >
             {THROTTLE_OPTIONS.map((ms, idx) => {
-              const active = idx === throttleIdx
+              const active = idx === throttleIdx;
               return (
                 <button
                   key={ms}
@@ -67,12 +65,12 @@ export default function UseWindowScrollDemo() {
                     "rounded-[3px] px-1.5 py-0.5 font-mono text-2xs tabular-nums transition-colors",
                     active
                       ? "bg-control text-foreground shadow-control"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {ms}ms
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -141,9 +139,7 @@ export default function UseWindowScrollDemo() {
           size="compact"
           className="flex-1 font-mono tabular-nums"
           disabled={atTop}
-          onClick={() =>
-            scrollTo({ top: Math.max(0, y - 240), behavior: "smooth" })
-          }
+          onClick={() => scrollTo({ top: Math.max(0, y - 240), behavior: "smooth" })}
           leadingIcon={<ArrowUp />}
         >
           240px
@@ -168,5 +164,5 @@ export default function UseWindowScrollDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
