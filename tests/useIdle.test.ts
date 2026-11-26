@@ -1,70 +1,92 @@
-import { useInert } from '@/hooks/useInert';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { useIdle } from '@/hooks/useIdle';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe('useInert', () => {
-  let hostContainer: HTMLDivElement;
-  let targetEl: HTMLDivElement;
-  let siblingEl: HTMLDivElement;
-  let styleEl: HTMLStyleElement;
-
-  beforeEach(() => {
-    hostContainer = document.createElement('div');
-    targetEl = document.createElement('div');
-    hostContainer.appendChild(targetEl);
-    siblingEl = document.createElement('div');
-    styleEl = document.createElement('style');
-    document.body.append(hostContainer, siblingEl, styleEl);
-  });
-
+describe('useIdle', () => {
   afterEach(() => {
-    hostContainer.remove();
-    siblingEl.remove();
-    styleEl.remove();
+    vi.useRealTimers();
+    Reflect.deleteProperty(document, 'hidden');
   });
 
-  it('applies inert and aria-hidden, reference-counts concurrent locks, and restores pre-existing attributes on release', async () => {
-    targetEl.setAttribute('aria-hidden', 'false');
+  it('marks user as idle after timeout, resets on throttled activity or visible visibilitychange, and cleans up on unmount', async () => {
+    vi.useFakeTimers();
 
-    const lock1 = await renderHook(
-      (props?: { inert: boolean }) => useInert(targetEl, props?.inert ?? true),
-      { initialProps: { inert: true } }
-    );
-    const lock2 = await renderHook(() => useInert(targetEl, true));
-
-    expect(targetEl.hasAttribute('inert')).toBe(true);
-    expect(targetEl.getAttribute('aria-hidden')).toBe('true');
-
-
-    await lock1.rerender({ inert: false });
-    expect(targetEl.hasAttribute('inert')).toBe(true);
-    expect(targetEl.getAttribute('aria-hidden')).toBe('true');
-
-
-    await lock2.unmount();
-    expect(targetEl.hasAttribute('inert')).toBe(false);
-    expect(targetEl.getAttribute('aria-hidden')).toBe('false');
-    await lock1.unmount();
-  });
-
-  it('traps top-level body siblings while skipping target ancestors and script/style tags', async () => {
-    const { unmount } = await renderHook(() =>
-      useInert(targetEl, true, { trapSiblings: true })
+    const { result, act, unmount } = await renderHook(() =>
+      useIdle(1000, { throttleMs: 100 })
     );
 
+    expect(result.current).toBe(false);
 
-    expect(siblingEl.hasAttribute('inert')).toBe(true);
-    expect(siblingEl.getAttribute('aria-hidden')).toBe('true');
+    await act(async () => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(result.current).toBe(true);
 
+    await act(async () => {
+      window.dispatchEvent(new Event('mousemove'));
+    });
+    expect(result.current).toBe(false);
 
-    expect(targetEl.hasAttribute('inert')).toBe(false);
-    expect(hostContainer.hasAttribute('inert')).toBe(false);
-    expect(styleEl.hasAttribute('inert')).toBe(false);
+    await act(async () => {
+      vi.advanceTimersByTime(600);
+      window.dispatchEvent(new Event('keydown'));
+      vi.advanceTimersByTime(600);
+    });
+    expect(result.current).toBe(false);
+
+    await act(async () => {
+      vi.advanceTimersByTime(400);
+    });
+    expect(result.current).toBe(true);
+
+    Object.defineProperty(document, 'hidden', { value: true, configurable: true });
+    await act(async () => {
+      vi.advanceTimersByTime(200);
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    expect(result.current).toBe(true);
+
+    Object.defineProperty(document, 'hidden', { value: false, configurable: true });
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    expect(result.current).toBe(false);
 
     await unmount();
-    expect(siblingEl.hasAttribute('inert')).toBe(false);
-    expect(siblingEl.hasAttribute('aria-hidden')).toBe(false);
+    await act(async () => {
+      vi.advanceTimersByTime(2000);
+    });
+    expect(result.current).toBe(false);
+  });
+
+  it('supports initialState, custom events list, and unthrottled mode (throttleMs: 0)', async () => {
+    vi.useFakeTimers();
+
+    const { result, act } = await renderHook(() =>
+      useIdle(500, {
+        initialState: true,
+        events: ['click'],
+        throttleMs: 0,
+      })
+    );
+
+    expect(result.current).toBe(true);
+
+    await act(async () => {
+      window.dispatchEvent(new Event('mousemove'));
+    });
+    expect(result.current).toBe(true);
+
+    await act(async () => {
+      window.dispatchEvent(new Event('click'));
+    });
+    expect(result.current).toBe(false);
+
+    await act(async () => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(result.current).toBe(true);
   });
 });
