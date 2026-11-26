@@ -8,23 +8,34 @@ import { renderHook } from "vitest-browser-react";
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe("useIntersectionObserver", () => {
+  let rootEl: HTMLDivElement;
   let el: HTMLDivElement;
 
   beforeEach(() => {
+    rootEl = document.createElement("div");
+    rootEl.style.width = "100px";
+    rootEl.style.height = "100px";
+    rootEl.style.overflow = "auto";
+
     el = document.createElement("div");
     el.style.width = "50px";
     el.style.height = "50px";
-    document.body.appendChild(el);
+
+    rootEl.appendChild(el);
+    document.body.appendChild(rootEl);
   });
 
   afterEach(() => {
-    el.remove();
+    rootEl.remove();
   });
 
-  it("tracks intersection changes and stops observing after first intersection when freezeOnceVisible is true", async () => {
+  it("tracks intersection changes within root and stops observing after first intersection when freezeOnceVisible is true", async () => {
     const onChange = vi.fn();
+
     const { result, rerender } = await renderHook((props?: UseIntersectionObserverOptions) =>
       useIntersectionObserver(el, {
+        root: rootEl,
+        rootMargin: "0px",
         threshold: [0, 0.5],
         freezeOnceVisible: false,
         onChange,
@@ -50,9 +61,12 @@ describe("useIntersectionObserver", () => {
 
   it("does not observe when enabled is false or target is null", async () => {
     const onChange = vi.fn();
+
     const { result, rerender } = await renderHook(
       (props?: { target: Element | null; enabled: boolean }) =>
         useIntersectionObserver(props ? props.target : el, {
+          root: rootEl,
+          rootMargin: "0px",
           enabled: props?.enabled ?? false,
           onChange,
         }),

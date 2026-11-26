@@ -5,20 +5,28 @@ import { renderHook } from "vitest-browser-react";
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe("useInfiniteScroll", () => {
+  let rootEl: HTMLDivElement;
   let sentinel: HTMLDivElement;
 
   beforeEach(() => {
+    rootEl = document.createElement("div");
+    rootEl.style.width = "100px";
+    rootEl.style.height = "100px";
+    rootEl.style.overflow = "auto";
+
     sentinel = document.createElement("div");
     sentinel.style.width = "50px";
     sentinel.style.height = "50px";
-    document.body.appendChild(sentinel);
+
+    rootEl.appendChild(sentinel);
+    document.body.appendChild(rootEl);
   });
 
   afterEach(() => {
-    sentinel.remove();
+    rootEl.remove();
   });
 
-  it("triggers onLoadMore when sentinel intersects, tracks isLoading, and ignores concurrent calls", async () => {
+  it("triggers onLoadMore when sentinel intersects root, tracks isLoading, and ignores concurrent calls", async () => {
     let resolveLoad!: () => void;
     let notifyStarted!: () => void;
     const started = new Promise<void>((r) => {
@@ -37,7 +45,11 @@ describe("useInfiniteScroll", () => {
           notifyStarted();
           return loadGate;
         },
-        { threshold: [0, 0.5] },
+        {
+          root: rootEl,
+          rootMargin: "0px 0px 100px 0px",
+          threshold: [0, 0.5],
+        },
       ),
     );
 
@@ -71,7 +83,7 @@ describe("useInfiniteScroll", () => {
           () => {
             callCount += 1;
           },
-          props ?? { hasMore: false, enabled: true },
+          props ?? { root: rootEl, rootMargin: "0px", hasMore: false, enabled: true },
         ),
     );
 
@@ -80,13 +92,13 @@ describe("useInfiniteScroll", () => {
     });
     expect(callCount).toBe(0);
 
-    await rerender({ hasMore: true, enabled: false });
+    await rerender({ root: rootEl, rootMargin: "0px", hasMore: true, enabled: false });
     await act(async () => {
       await result.current.loadMore();
     });
     expect(callCount).toBe(0);
 
-    await rerender({ hasMore: true, enabled: true, target: null });
+    await rerender({ root: rootEl, rootMargin: "0px", hasMore: true, enabled: true, target: null });
     expect(result.current.isLoading).toBe(false);
   });
 
@@ -101,10 +113,14 @@ describe("useInfiniteScroll", () => {
     });
 
     const { result, act, unmount } = await renderHook(() =>
-      useInfiniteScroll(sentinel, () => {
-        notifyStarted();
-        return loadGate;
-      }),
+      useInfiniteScroll(
+        sentinel,
+        () => {
+          notifyStarted();
+          return loadGate;
+        },
+        { root: rootEl, rootMargin: "0px" },
+      ),
     );
 
     await act(async () => {
@@ -113,6 +129,7 @@ describe("useInfiniteScroll", () => {
     expect(result.current.isLoading).toBe(true);
 
     await unmount();
+
     await act(async () => {
       resolveLoad();
       await loadGate;
