@@ -28,7 +28,6 @@
   },
   "type": "module",
   "scripts": {
-    "postinstall": "fumadocs-mdx",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
