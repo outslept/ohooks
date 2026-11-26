@@ -60,7 +60,7 @@ jobs:
           key: playwright-${{ runner.os }}-${{ matrix.browser }}-${{ hashFiles('pnpm-lock.yaml') }}
       - name: install playwright browser & deps (cache miss)
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+        run: pnpm exec playwright install --with-deps --only-shell ${{ matrix.browser }}
       - name: install playwright os deps only (cache hit)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: pnpm exec playwright install-deps ${{ matrix.browser }}
