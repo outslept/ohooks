@@ -1,16 +1,25 @@
+import { createHighlights } from "fumadocs-core/highlight/highlights";
+import { rehypeCodeFromHighlighter } from "fumadocs-core/mdx-plugins/rehype-code.core";
 import { createMDX } from "fumadocs-mdx/next";
-import pierreDark from "@pierre/theme/pierre-dark-vibrant";
-import pierreLight from "@pierre/theme/pierre-light-vibrant";
+import { pierreDark, pierreLight } from "@pierre/highlights/themes";
+
+const highlighter = createHighlights({
+  themes: {
+    light: pierreLight,
+    dark: pierreDark,
+  },
+});
 
 const withMDX = createMDX({
   mdxOptions: {
-    rehypeCodeOptions: {
-      themes: {
-        light: pierreLight,
-        dark: pierreDark,
-      },
-      defaultColor: false,
-    },
+    rehypeCodeOptions: false,
+    rehypePlugins: (v) => [
+      () =>
+        rehypeCodeFromHighlighter(({ transformers }) =>
+          highlighter.override({ shikiTransformers: transformers }),
+        ),
+      ...v,
+    ],
   },
 });
 
